@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>О компании | TopDisk</title>
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/bootstrap-grid.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+    <header class="header">
+        <div class="container">
+            <!-- ВЕРХНЯЯ ПОЛОСА --------------------------------------------------- -->
+            <div class="header__top">
+                <div class="header__row">
+                    <!-- Навигация слева -->
+                    <nav class="header__nav">
+                        <ul class="header__nav-list">
+                            <li class="header__nav-item"><a href="#">О компании</a></li>
+                            <li class="header__nav-item"><a href="#">Поставщикам</a></li>
+                            <li class="header__nav-item"><a href="#">Доставка и оплата</a></li>
+                            <li class="header__nav-item"><a href="#">Трейд-ин</a></li>
+                            <li class="header__nav-item"><a href="#">Возврат</a></li>
+                            <li class="header__nav-item"><a href="#">Контакты</a></li>
+                        </ul>
+                    </nav>
+
+                    <!-- «Обратный звонок» + телефон (в одну строку, 44 px) -->
+                    <div class="header__contacts">
+                        <a href="#" class="header__callback">Обратный звонок</a>
+                        <a href="tel:+78005002141" class="header__phone">8 (800) 500-21-41</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- НИЖНЯЯ ПОЛОСА ---------------------------------------------------- -->
+            <div class="header__bottom">
+                <div class="header__row">
+                    <!-- Логотип -->
+                    <a href="/" class="header__logo"><img src="img/header/logo.png" alt="logo"></a>
+
+                    <!-- Каталог (строго +45 px от лого) -->
+                    <button class="header__catalog">
+                        <span class="header__catalog-icon"><img src="img/header/burger.png" alt="Каталог"></span>
+                        <span class="header__catalog-text">Каталог</span>
+                    </button>
+
+                    <!-- Поиск (+20 px от каталога, тянется) -->
+                    <form class="header__search">
+                        <button class="header__search-btn" aria-label="Найти"></button>
+                        <input type="search" class="header__search-input" placeholder="Поиск по каталогу">
+
+                    </form>
+
+                    <!-- Иконки действий справа -->
+                    <ul class="header__actions">
+                        <li class="header__action header__action--account">
+                            <a href="#" aria-label="Кабинет"><img src="img/header/user.png"
+                                    src="Кабинет"><span>Кабинет</span></a>
+                        </li>
+                        <li class="header__action header__action--compare">
+                            <a href="#" aria-label="Сравнение"><img src="img/header/ves.png"
+                                    src="Сравнение"><span>Сравнение</span></a>
+                        </li>
+                        <li class="header__action header__action--favorite">
+                            <a href="#" aria-label="Избранное"><img src="img/header/heart.png"
+                                    src="Избранное"><span>Избранное</span></a>
+                        </li>
+                        <li class="header__action header__action--cart">
+                            <a href="#" aria-label="Корзина"><img src="img/header/cart.png"
+                                    src="Корзина"><span>Корзина</span></a>
+                        </li>
+                    </ul>
+
+
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="breadcrumbs">
+        <div class="container">
+            <ul class="breadcrumbs-list">
+                <li class="breadcrumbs-item">
+                    <a class="breadcrumbs-link" href="#">Главная</a>
+                </li>
+                <li class="breadcrumbs-item">
+                    <a class="breadcrumbs-link" href="#">О нас</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page delivery-page">
+            <nav class="sidebar">
+                <ul class="sidebar__list">
+                    <li class="sidebar__item"><a class="sidebar__link" href="about.html">О компании</a></li>
+                    <li class="sidebar__item"><a class="sidebar__link" href="contacts.html">Контакты</a></li>
+                    <li class="sidebar__item"><a class="sidebar__link" href="#">Поставщикам</a></li>
+                    <li class="sidebar__item"><a class="sidebar__link" href="#">Оптовикам</a></li>
+                    <li class="sidebar__item"><a class="sidebar__link" href="#">Возврат</a></li>
+                    <li class="sidebar__item"><a class="sidebar__link" href="#">Трейд‑ин</a></li>
+                    <li class="sidebar__item"><a class="sidebar__link sidebar__link--active" href="delivery.html">Доставка и
+                            оплата</a>
+                    </li>
+                    <li class="sidebar__item"><a class="sidebar__link" href="#">Клубная карта</a></li>
+                    <li class="sidebar__item"><a class="sidebar__link" href="#">Обмен и возврат</a></li>
+                    <li class="sidebar__item"><a class="sidebar__link" href="#">Гарантия низкой цены</a></li>
+                </ul>
+            </nav>
+
+            <main class="page__main">
+                <!-- ========================= Доставка ========================= -->
+                <h1>Доставка Top Disc</h1>
+
+                <section class="pickup">
+                    <h2>Самовывоз</h2>
+                    <p>Забрать заказ можно через 15 минут после его оформления на сайте, в рабочее время.</p>
+                    <div class="pickup__map">
+                        <!-- Embed карта — замените src на актуальный -->
+                        <iframe
+                            src="https://yandex.ru/map-widget/v1/?um=constructor%3Ac93884cf59e976738da5f3c4be4cc7411e578827b3014ae7787ce0351a9f8c1b&amp;source=constructor"
+                            width="100%" height="240" frameborder="0"></iframe>
+                    </div>
+                </section>
+
+                <section class="delivery-options">
+                    <!-- 1. Доставка по Пензе -->
+                    <aside class="city-delivery">
+                        <div class="city-delivery__header">
+
+                            <h3 class="city-delivery__title">Доставка по Пензе</h3>
+                            <img src="/img/delivery/1.png" alt="Грузовик Top Disc" />
+                        </div>
+
+                        <!-- Accordions -->
+                        <details class="accordion">
+                            <summary>Доставим за 2 часа!</summary>
+
+                        </details>
+
+                        <details class="accordion">
+                            <summary>Грузовая доставка по Пензе</summary>
+
+                        </details>
+
+                        <details class="accordion">
+                            <summary>Юридическая информация</summary>
+
+                        </details>
+                    </aside>
+
+                    <!-- 2. Доставка в регионы -->
+                    <div class="region-delivery">
+                        <h3>Доставка в регионы</h3>
+                        <p>
+                            Отправка товара в другие регионы производится на 1‑2 день с момента зачисления денег
+                            на наш счёт. При оформлении заказа доступны несколько способов доставки. В регионы возможна
+                            доставка по всей России транспортными компаниями «СДЭК», «ПЭК», «Boxberry» или курьерской
+                            службой.
+                            Способ доставки необходимо выбрать при оформлении заказа. После оформления наши менеджеры
+                            свяжутся с вами по телефону для уточнения деталей.
+                        </p>
+                        <div class="region-delivery__logos">
+                            <img src="/img/delivery/sdek.png" alt="CДЭК" />
+
+                        </div>
+                        <p class="region-delivery__note"><strong>*</strong>Сумма доставки будет известна при оформлении
+                            заказа</p>
+                    </div>
+                </section>
+
+                <!-- ========================= Оплата ========================= -->
+                <section class="payment-section">
+                    <h3 class="payment-section__title">Оплата Top Disc</h3>
+                    <p class="payment-section__subtitle">
+                        Способ оплаты любого заказа вы выбираете при его оформлении. Оплата в Интернет‑магазине
+                        производится
+                        только в рублях. После подтверждения заказа оператором интернет‑магазина способ оплаты изменен
+                        быть
+                        не может.
+                    </p>
+
+                    <!-- Оплата при получении -->
+                    <div class="payment-card">
+                        <h3>Оплата при получении</h3>
+                        <p>Наличный расчет<bR>
+                            Самый распространенный и удобный способ оплаты покупок. <br>
+                            Оплата банковской картой при самовывозе<br>
+                            Оплата банковской картой курьеру
+                        </p>
+                        <p><strong>К оплате принимаются банковские карты Мир, Visa и MasterCard:</strong><br>
+                            Оплата заказа производится в непосредственно в магазине.<br>
+                            В случае, если Вы оплатили заказ банковской карточкой и затем отказались от него,
+                            возврат<br> переведенных средств производится на Ваш банковский (карточный) счет.</p>
+                        <p>
+                            <strong>При оплате курьеру принимаются банковские карты Мир, Visa и MasterCard, а также
+                                наличная оплата:</strong><br>
+                            Оплата заказа производится в непосредственно курьеру. Оплата заказа производится
+                            в непосредственно<br> курьеру. Оплата заказа производится в непосредственно курьеру.
+                        </p>
+                    </div>
+
+                    <!-- Оплата картой на сайте -->
+                    <div class="payment-card payment-card--green">
+                        <h3>Оплата с помощью банковской карты на сайте</h3>
+                        <div class="payment-card__flex">
+                            <div class="payment-card__flex-left">
+
+                                <p>Для выбора оплаты товара с помощью банковской карты на соответствующей странице сайта
+                                    необходимо нажать кнопку «Оплата банковской картой».</p>
+                                <p>
+                                    Оплата происходит через авторизационный сервер Процессингового центра Банка с
+                                    использованием Банковских кредитных карт следующих платежных систем:
+                                </p>
+                                <ul class="check-list">
+                                    <li>Мир</li>
+                                    <li>VISA International</li>
+                                    <li>MasterCard World Wide</li>
+                                </ul>
+                            </div>
+                            <div class="payment-card__illustration">
+                                <img src="img/delivery/2.png" alt="Скриншот формы оплаты" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Процессы и гарантии -->
+                    <div class="payment-card payment-card-process">
+                        <div class="payment-card-process_block">
+                            <h3>Описание процесса передачи данных</h3>
+                            <p>
+                                Для оплаты покупки Вы будете перенаправлены на платежный шлюз для ввода реквизитов Вашей
+                                карты. Пожалуйста, приготовьте Вашу пластиковую карту заранее. Соединение с платежным
+                                шлюзом и передача информации осуществляется в защищенном режиме с использованием
+                                протокола шифрования SSL.
+                            </p>
+                            <p>В случае если Ваш банк поддерживает технологию безопасного проведения интернет-платежей
+                                Verified By Visa или MasterCard Secure Code для проведения платежа также может
+                                потребоваться ввод специального пароля. Способы и возможность получения паролей для
+                                совершения интернет-платежей Вы можете уточнить в банке, выпустившем карту.</p>
+                            <p>Настоящий сайт поддерживает 258-битное шифрование. Конфиденциальность сообщаемой
+                                персональной информации обеспечивается ПАО "Сбербанк России". Введенная информация не
+                                будет предоставлена третьим лицам за исключением случаев, предусмотренных
+                                законодательством РФ. Проведение платежей по банковским картам осуществляется в строгом
+                                соответствии с требованиями платежных систем Visa Int. и MasterCard Europe Sprl.</p>
+                        </div>
+                        <div class="payment-card-process_block">
+                            <h3>Описание процессa оплаты</h3>
+                            <p>
+                                При выборе формы оплаты с помощью пластиковой карты проведение платежа по заказу
+                                производится непосредственно после его оформления. После завершения оформления заказа в
+                                нашем магазине,
+                                Вы должны будете нажать на кнопку «Оплата банковской картой», при этом система
+                                переключит Вас
+                                на страницу авторизационного сервера, где Вам будет предложено ввести данные пластиковой
+                                карты, инициировать ее авторизацию, после чего вернуться в наш магазин кнопкой
+                                "Вернуться в магазин".
+                                После того, как Вы возвращаетесь в наш магазин, система уведомит Вас о результатах
+                                авторизации.
+                                В случае подтверждения авторизации Ваш заказ будет автоматически выполняться в
+                                соответствии с заданными Вами условиями. В случае отказа в авторизации карты Вы сможете
+                                повторить процедуру оплаты.</p>
+                        </div>
+                        <div class="payment-card-process_block">
+                            <h3>При аннулировании заказа</h3>
+                            <p>
+                                При аннулировании позиций из оплаченного заказа (или при аннулировании заказа целиком)
+                                Вы можете заказать другой товар на эту сумму, либо вернуть всю сумму на карту
+                                предварительно написав письмо на e-mail.</p>
+                        </div>
+                        <div class="payment-card-process_block">
+                            <h3>Могу ли я отменить заказ?</h3>
+                            <p>
+                                Если вы оформили заказ, но еще не получили его, то такой заказ можно без проблем
+                                отменить. Если товар уже был оплачен, то денежные средства вернутся обратно.</p>
+                        </div>
+
+                    </div>
+
+                    <div class="payment-card payment-card--green payment-card-garant">
+                        <h3>Гарантийные обязательства</h3>
+                        <p>
+                            Гарантийное обслуживание оборудования в течение всего гарантийного срока осуществляется
+                            авторизованными сервисными центрами соответствующих фирм-изготовителей. Адреса сервисных
+                            центров Вы можете найти на соответствующей странице нашего сайта. Обязательным условием
+                            выполнения гарантийного ремонта является наличие гарантийного талона , в котором должны бать
+                            заполнены графы с наименованием товара, гарантийным сроком, датой продажи и серийным номером
+                            устройства.
+                        </p>
+                    </div>
+
+                    <!-- Visa -->
+                    <div class="payment-card">
+                        <h3>Оплата по банковским картам VISA</h3>
+                        <div class="payment-card-row">
+                            <div class="cards-info__images">
+                                <img src="img/delivery/3.png" alt="Visa Electron" />
+
+                            </div>
+                            <p>
+                                К оплате принимаются все виды платежных карточек VISA, за исключением Visa Electron. В
+                                большинстве случаев карта Visa Electron не применима для оплаты через интернет, за
+                                исключением карт, выпущенных отдельными банками.
+                                О возможность оплаты картой Visa Electron вам нужно выяснять у банка-эмитента вашей
+                                карты.
+                            </p>
+                        </div>
+
+
+                        <h3>Оплата по кредитным картам MasterCard</h3>
+                        <p>На сайте к оплате принимаются все виды MasterCard.</p>
+                        <div class="cards-info__images cards-info__images-cards">
+                            <img src="/img/delivery/4.png" class="d-none d-md-flex">
+                            <img src="/img/delivery/4mob.png " class="d-flex d-md-none" style="max-width: 354px;">
+                        </div>
+                        <p class="payment-subtitle">Что нужно знать:</p>
+                        <ul class="check-list pin-check">
+                            <li>номер вашей кредитной карты;</li>
+                            <li>cрок окончания действия вашей кредитной карты, месяц/год;</li>
+                            <li>CVV код для карт Visa / CVC код для Master Card:<br>
+                                3 последние цифры на полосе для подписи на обороте карты.</li>
+                        </ul>
+                        <div class="d-flex row-cards-2" style="gap: 30px; align-items: center;">
+                            <div class="cards-info__images d-md-flex d-none " style="max-width: 292px; padding-left: 26px; width: 100%;min-width: 292px;">
+                                <img src="img/delivery/5.png" alt="Мир" />
+                            </div>
+                            <p>
+                                Если на вашей карте код CVC / CVV отсутствует, то, возможно, карта не пригодна для CNP
+                                транзакций (т.е. таких транзакций, при которых сама карта не присутствует, а используются её
+                                реквизиты), и вам следует обратиться в банк для получения подробной информации.
+                            </p>
+                        </div>
+                        <h3>Оплата по банковским картам МИР</h3>
+                        <p>К оплате принимаются все виды платежных карточек МИР. К оплате принимаются все виды платежных
+                            карточек МИР. К оплате принимаются все виды платежных карточек МИР.</p>
+                        <div class="cards-info__images mir-img">
+                            <img src="img/delivery/6.png" alt="Мир" />
+
+                        </div>
+
+                    </div>
+                    <div class="payment-card payment-card--green payment-card--green-visa">
+                        <h3>Оплата заказов банковскими картами сбербанка</h3>
+
+                        <p><strong>Как оплатить банковской картой.</strong>
+                            По кнопке "Перейти на сайт платежной системы СБЕРБАНК" Вы будете перенаправлены на платежный
+                            шлюз ПАО "Сбербанк России", где Вы сможете указать реквизиты Вашей банковской карты.
+                            Соединение с платежным шлюзом и передача параметров Вашей пластиковой карты осуществляется в
+                            защищенном режиме с использованием 128-битного протокола шифрования SSL.
+                        </p>
+                        <div class="cards-info__images cards-info__images-visa">
+                            <img src="img/delivery/7.png" alt="Visa" />
+
+                        </div>
+                        <p>Если Банк-Эмитент вашей пластиковой карты поддерживает технологию безопасного проведения
+                            интернет-платежей Verified By VISA или MasterCard SecureCode, будьте готовы указать
+                            специальный пароль, необходимый для успешной оплаты. Способы и возможность получения пароля
+                            для совершения интернет-платежа Вы можете уточнить в банке, выпустившем Вашу карту.</p>
+                        <p>При выборе формы оплаты с помощью банковской карты проведение платежа по заказу производится
+                            непосредственно после подтверждения его менеджером. После подтверждения заказа менеджером,
+                            Вы должны будете зайти в личный кабинет вашего заказа (по 20-значному уникальному номеру
+                            заказа, полученному при оформлении) и нажать на кнопку «Оплата банковской картой», при этом
+                            система переведёт Вас на страницу авторизационного сервера Сбербанка, где Вам будет
+                            предложено ввести данные пластиковой карты, инициировать ее авторизацию, после чего вы
+                            сможете вернуться в наш магазин кликом по кнопке "Вернуться в магазин". После возвращения в
+                            наш магазин, система уведомит Вас о результатах авторизации.</p>
+                        <p>До получения успешного подтверждения платежа Ваш заказ будет находиться в режиме ожидания,
+                            после пяти дней ожидания получения оплаты заказ будет автоматически аннулирован. После
+                            успешного подтверждения платежа Ваш заказ будет переведен в режим доставки по указанному
+                            адресу. В случае отказа в авторизации карты Вы сможете повторить процедуру оплаты.</p>
+                        <p>На оформление платежа Сбербанком выделяется 20 минут, поэтому, пожалуйста, приготовьте Вашу
+                            пластиковую карту заранее. Если Вам не хватит выделенного на оплату времени или в случае
+                            отказа в авторизации карты Вы сможете повторить процедуру оплаты.</p>
+                        <p>Конфиденциальность сообщаемой персональной информации обеспечивается ПАО "Сбербанк России".
+                            Введенная информация не будет предоставлена третьим лицам за исключением случаев,
+                            предусмотренных законодательством РФ. Проведение платежей по банковским картам
+                            осуществляется в строгом соответствии с требованиями платежных системVisa Int. и MasterCard
+                            Europe Sprl.</p>
+                    </div>
+                    <!-- Отмена заказа -->
+                    <div class="payment-card">
+                        <h3>Отмена заказа</h3>
+                        <p>
+                            При удалении товаров из оплаченного заказа или при аннулировании заказа целиком Вы можете
+                            заказать другой товар на такую же сумму, либо полностью вернуть всю сумму на карту с помощью
+                            Вашего менеджера.
+                        </p>
+                        <p>
+                            <strong>Доставка и выдача заказа, оплаченного пластиковй картой.</strong><br>
+                            Доставка или выдача при самовывозе товара, оплаченного пластиковой картой, осуществляется со
+                            дня зачисления денег на наш счет.
+                        </p>
+                        <p>Частные покупатели для получения товара должны предъявить паспорт владельца пластиковой
+                            карты, по которой производилась оплата заказа.</p>
+                        <p>Представитель юридического лица должен иметь доверенность с печатью от компании-плательщика
+                            или саму печать.</p>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+    <footer class="mobile-bar">
+
+
+        <!-- BOTTOM NAV -->
+        <nav class="mobile-nav">
+            <a class="mobile-nav__item nav-main">
+                <span>Главная</span>
+            </a>
+            <a class="mobile-nav__item nav-cart">
+                <span>Корзина</span>
+            </a>
+            <a class="mobile-nav__item nav-favorite">
+                <span>Избранное</span>
+            </a>
+            <a class="mobile-nav__item is-active nav-catalog">
+                <span>Каталог</span>
+            </a>
+            <a class="mobile-nav__item nav-user">
+                <span>Кабинет</span>
+            </a>
+        </nav>
+
+    </footer>
+    <footer>
+        <div class="container">
+            <div class="footer__row">
+                <div class="footer__left">
+                    <a href="/"><img src="/img/footer/logo.png" alt="logo" class="footer__logo"></a>
+                    <div class="footer__text">Индивидуальный Предприниматель<br>Ханакин Павел Алексеевич</div>
+                    <div class="footer__data">
+                        <div class="footer__data-item">ОГРНИП <span>304583636600069</span></div>
+
+                        <div class="footer__data-item">ИНН <span>583609230963</span></div>
+                    </div>
+                    <div class="footer__copyright">
+                        © 2007-2024 Top Disc.<br>Все права защищены
+                    </div>
+                </div>
+                <div class="footer__right">
+                    <div class="footer__top"></div>
+                    <div class="footer__bottom">
+                        <div class="footer__nav">
+                            <div class="footer__nav-left">
+                                <div class="footer__title">Компания</div>
+                                <nav>
+                                    <ul>
+                                        <li><a href="#">О нас</a></li>
+                                        <li><a href="#">Бренды</a></li>
+                                        <li><a href="#">Поставщикам</a></li>
+                                        <li><a href="#">Оптовикам</a></li>
+                                        <li><a href="#">Вакансии</a></li>
+                                        <li><a href="#">Контакты</a></li>
+                                    </ul>
+                                </nav>
+                            </div>
+                            <div class="footer__nav-right">
+                                <div class="footer__title">Покупателям</div>
+                                <nav>
+                                    <ul>
+                                        <li><a href="#">Статьи</a></li>
+                                        <li><a href="#">Клубная карта</a></li>
+                                        <li><a href="#">Доставка</a></li>
+                                        <li><a href="#">Оплата</a></li>
+                                        <li><a href="#">Обмен и возврат</a></li>
+                                        <li><a href="#">Трейд-ин</a></li>
+                                        <li><a href="#">Гарантия низкой цены</a></li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                        <div class="footer__contacts">
+                            <div class="footer__contacts-left">
+                                <div class="footer__title">Контакты</div>
+                                <a class="footer__phone" href="tel:8(800)500-21-41">8 (800) 500-21-41</a>
+                                <div class="footer__address">Пенза, улица Ставского, 4, корп. 1</div>
+                                <div class="footer__worktime">Ежедневно 9:00-21:00</div>
+                                <button class="callback_btn">
+                                    Обратный звонок
+                                </button>
+                            </div>
+                            <div class="footer__contacts-right">
+                                <div class="footer__socials-row">
+                                    <a href="#" class="footer__socials-item">
+                                        <img src="img/footer/wp.svg" alt="whatsapp">
+                                    </a>
+                                    <a href="#" class="footer__socials-item">
+                                        <img src="img/footer/tg.svg" alt="telegram">
+                                    </a>
+                                    <a href="#" class="footer__socials-item">
+                                        <img src="img/footer/mail.svg" alt="mail">
+                                    </a>
+                                    <a href="#" class="footer__socials-item">
+                                        <img src="img/footer/vk.svg" alt="vk">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=5cac17b6-1a2d-41ba-bdf4-1a42146f3768"
+        type="text/javascript"></script>
+    <script src="js/script.js"></script>
+</body>
+
+</html>

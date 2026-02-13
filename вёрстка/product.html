@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Товар | TopDisk</title>
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/bootstrap-grid.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            padding-bottom: 178px;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="header">
+        <div class="container">
+            <!-- ВЕРХНЯЯ ПОЛОСА --------------------------------------------------- -->
+            <div class="header__top">
+                <div class="header__row">
+                    <!-- Навигация слева -->
+                    <nav class="header__nav">
+                        <ul class="header__nav-list">
+                            <li class="header__nav-item"><a href="#">О компании</a></li>
+                            <li class="header__nav-item"><a href="#">Поставщикам</a></li>
+                            <li class="header__nav-item"><a href="#">Доставка и оплата</a></li>
+                            <li class="header__nav-item"><a href="#">Трейд-ин</a></li>
+                            <li class="header__nav-item"><a href="#">Возврат</a></li>
+                            <li class="header__nav-item"><a href="#">Контакты</a></li>
+                        </ul>
+                    </nav>
+
+                    <!-- «Обратный звонок» + телефон (в одну строку, 44 px) -->
+                    <div class="header__contacts">
+                        <a href="#" class="header__callback">Обратный звонок</a>
+                        <a href="tel:+78005002141" class="header__phone">8 (800) 500-21-41</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- НИЖНЯЯ ПОЛОСА ---------------------------------------------------- -->
+            <div class="header__bottom">
+                <div class="header__row">
+                    <!-- Логотип -->
+                    <a href="/" class="header__logo"><img src="img/header/logo.png" alt="logo"></a>
+
+                    <!-- Каталог (строго +45 px от лого) -->
+                    <button class="header__catalog">
+                        <span class="header__catalog-icon"><img src="img/header/burger.png" alt="Каталог"></span>
+                        <span class="header__catalog-text">Каталог</span>
+                    </button>
+
+                    <!-- Поиск (+20 px от каталога, тянется) -->
+                    <form class="header__search">
+                        <button class="header__search-btn" aria-label="Найти"></button>
+                        <input type="search" class="header__search-input" placeholder="Поиск по каталогу">
+
+                    </form>
+
+                    <!-- Иконки действий справа -->
+                    <ul class="header__actions">
+                        <li class="header__action header__action--account">
+                            <a href="#" aria-label="Кабинет"><img src="img/header/user.png"
+                                    src="Кабинет"><span>Кабинет</span></a>
+                        </li>
+                        <li class="header__action header__action--compare">
+                            <a href="#" aria-label="Сравнение"><img src="img/header/ves.png"
+                                    src="Сравнение"><span>Сравнение</span></a>
+                        </li>
+                        <li class="header__action header__action--favorite">
+                            <a href="#" aria-label="Избранное"><img src="img/header/heart.png"
+                                    src="Избранное"><span>Избранное</span></a>
+                        </li>
+                        <li class="header__action header__action--cart">
+                            <a href="#" aria-label="Корзина"><img src="img/header/cart.png"
+                                    src="Корзина"><span>Корзина</span></a>
+                        </li>
+                    </ul>
+
+
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="breadcrumbs">
+        <div class="container">
+            <ul class="breadcrumbs-list">
+                <li class="breadcrumbs-item">
+                    <a class="breadcrumbs-link" href="#">Главная</a>
+                </li>
+                <li class="breadcrumbs-item">
+                    <a class="breadcrumbs-link" href="#">Каталог</a>
+                </li>
+                <li class="breadcrumbs-item">
+                    <a class="breadcrumbs-link" href="#">Смартфоны и гаджеты</a>
+                </li>
+                <li class="breadcrumbs-item">
+                    <a class="breadcrumbs-link" href="#">Смартфоны</a>
+                </li>
+                <li class="breadcrumbs-item">
+                    <a class="breadcrumbs-link" href="#">Смартфоны Apple Iphone</a>
+                </li>
+                <li class="breadcrumbs-item">
+                    <a class="breadcrumbs-link" href="#">Смартфоны Apple Iphone 16</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="container">
+        <div class="product-info">
+
+
+            <!-- ==============  GALLERY  ============== -->
+            <div class="product-gallery">
+                <div class="desktop-hidden product__action-btns">
+                    <div class="arrow-back">
+                        <a href="/index.html" class="action-btn back" aria-label="назад"></a>
+
+                    </div>
+                    <div class="catalog__main-item-action-buttons ">
+                        <button class="action-btn favorite" type="button" aria-label="Добавить в избранное"></button>
+
+                        <button class="action-btn compare" type="button" aria-label="Добавить к сравнению"></button>
+                    </div>
+                </div>
+                <!-- миниатюры (desktop) -->
+                <div class="product-gallery__thumbs swiper">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide"><img src="/img/product/iphone/slider.png" alt=""></div>
+                        <div class="swiper-slide"><img src="/img/product/iphone/main.png" alt=""></div>
+                        <div class="swiper-slide"><img src="/img/product/iphone/slider.png" alt=""></div>
+                        <div class="swiper-slide"><img src="/img/product/iphone/slider.png" alt=""></div>
+                        <div class="swiper-slide"><img src="/img/product/iphone/slider.png" alt=""></div>
+                    </div>
+                </div>
+
+                <!-- большой слайдер -->
+                <div class="product-gallery__main">
+                    <button class="gallery-nav gallery-prev" aria-label="prev"></button>
+
+                    <div class="swiper product-gallery__swiper">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide"><img src="/img/product/iphone/slider.png" alt=""></div>
+                            <div class="swiper-slide"><img src="/img/product/iphone/main.png" alt=""></div>
+                            <div class="swiper-slide"><img src="/img/product/iphone/slider.png" alt=""></div>
+                            <div class="swiper-slide"><img src="/img/product/iphone/slider.png" alt=""></div>
+                            <div class="swiper-slide"><img src="/img/product/iphone/slider.png" alt=""></div>
+                        </div>
+
+                        <!-- точки для мобилки -->
+                        <div class="swiper-pagination"></div>
+                    </div>
+
+                    <button class="gallery-nav gallery-next" aria-label="next"></button>
+                </div>
+
+            </div>
+            <div class="product">
+                <!-- заголовок + бейджи -->
+                <header class="product__header">
+                    <diV class="product__row-badge">
+                        <span class="product__badge product__badge--hit">Хит</span>
+                        <span class="product__bonus mobile-hidden">740
+                            <img class="catalog__main-score-img" alt="Score" src="/img/header/score.png">
+                        </span>
+                    </diV>
+                    <h1 class="product__title">
+                        Apple iPhone 15 Pro dual-SIM 256 ГБ, «титановый чёрный»
+                        <span class="product__bonus desktop-hidden">740 <img class="catalog__main-score-img" alt="Score"
+                                src="/img/header/score.png"></span>
+                    </h1>
+
+                </header>
+                <!-- ЦЕНА -->
+                <div class="product__price-block desktop-hidden">
+                    <span class="product__price">76 990 ₽</span>
+                    <del class="product__old-price">124 990 ₽</del>
+                </div>
+                <!-- рейтинг / артикул -->
+                <div class="product__meta">
+                    <span class="product__sku">Артикул: 20237586</span>
+                    <div class="product__meta-right">
+                        <span class="product__rating">
+                            <img src="/img/star.png" alt="star">
+                            5.0
+                        </span>
+                        <div class="catalog__main-item-action-buttons mobile-hidden">
+                            <button class="action-btn favorite" type="button"
+                                aria-label="Добавить в избранное"></button>
+
+                            <button class="action-btn compare" type="button" aria-label="Добавить к сравнению"></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="product__options">
+                    <!-- ВЫБОР ЦВЕТА -->
+                    <div class="product__option">
+                        <span class="product__option-label">Цвет:</span>
+
+                        <div class="product__switches" data-switch="color">
+                            <button class="product__switch is-active" data-value="black" style="--sw-color:#272826"
+                                aria-label="Чёрный"></button>
+                            <button class="product__switch" data-value="beige" style="--sw-color:#ABA69B"
+                                aria-label="Бежевый"></button>
+                        </div>
+                    </div>
+
+                    <!-- ВЫБОР ПАМЯТИ -->
+                    <div class="product__option product__option--storage">
+                        <span class="product__option-label">Память:</span>
+
+                        <div class="product__switches product__switches--storage" data-switch="storage">
+                            <button class="product__switch is-active" data-value="128">128 ГБ</button>
+                            <button class="product__switch" data-value="256">256 ГБ</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- ЦЕНА -->
+                <div class="product__price-block mobile-hidden">
+                    <span class="product__price">76 990 ₽</span>
+                    <del class="product__old-price">124 990 ₽</del>
+                </div>
+
+                <!-- КНОПКИ -->
+                <div class="product__actions mobile-hidden">
+                    <button class="product__btn product__btn--primary">Добавить в корзину</button>
+                    <button class="product__btn product__btn--outline">Купить в 1 клик</button>
+                </div>
+
+            </div>
+
+        </div>
+        <div class="product-banners">
+            <div class="banner1">
+                <div class="banner1-text">
+                    Кредит или рассрочка от
+                </div>
+                <div class="banner1-price">
+                    4 026 ₽/мес
+                </div>
+            </div>
+            <div class="banner2">
+                <div class="banner2-text">
+                    Нашли<br>
+                    дешевле?
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--  product-specs  -->
+    <section class="product-specs">
+        <div class="container">
+
+            <!-- Заголовок (на мобилке раскрывает / скрывает блок) -->
+            <button class="specs__header" type="button" data-specs-toggle>
+                <h2 class="specs__title">Характеристики</h2>
+                <span class="specs__arrow"></span>
+            </button>
+
+            <!-- Тело -->
+            <div class="specs__body">
+                <dl class="specs__list">
+                    <div class="specs__row">
+                        <dt>Бренд</dt>
+                        <dd>Apple</dd>
+                    </div>
+                    <div class="specs__row">
+                        <dt>Диагональ экрана</dt>
+                        <dd>6.1″</dd>
+                    </div>
+                    <div class="specs__row">
+                        <dt>Разрешение экрана</dt>
+                        <dd>2556×1179</dd>
+                    </div>
+                    <div class="specs__row">
+                        <dt>Тип экрана</dt>
+                        <dd>Super Retina XDR</dd>
+                    </div>
+                    <div class="specs__row">
+                        <dt>Встроенная память</dt>
+                        <dd>128 ГБ</dd>
+                    </div>
+
+                    <!-- дополнительные характеристики (скрыты до клика «все…») -->
+                    <div class="specs__row specs__row--extra">
+                        <dt>Процессор</dt>
+                        <dd>A17 Pro</dd>
+                    </div>
+                    <div class="specs__row specs__row--extra">
+                        <dt>Оперативная память</dt>
+                        <dd>8 ГБ</dd>
+                    </div>
+                    <div class="specs__row specs__row--extra">
+                        <dt>Ёмкость батареи</dt>
+                        <dd>3274 мА·ч</dd>
+                    </div>
+                    <!-- … -->
+                </dl>
+
+                <!-- кнопка «Все характеристики / Скрыть» (ПК) -->
+                <button class="specs__more" type="button" data-specs-more>
+                    Все характеристики
+                </button>
+            </div>
+
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="product-description">
+            <div class="description__mainimage-wrapper">
+                <img class="description__mainimage" src="img/product/iphone/main.png" alt="Товар">
+            </div>
+            <div class="description-wrapper">
+                <div class="description-row flex-column flex-lg-row" style="gap: 80px;">
+                    <div class="description-col" style="max-width: 592px;">
+                        <div class="description-block">
+                            <h5>
+                                iPhone 15
+                            </h5>
+                            <p>
+                                Динамичный остров остается на вершине всего этого. Новая 48-мегапиксельная камера.
+                                Фотографии со сверх высоким разрешением. 2x телефото. Прочный корпус из цветного стекла
+                                и
+                                алюминия. Заряжаться так же просто, как через USB-C.
+                            </p>
+                        </div>
+                        <div class="description-block">
+                            <h5>
+                                Динамичный остров. Для тех случаев, когда вещи просто всплывают
+                            </h5>
+                            <p>
+                                Dynamic Island отображает оповещения и действия в режиме реального времени, чтобы вы не
+                                пропустили их, занимаясь чем-то другим. Вы можете отслеживать свою следующую поездку,
+                                видеть, кто звонит, проверять статус вашего рейса и многое другое.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="description-col">
+                        <div class="description__image-wrapper">
+                            <img class="description__image description__image1" src="img/product/iphone/1.png"
+                                alt="Товар">
+                        </div>
+                    </div>
+                </div>
+                <div class="description-row flex-column-reverse  flex-lg-row" style="gap: 50px;">
+                    <div class="description-col">
+                        <div class="description__image-wrapper">
+                            <img class="description__image" src="img/product/iphone/2.png" alt="Товар">
+                        </div>
+                    </div>
+                    <div class="description-col" style="max-width: 563px;">
+                        <div class="description-block">
+                            <h5>
+                                Цвет насквозь. Прочный со всех сторон
+                            </h5>
+                            <p>
+                                Инновационный новый дизайн включает в себя заднее стекло, цвет которого пронизывает весь
+                                материал. Специальная технология двойного ионообмена стекла и корпус из аэрокосмического
+                                алюминия делают iPhone 15 невероятно прочным.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="description-row flex-column  flex-lg-row" style="gap: 40px;">
+                    <div class="description-col" style="max-width: 564px;">
+                        <div class="description-block">
+                            <h5>
+                                Надежный и долговечный
+                            </h5>
+                            <p>
+                                Керамический экран спереди прочнее, чем стекло для любого смартфона.
+                            </p>
+                        </div>
+                        <div class="description-block">
+                            <h5>
+                                Удивительно прочный
+                            </h5>
+                            <p>
+                                iPhone устойчив к брызгам, воде и пыли. Какое облегчение.
+                            </p>
+                        </div>
+                        <div class="description-block">
+                            <h5>
+                                Совершенно новая основная камера на 48 Мп. Для захватывающие дух
+                                снимки, вызывающие улыбку
+                            </h5>
+                            <p>
+                                Теперь основная камера снимает в сверхвысоком разрешении. Так что делать выдающиеся
+                                фотографии с потрясающей детализацией стало проще, чем когда-либо, — от моментальных
+                                снимков до потрясающих пейзажей. Разрешение до 4x для получения невероятных деталей. 2x
+                                Телефото - это все равно что иметь третью камеру.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="description-col">
+                        <div class="description__image-wrapper">
+                            <img class="description__image" src="img/product/iphone/3.png" alt="Товар">
+                        </div>
+                    </div>
+                </div>
+                <div class="description-row flex-column  flex-lg-row" style="gap: 54px;">
+                    <div class="description-col" style="max-width: 625px;">
+                        <div class="description-block">
+                            <h5>
+                                Фокус‑покус, новые волшебные портреты
+                            </h5>
+                            <p>
+                                Больше деталей и насыщеннее цвета вносят разительный вклад в ваши портреты. Теперь вы
+                                можете касаться, чтобы переключать фокус между объектами — даже после того, как сделаете
+                                снимок. Вуаля, chango.
+                                <br> <br>
+                                Хотите быстро запечатлеть момент, прежде чем он исчезнет? Вам больше не нужно
+                                переключаться в портретный режим. Если объектом съемки является человек, собака или
+                                кошка, iPhone 15 автоматически фиксирует информацию о глубине. Таким образом, вы можете
+                                мгновенно просмотреть свою фотографию  в виде портрета с искусным эффектом размытия. Или
+                                позже в приложении "Фотографии".
+                            </p>
+                        </div>
+
+                    </div>
+                    <div class="description-col">
+                        <div class="description__image-wrapper">
+                            <img class="description__image" src="img/product/iphone/4.png" alt="Товар">
+                        </div>
+                    </div>
+                </div>
+                <div class="description-row flex-column-reverse  flex-lg-row" style="gap: 66px;">
+                    <div class="description-col">
+                        <div class="description__image-wrapper">
+                            <img class="description__image" src="img/product/iphone/5.png" alt="Товар">
+                        </div>
+                    </div>
+                    <div class="description-col" style="max-width: 474px;">
+                        <div class="description-block">
+                            <h5>
+                                2-кратное телефото
+                            </h5>
+                            <p>
+                                Для создания идеального портрета.
+                            </p>
+                        </div>
+                        <div class="description-block">
+                            <h5 style="margin-bottom: 0;">
+                                Срок службы батареи в течение всего дня. Для всех дел, которые вы хотите продолжать
+                                делать.
+                            </h5>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="description-row flex-column  flex-lg-row" style="gap: 80px;">
+                    <div class="description-col" style="max-width: 641px;">
+                        <div class="description-block">
+                            <h5>
+                                Бионический чип A16. Проверенный временем мощный процессор
+                            </h5>
+                            <p>
+                                A16 Bionic обладает всеми видами расширенных функций. Например, компьютерная фотосъемка,
+                                 используемая для получения 24-мегапиксельных фотографий и портретов нового
+                                поколения. Изоляция голоса  при телефонных звонках. И отличная производительность для
+                                игр с интенсивным использованием графики. Все это с невероятной эффективностью
+                                обеспечивает длительное время автономной работы. Неудивительно, что изначально это был
+                                профессиональный чип.
+                            </p>
+                        </div>
+
+                    </div>
+                    <div class="description-col">
+                        <div class="description__image-wrapper">
+                            <img class="description__image" src="img/product/iphone/6.png" alt="Товар">
+                        </div>
+                    </div>
+                </div>
+                <div class="description-row flex-column-reverse  flex-lg-row" style="gap: 68px;">
+                    <div class="description-col">
+                        <div class="description__image-wrapper">
+                            <img class="description__image" src="img/product/iphone/7.png" alt="Товар">
+                        </div>
+                    </div>
+                    <div class="description-col" style="max-width: 528px;">
+                        <div class="description-block">
+                            <h5>
+                                USB-Cсовместим
+                            </h5>
+                            <p>
+                                Новый разъем USB-C позволяет заряжать ваш Mac или iPad с помощью того же кабеля, который
+                                вы используете для зарядки iPhone 15. Вы даже можете использовать iPhone 15 для зарядки
+                                Apple Watch или AirPods. Прощай, помехи в кабелях.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="description-row flex-column  flex-lg-row" style="gap: 80px;">
+                    <div class="description-col" style="max-width: 515px;">
+                        <div class="description-block">
+                            <h5>
+                                В экстренных случаях iPhone прикроет вас
+                            </h5>
+                            <p>
+                                Новая система помощи на дороге через спутник поможет вам в таких случаях, как спущенное
+                                колесо или разряженный аккумулятор, даже когда вы находитесь вне сети. iPhone также
+                                имеет Экстренный SOS через спутник и обнаружение сбоев,  два жизненно важные функции
+                                безопасности, которые помогли спасти жизни.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="description-col">
+                        <div class="description__image-wrapper">
+                            <img class="description__image" src="img/product/iphone/8.png" alt="Товар">
+                        </div>
+                    </div>
+                </div>
+                <div class="description-row flex-column-reverse  flex-lg-row" style="gap: 80px;">
+                    <div class="description-col">
+                        <img class="description__image" src="img/product/iphone/9.png" alt="Товар">
+                    </div>
+                    <div class="description-col" style="max-width: 508px;">
+                        <div class="description-block">
+                            <h5>
+                                iOS 17
+                            </h5>
+                            <p>
+                                Оформите его. Поменяйте местами. Наклейте наклейку.
+                            </p>
+                        </div>
+                        <div class="description-block">
+                            <h5>
+                                Плакат с контактами
+                            </h5>
+                            <p>
+                                Создайте свой собственный плакат, который контакты будут видеть при вашем звонке.
+                                Выберите понравившуюся картинку или Memoji, соедините ее с любимым шрифтом, и вот она —
+                                ваша собственная визитная карточка.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="description-row flex-column flex-lg-row" style="gap: 106px;">
+                    <div class="description-col">
+                        <div class="description-block">
+                            <h5>
+                                Живые наклейки
+                            </h5>
+                            <p>
+                                Коснитесь объекта на фотографии и удерживайте его, чтобы отделить от фона и создать
+                                наклейку. Добавьте такие эффекты, как "Пухлость" и "Блеск". Или создайте анимированные
+                                наклейки из "живых фотографий".
+                            </p>
+                        </div>
+                    </div>
+                    <div class="description-col">
+                        <div class="description-block">
+                            <h5>
+                                NameDrop
+                            </h5>
+                            <p>
+                                Хотите обменяться с кем-нибудь контактной информацией? Просто поднесите свой iPhone
+                                поближе к их.  Вы оба можете выбрать, чем хотите поделиться, и информация передается
+                                мгновенно.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <section class="hits">
+        <div class="container">
+
+            <h2 class="hits__title">Вместе с этим покупают</h2>
+            <div class="hits-slider-wrapper">
+                <!-- навигация -->
+                <button class="hits__nav hits__nav--prev" aria-label="Предыдущий"></button>
+                <!-- Swiper -->
+                <div class="swiper hits__swiper">
+                    <div class="swiper-wrapper">
+
+
+
+                        <div class="swiper-slide">
+                            <div class="catalog__main-item">
+                                <div class="catalog__main-imagewrapper">
+                                    <div class="catalog__main-item-action-buttons">
+                                        <button class="action-btn favorite" type="button"
+                                            aria-label="Добавить в избранное"></button>
+
+                                        <button class="action-btn compare" type="button"
+                                            aria-label="Добавить к сравнению"></button>
+                                    </div>
+                                    <img class="catalog__main-image" alt="Товар" src="/img/catalog/iphone.png">
+                                </div>
+                                <a href="#" class="catalog__main-title">Apple iPhone 15 Pro Max dual-SIM 256 ГБ,
+                                    «титановый
+                                    синий»</a>
+                                <div class="catalog__main-row">
+                                    <div class="catalog__main-prices">
+                                        <div class="catalog__main-price">140 000 ₽</div>
+                                        <div class="catalog__main-oldprice">150 000 ₽</div>
+                                    </div>
+                                    <div class="catalog__main-score">
+                                        <div class="catalog__main-score-num">740</div>
+                                        <img class="catalog__main-score-img" alt="Score" src="/img/header/score.png">
+                                    </div>
+                                </div>
+                                <button class="catalog__main-button">В корзину</button>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="catalog__main-item">
+                                <div class="catalog__main-imagewrapper">
+                                    <div class="catalog__main-item-action-buttons">
+                                        <button class="action-btn favorite" type="button"
+                                            aria-label="Добавить в избранное"></button>
+
+                                        <button class="action-btn compare" type="button"
+                                            aria-label="Добавить к сравнению"></button>
+                                    </div>
+                                    <img class="catalog__main-image" alt="Товар" src="/img/catalog/iphone1.png">
+                                </div>
+                                <a href="#" class="catalog__main-title">Apple iPhone 15 Pro Max dual-SIM 256 ГБ,
+                                    «титановый
+                                    синий»</a>
+                                <div class="catalog__main-row">
+                                    <div class="catalog__main-prices">
+                                        <div class="catalog__main-price">140 000 ₽</div>
+                                        <div class="catalog__main-oldprice">150 000 ₽</div>
+                                    </div>
+                                    <div class="catalog__main-score">
+                                        <div class="catalog__main-score-num">740</div>
+                                        <img class="catalog__main-score-img" alt="Score" src="/img/header/score.png">
+                                    </div>
+                                </div>
+                                <button class="catalog__main-button">В корзину</button>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="catalog__main-item">
+                                <div class="catalog__main-imagewrapper">
+                                    <div class="catalog__main-item-action-buttons">
+                                        <button class="action-btn favorite" type="button"
+                                            aria-label="Добавить в избранное"></button>
+
+                                        <button class="action-btn compare" type="button"
+                                            aria-label="Добавить к сравнению"></button>
+                                    </div>
+                                    <img class="catalog__main-image" alt="Товар" src="/img/catalog/iphone2.png">
+                                </div>
+                                <a href="#" class="catalog__main-title">Apple iPhone 15 Pro Max dual-SIM 256 ГБ,
+                                    «титановый
+                                    синий»</a>
+                                <div class="catalog__main-row">
+                                    <div class="catalog__main-prices">
+                                        <div class="catalog__main-price">140 000 ₽</div>
+                                        <div class="catalog__main-oldprice">150 000 ₽</div>
+                                    </div>
+                                    <div class="catalog__main-score">
+                                        <div class="catalog__main-score-num">740</div>
+                                        <img class="catalog__main-score-img" alt="Score" src="/img/header/score.png">
+                                    </div>
+                                </div>
+                                <button class="catalog__main-button">В корзину</button>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="catalog__main-item">
+                                <div class="catalog__main-imagewrapper">
+                                    <div class="catalog__main-item-action-buttons">
+                                        <button class="action-btn favorite" type="button"
+                                            aria-label="Добавить в избранное"></button>
+
+                                        <button class="action-btn compare" type="button"
+                                            aria-label="Добавить к сравнению"></button>
+                                    </div>
+                                    <img class="catalog__main-image" alt="Товар" src="/img/catalog/iphone3.png">
+                                </div>
+                                <a href="#" class="catalog__main-title">Apple iPhone 15 Pro Max dual-SIM 256 ГБ,
+                                    «титановый
+                                    синий»</a>
+                                <div class="catalog__main-row">
+                                    <div class="catalog__main-prices">
+                                        <div class="catalog__main-price">140 000 ₽</div>
+                                        <div class="catalog__main-oldprice">150 000 ₽</div>
+                                    </div>
+                                    <div class="catalog__main-score">
+                                        <div class="catalog__main-score-num">740</div>
+                                        <img class="catalog__main-score-img" alt="Score" src="/img/header/score.png">
+                                    </div>
+                                </div>
+                                <button class="catalog__main-button">В корзину</button>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="catalog__main-item">
+                                <div class="catalog__main-imagewrapper">
+                                    <div class="catalog__main-item-action-buttons">
+                                        <button class="action-btn favorite" type="button"
+                                            aria-label="Добавить в избранное"></button>
+
+                                        <button class="action-btn compare" type="button"
+                                            aria-label="Добавить к сравнению"></button>
+                                    </div>
+                                    <img class="catalog__main-image" alt="Товар" src="/img/catalog/iphone.png">
+                                </div>
+                                <a href="#" class="catalog__main-title">Apple iPhone 15 Pro Max dual-SIM 256 ГБ,
+                                    «титановый
+                                    синий»</a>
+                                <div class="catalog__main-row">
+                                    <div class="catalog__main-prices">
+                                        <div class="catalog__main-price">140 000 ₽</div>
+                                        <div class="catalog__main-oldprice">150 000 ₽</div>
+                                    </div>
+                                    <div class="catalog__main-score">
+                                        <div class="catalog__main-score-num">740</div>
+                                        <img class="catalog__main-score-img" alt="Score" src="/img/header/score.png">
+                                    </div>
+                                </div>
+                                <button class="catalog__main-button">В корзину</button>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="catalog__main-item">
+                                <div class="catalog__main-imagewrapper">
+                                    <div class="catalog__main-item-action-buttons">
+                                        <button class="action-btn favorite" type="button"
+                                            aria-label="Добавить в избранное"></button>
+
+                                        <button class="action-btn compare" type="button"
+                                            aria-label="Добавить к сравнению"></button>
+                                    </div>
+                                    <img class="catalog__main-image" alt="Товар" src="/img/catalog/iphone1.png">
+                                </div>
+                                <a href="#" class="catalog__main-title">Apple iPhone 15 Pro Max dual-SIM 256 ГБ,
+                                    «титановый
+                                    синий»</a>
+                                <div class="catalog__main-row">
+                                    <div class="catalog__main-prices">
+                                        <div class="catalog__main-price">140 000 ₽</div>
+                                        <div class="catalog__main-oldprice">150 000 ₽</div>
+                                    </div>
+                                    <div class="catalog__main-score">
+                                        <div class="catalog__main-score-num">740</div>
+                                        <img class="catalog__main-score-img" alt="Score" src="/img/header/score.png">
+                                    </div>
+                                </div>
+                                <button class="catalog__main-button">В корзину</button>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="catalog__main-item">
+                                <div class="catalog__main-imagewrapper">
+                                    <div class="catalog__main-item-action-buttons">
+                                        <button class="action-btn favorite" type="button"
+                                            aria-label="Добавить в избранное"></button>
+
+                                        <button class="action-btn compare" type="button"
+                                            aria-label="Добавить к сравнению"></button>
+                                    </div>
+                                    <img class="catalog__main-image" alt="Товар" src="/img/catalog/iphone2.png">
+                                </div>
+                                <a href="#" class="catalog__main-title">Apple iPhone 15 Pro Max dual-SIM 256 ГБ,
+                                    «титановый
+                                    синий»</a>
+                                <div class="catalog__main-row">
+                                    <div class="catalog__main-prices">
+                                        <div class="catalog__main-price">140 000 ₽</div>
+                                        <div class="catalog__main-oldprice">150 000 ₽</div>
+                                    </div>
+                                    <div class="catalog__main-score">
+                                        <div class="catalog__main-score-num">740</div>
+                                        <img class="catalog__main-score-img" alt="Score" src="/img/header/score.png">
+                                    </div>
+                                </div>
+                                <button class="catalog__main-button">В корзину</button>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="catalog__main-item">
+                                <div class="catalog__main-imagewrapper">
+                                    <div class="catalog__main-item-action-buttons">
+                                        <button class="action-btn favorite" type="button"
+                                            aria-label="Добавить в избранное"></button>
+
+                                        <button class="action-btn compare" type="button"
+                                            aria-label="Добавить к сравнению"></button>
+                                    </div>
+                                    <img class="catalog__main-image" alt="Товар" src="/img/catalog/iphone3.png">
+                                </div>
+                                <a href="#" class="catalog__main-title">Apple iPhone 15 Pro Max dual-SIM 256 ГБ,
+                                    «титановый
+                                    синий»</a>
+                                <div class="catalog__main-row">
+                                    <div class="catalog__main-prices">
+                                        <div class="catalog__main-price">140 000 ₽</div>
+                                        <div class="catalog__main-oldprice">150 000 ₽</div>
+                                    </div>
+                                    <div class="catalog__main-score">
+                                        <div class="catalog__main-score-num">740</div>
+                                        <img class="catalog__main-score-img" alt="Score" src="/img/header/score.png">
+                                    </div>
+                                </div>
+                                <button class="catalog__main-button">В корзину</button>
+                            </div>
+                        </div>
+                        <!-- …добавляйте сколько нужно -->
+                    </div>
+                </div>
+                <button class="hits__nav hits__nav--next" aria-label="Следующий"></button>
+            </div>
+        </div>
+    </section>
+    <section class="hits-green">
+        <div class="container">
+
+            <h2 class="hits-green__title">Успейте купить</h2>
+            <div class="hits-slider-wrapper">
+                <!-- навигация -->
+                <button class="hits-green__nav hits-green__nav--prev" aria-label="Предыдущий"></button>
+                <!-- Swiper -->
+                <div class="swiper hits-green__swiper">
+                    <div class="swiper-wrapper">
+
+
+
+                        <div class="swiper-slide">
+                            <div class="catalog__main-item">
+                                <div class="catalog__main-imagewrapper">
+                                    <img class="catalog__main-image" alt="Товар" src="/img/catalog/iphone.png">
+                                </div>
+                                <div class="catalog__main-prices">
+                                    <div class="catalog__main-price">140 000 ₽</div>
+                                    <div class="catalog__main-oldprice">150 000 ₽</div>
+                                </div>
+                                <a href="#" class="catalog__main-title">Apple iPhone 15 Pro Max dual-SIM 256 ГБ,
+                                    «титановый
+                                    синий»</a>
+                                <button class="catalog__main-button">В корзину</button>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="catalog__main-item">
+                                <div class="catalog__main-imagewrapper">
+                                    <img class="catalog__main-image" alt="Товар" src="/img/catalog/iphone.png">
+                                </div>
+                                <div class="catalog__main-prices">
+                                    <div class="catalog__main-price">140 000 ₽</div>
+                                    <div class="catalog__main-oldprice">150 000 ₽</div>
+                                </div>
+                                <a href="#" class="catalog__main-title">Apple iPhone 15 Pro Max dual-SIM 256 ГБ,
+                                    «титановый
+                                    синий»</a>
+                                <button class="catalog__main-button">В корзину</button>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="catalog__main-item">
+                                <div class="catalog__main-imagewrapper">
+                                    <img class="catalog__main-image" alt="Товар" src="/img/catalog/iphone.png">
+                                </div>
+                                <div class="catalog__main-prices">
+                                    <div class="catalog__main-price">140 000 ₽</div>
+                                    <div class="catalog__main-oldprice">150 000 ₽</div>
+                                </div>
+                                <a href="#" class="catalog__main-title">Apple iPhone 15 Pro Max dual-SIM 256 ГБ,
+                                    «титановый
+                                    синий»</a>
+                                <button class="catalog__main-button">В корзину</button>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="catalog__main-item">
+                                <div class="catalog__main-imagewrapper">
+                                    <img class="catalog__main-image" alt="Товар" src="/img/catalog/iphone.png">
+                                </div>
+                                <div class="catalog__main-prices">
+                                    <div class="catalog__main-price">140 000 ₽</div>
+                                    <div class="catalog__main-oldprice">150 000 ₽</div>
+                                </div>
+                                <a href="#" class="catalog__main-title">Apple iPhone 15 Pro Max dual-SIM 256 ГБ,
+                                    «титановый
+                                    синий»</a>
+                                <button class="catalog__main-button">В корзину</button>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="catalog__main-item">
+                                <div class="catalog__main-imagewrapper">
+                                    <img class="catalog__main-image" alt="Товар" src="/img/catalog/iphone.png">
+                                </div>
+                                <div class="catalog__main-prices">
+                                    <div class="catalog__main-price">140 000 ₽</div>
+                                    <div class="catalog__main-oldprice">150 000 ₽</div>
+                                </div>
+                                <a href="#" class="catalog__main-title">Apple iPhone 15 Pro Max dual-SIM 256 ГБ,
+                                    «титановый
+                                    синий»</a>
+                                <button class="catalog__main-button">В корзину</button>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="catalog__main-item">
+                                <div class="catalog__main-imagewrapper">
+                                    <img class="catalog__main-image" alt="Товар" src="/img/catalog/iphone.png">
+                                </div>
+                                <div class="catalog__main-prices">
+                                    <div class="catalog__main-price">140 000 ₽</div>
+                                    <div class="catalog__main-oldprice">150 000 ₽</div>
+                                </div>
+                                <a href="#" class="catalog__main-title">Apple iPhone 15 Pro Max dual-SIM 256 ГБ,
+                                    «титановый
+                                    синий»</a>
+                                <button class="catalog__main-button">В корзину</button>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="catalog__main-item">
+                                <div class="catalog__main-imagewrapper">
+                                    <img class="catalog__main-image" alt="Товар" src="/img/catalog/iphone.png">
+                                </div>
+                                <div class="catalog__main-prices">
+                                    <div class="catalog__main-price">140 000 ₽</div>
+                                    <div class="catalog__main-oldprice">150 000 ₽</div>
+                                </div>
+                                <a href="#" class="catalog__main-title">Apple iPhone 15 Pro Max dual-SIM 256 ГБ,
+                                    «титановый
+                                    синий»</a>
+                                <button class="catalog__main-button">В корзину</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <button class="hits-green__nav hits-green__nav--next" aria-label="Следующий"></button>
+            </div>
+        </div>
+    </section>
+    <section class="hits">
+        <div class="container">
+
+            <h2 class="hits__title">Вместе с этим покупают</h2>
+            <div class="hits-slider-wrapper">
+                <!-- навигация -->
+                <button class="hits__nav hits__nav--prev" aria-label="Предыдущий"></button>
+                <!-- Swiper -->
+                <div class="swiper hits__swiper">
+                    <div class="swiper-wrapper">
+
+
+
+                        <div class="swiper-slide">
+                            <div class="catalog__main-item">
+                                <div class="catalog__main-imagewrapper">
+                                    <div class="catalog__main-item-action-buttons">
+                                        <button class="action-btn favorite" type="button"
+                                            aria-label="Добавить в избранное"></button>
+
+                                        <button class="action-btn compare" type="button"
+                                            aria-label="Добавить к сравнению"></button>
+                                    </div>
+                                    <img class="catalog__main-image" alt="Товар" src="/img/catalog/iphone.png">
+                                </div>
+                                <a href="#" class="catalog__main-title">Apple iPhone 15 Pro Max dual-SIM 256 ГБ,
+                                    «титановый
+                                    синий»</a>
+                                <div class="catalog__main-row">
+                                    <div class="catalog__main-prices">
+                                        <div class="catalog__main-price">140 000 ₽</div>
+                                        <div class="catalog__main-oldprice">150 000 ₽</div>
+                                    </div>
+                                    <div class="catalog__main-score">
+                                        <div class="catalog__main-score-num">740</div>
+                                        <img class="catalog__main-score-img" alt="Score" src="/img/header/score.png">
+                                    </div>
+                                </div>
+                                <button class="catalog__main-button">В корзину</button>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="catalog__main-item">
+                                <div class="catalog__main-imagewrapper">
+                                    <div class="catalog__main-item-action-buttons">
+                                        <button class="action-btn favorite" type="button"
+                                            aria-label="Добавить в избранное"></button>
+
+                                        <button class="action-btn compare" type="button"
+                                            aria-label="Добавить к сравнению"></button>
+                                    </div>
+                                    <img class="catalog__main-image" alt="Товар" src="/img/catalog/iphone1.png">
+                                </div>
+                                <a href="#" class="catalog__main-title">Apple iPhone 15 Pro Max dual-SIM 256 ГБ,
+                                    «титановый
+                                    синий»</a>
+                                <div class="catalog__main-row">
+                                    <div class="catalog__main-prices">
+                                        <div class="catalog__main-price">140 000 ₽</div>
+                                        <div class="catalog__main-oldprice">150 000 ₽</div>
+                                    </div>
+                                    <div class="catalog__main-score">
+                                        <div class="catalog__main-score-num">740</div>
+                                        <img class="catalog__main-score-img" alt="Score" src="/img/header/score.png">
+                                    </div>
+                                </div>
+                                <button class="catalog__main-button">В корзину</button>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="catalog__main-item">
+                                <div class="catalog__main-imagewrapper">
+                                    <div class="catalog__main-item-action-buttons">
+                                        <button class="action-btn favorite" type="button"
+                                            aria-label="Добавить в избранное"></button>
+
+                                        <button class="action-btn compare" type="button"
+                                            aria-label="Добавить к сравнению"></button>
+                                    </div>
+                                    <img class="catalog__main-image" alt="Товар" src="/img/catalog/iphone2.png">
+                                </div>
+                                <a href="#" class="catalog__main-title">Apple iPhone 15 Pro Max dual-SIM 256 ГБ,
+                                    «титановый
+                                    синий»</a>
+                                <div class="catalog__main-row">
+                                    <div class="catalog__main-prices">
+                                        <div class="catalog__main-price">140 000 ₽</div>
+                                        <div class="catalog__main-oldprice">150 000 ₽</div>
+                                    </div>
+                                    <div class="catalog__main-score">
+                                        <div class="catalog__main-score-num">740</div>
+                                        <img class="catalog__main-score-img" alt="Score" src="/img/header/score.png">
+                                    </div>
+                                </div>
+                                <button class="catalog__main-button">В корзину</button>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="catalog__main-item">
+                                <div class="catalog__main-imagewrapper">
+                                    <div class="catalog__main-item-action-buttons">
+                                        <button class="action-btn favorite" type="button"
+                                            aria-label="Добавить в избранное"></button>
+
+                                        <button class="action-btn compare" type="button"
+                                            aria-label="Добавить к сравнению"></button>
+                                    </div>
+                                    <img class="catalog__main-image" alt="Товар" src="/img/catalog/iphone3.png">
+                                </div>
+                                <a href="#" class="catalog__main-title">Apple iPhone 15 Pro Max dual-SIM 256 ГБ,
+                                    «титановый
+                                    синий»</a>
+                                <div class="catalog__main-row">
+                                    <div class="catalog__main-prices">
+                                        <div class="catalog__main-price">140 000 ₽</div>
+                                        <div class="catalog__main-oldprice">150 000 ₽</div>
+                                    </div>
+                                    <div class="catalog__main-score">
+                                        <div class="catalog__main-score-num">740</div>
+                                        <img class="catalog__main-score-img" alt="Score" src="/img/header/score.png">
+                                    </div>
+                                </div>
+                                <button class="catalog__main-button">В корзину</button>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="catalog__main-item">
+                                <div class="catalog__main-imagewrapper">
+                                    <div class="catalog__main-item-action-buttons">
+                                        <button class="action-btn favorite" type="button"
+                                            aria-label="Добавить в избранное"></button>
+
+                                        <button class="action-btn compare" type="button"
+                                            aria-label="Добавить к сравнению"></button>
+                                    </div>
+                                    <img class="catalog__main-image" alt="Товар" src="/img/catalog/iphone.png">
+                                </div>
+                                <a href="#" class="catalog__main-title">Apple iPhone 15 Pro Max dual-SIM 256 ГБ,
+                                    «титановый
+                                    синий»</a>
+                                <div class="catalog__main-row">
+                                    <div class="catalog__main-prices">
+                                        <div class="catalog__main-price">140 000 ₽</div>
+                                        <div class="catalog__main-oldprice">150 000 ₽</div>
+                                    </div>
+                                    <div class="catalog__main-score">
+                                        <div class="catalog__main-score-num">740</div>
+                                        <img class="catalog__main-score-img" alt="Score" src="/img/header/score.png">
+                                    </div>
+                                </div>
+                                <button class="catalog__main-button">В корзину</button>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="catalog__main-item">
+                                <div class="catalog__main-imagewrapper">
+                                    <div class="catalog__main-item-action-buttons">
+                                        <button class="action-btn favorite" type="button"
+                                            aria-label="Добавить в избранное"></button>
+
+                                        <button class="action-btn compare" type="button"
+                                            aria-label="Добавить к сравнению"></button>
+                                    </div>
+                                    <img class="catalog__main-image" alt="Товар" src="/img/catalog/iphone1.png">
+                                </div>
+                                <a href="#" class="catalog__main-title">Apple iPhone 15 Pro Max dual-SIM 256 ГБ,
+                                    «титановый
+                                    синий»</a>
+                                <div class="catalog__main-row">
+                                    <div class="catalog__main-prices">
+                                        <div class="catalog__main-price">140 000 ₽</div>
+                                        <div class="catalog__main-oldprice">150 000 ₽</div>
+                                    </div>
+                                    <div class="catalog__main-score">
+                                        <div class="catalog__main-score-num">740</div>
+                                        <img class="catalog__main-score-img" alt="Score" src="/img/header/score.png">
+                                    </div>
+                                </div>
+                                <button class="catalog__main-button">В корзину</button>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="catalog__main-item">
+                                <div class="catalog__main-imagewrapper">
+                                    <div class="catalog__main-item-action-buttons">
+                                        <button class="action-btn favorite" type="button"
+                                            aria-label="Добавить в избранное"></button>
+
+                                        <button class="action-btn compare" type="button"
+                                            aria-label="Добавить к сравнению"></button>
+                                    </div>
+                                    <img class="catalog__main-image" alt="Товар" src="/img/catalog/iphone2.png">
+                                </div>
+                                <a href="#" class="catalog__main-title">Apple iPhone 15 Pro Max dual-SIM 256 ГБ,
+                                    «титановый
+                                    синий»</a>
+                                <div class="catalog__main-row">
+                                    <div class="catalog__main-prices">
+                                        <div class="catalog__main-price">140 000 ₽</div>
+                                        <div class="catalog__main-oldprice">150 000 ₽</div>
+                                    </div>
+                                    <div class="catalog__main-score">
+                                        <div class="catalog__main-score-num">740</div>
+                                        <img class="catalog__main-score-img" alt="Score" src="/img/header/score.png">
+                                    </div>
+                                </div>
+                                <button class="catalog__main-button">В корзину</button>
+                            </div>
+                        </div>
+                        <div class="swiper-slide">
+                            <div class="catalog__main-item">
+                                <div class="catalog__main-imagewrapper">
+                                    <div class="catalog__main-item-action-buttons">
+                                        <button class="action-btn favorite" type="button"
+                                            aria-label="Добавить в избранное"></button>
+
+                                        <button class="action-btn compare" type="button"
+                                            aria-label="Добавить к сравнению"></button>
+                                    </div>
+                                    <img class="catalog__main-image" alt="Товар" src="/img/catalog/iphone3.png">
+                                </div>
+                                <a href="#" class="catalog__main-title">Apple iPhone 15 Pro Max dual-SIM 256 ГБ,
+                                    «титановый
+                                    синий»</a>
+                                <div class="catalog__main-row">
+                                    <div class="catalog__main-prices">
+                                        <div class="catalog__main-price">140 000 ₽</div>
+                                        <div class="catalog__main-oldprice">150 000 ₽</div>
+                                    </div>
+                                    <div class="catalog__main-score">
+                                        <div class="catalog__main-score-num">740</div>
+                                        <img class="catalog__main-score-img" alt="Score" src="/img/header/score.png">
+                                    </div>
+                                </div>
+                                <button class="catalog__main-button">В корзину</button>
+                            </div>
+                        </div>
+                        <!-- …добавляйте сколько нужно -->
+                    </div>
+                </div>
+                <button class="hits__nav hits__nav--next" aria-label="Следующий"></button>
+            </div>
+        </div>
+    </section>
+    <footer class="mobile-bar">
+
+        <!-- ACTION BUTTONS -->
+        <div class="mobile-bar__actions">
+            <button class="product__btn product__btn--primary">Добавить в корзину</button>
+            <button class="product__btn product__btn--outline">Купить в 1 клик</button>
+        </div>
+
+        <!-- BOTTOM NAV -->
+        <nav class="mobile-nav">
+            <a class="mobile-nav__item nav-main">
+                <span>Главная</span>
+            </a>
+            <a class="mobile-nav__item nav-cart">
+                <span>Корзина</span>
+            </a>
+            <a class="mobile-nav__item nav-favorite">
+                <span>Избранное</span>
+            </a>
+            <a class="mobile-nav__item is-active nav-catalog">
+                <span>Каталог</span>
+            </a>
+            <a class="mobile-nav__item nav-user">
+                <span>Кабинет</span>
+            </a>
+        </nav>
+
+    </footer>
+    <footer>
+        <div class="container">
+            <div class="footer__row">
+                <div class="footer__left">
+                    <a href="/"><img src="/img/footer/logo.png" alt="logo" class="footer__logo"></a>
+                    <div class="footer__text">Индивидуальный Предприниматель<br>Ханакин Павел Алексеевич</div>
+                    <div class="footer__data">
+                        <div class="footer__data-item">ОГРНИП <span>304583636600069</span></div>
+
+                        <div class="footer__data-item">ИНН <span>583609230963</span></div>
+                    </div>
+                    <div class="footer__copyright">
+                        © 2007-2024 Top Disc.<br>Все права защищены
+                    </div>
+                </div>
+                <div class="footer__right">
+                    <div class="footer__top"></div>
+                    <div class="footer__bottom">
+                        <div class="footer__nav">
+                            <div class="footer__nav-left">
+                                <div class="footer__title">Компания</div>
+                                <nav>
+                                    <ul>
+                                        <li><a href="#">О нас</a></li>
+                                        <li><a href="#">Бренды</a></li>
+                                        <li><a href="#">Поставщикам</a></li>
+                                        <li><a href="#">Оптовикам</a></li>
+                                        <li><a href="#">Вакансии</a></li>
+                                        <li><a href="#">Контакты</a></li>
+                                    </ul>
+                                </nav>
+                            </div>
+                            <div class="footer__nav-right">
+                                <div class="footer__title">Покупателям</div>
+                                <nav>
+                                    <ul>
+                                        <li><a href="#">Статьи</a></li>
+                                        <li><a href="#">Клубная карта</a></li>
+                                        <li><a href="#">Доставка</a></li>
+                                        <li><a href="#">Оплата</a></li>
+                                        <li><a href="#">Обмен и возврат</a></li>
+                                        <li><a href="#">Трейд-ин</a></li>
+                                        <li><a href="#">Гарантия низкой цены</a></li>
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                        <div class="footer__contacts">
+                            <div class="footer__contacts-left">
+                                <div class="footer__title">Контакты</div>
+                                <a class="footer__phone" href="tel:8(800)500-21-41">8 (800) 500-21-41</a>
+                                <div class="footer__address">Пенза, улица Ставского, 4, корп. 1</div>
+                                <div class="footer__worktime">Ежедневно 9:00-21:00</div>
+                                <button class="callback_btn">
+                                    Обратный звонок
+                                </button>
+                            </div>
+                            <div class="footer__contacts-right">
+                                <div class="footer__socials-row">
+                                    <a href="#" class="footer__socials-item">
+                                        <img src="img/footer/wp.svg" alt="whatsapp">
+                                    </a>
+                                    <a href="#" class="footer__socials-item">
+                                        <img src="img/footer/tg.svg" alt="telegram">
+                                    </a>
+                                    <a href="#" class="footer__socials-item">
+                                        <img src="img/footer/mail.svg" alt="mail">
+                                    </a>
+                                    <a href="#" class="footer__socials-item">
+                                        <img src="img/footer/vk.svg" alt="vk">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=5cac17b6-1a2d-41ba-bdf4-1a42146f3768"
+        type="text/javascript"></script>
+    <script src="js/script.js"></script>
+</body>
+
+</html>

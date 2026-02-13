@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>О компании | TopDisk</title>
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/bootstrap-grid.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+  <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+      <!-- ВЕРХНЯЯ ПОЛОСА --------------------------------------------------- -->
+      <div class="header__top">
+        <div class="header__row">
+          <!-- Навигация слева -->
+          <nav class="header__nav">
+            <ul class="header__nav-list">
+              <li class="header__nav-item"><a href="#">О компании</a></li>
+              <li class="header__nav-item"><a href="#">Поставщикам</a></li>
+              <li class="header__nav-item"><a href="#">Доставка и оплата</a></li>
+              <li class="header__nav-item"><a href="#">Трейд-ин</a></li>
+              <li class="header__nav-item"><a href="#">Возврат</a></li>
+              <li class="header__nav-item"><a href="#">Контакты</a></li>
+            </ul>
+          </nav>
+
+          <!-- «Обратный звонок» + телефон (в одну строку, 44 px) -->
+          <div class="header__contacts">
+            <a href="#" class="header__callback">Обратный звонок</a>
+            <a href="tel:+78005002141" class="header__phone">8 (800) 500-21-41</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- НИЖНЯЯ ПОЛОСА ---------------------------------------------------- -->
+      <div class="header__bottom">
+        <div class="header__row">
+          <!-- Логотип -->
+          <a href="/" class="header__logo"><img src="img/header/logo.png" alt="logo"></a>
+
+          <!-- Каталог (строго +45 px от лого) -->
+          <button class="header__catalog">
+            <span class="header__catalog-icon"><img src="img/header/burger.png" alt="Каталог"></span>
+            <span class="header__catalog-text">Каталог</span>
+          </button>
+
+          <!-- Поиск (+20 px от каталога, тянется) -->
+          <form class="header__search">
+            <button class="header__search-btn" aria-label="Найти"></button>
+            <input type="search" class="header__search-input" placeholder="Поиск по каталогу">
+
+          </form>
+
+          <!-- Иконки действий справа -->
+          <ul class="header__actions">
+            <li class="header__action header__action--account">
+              <a href="#" aria-label="Кабинет"><img src="img/header/user.png" src="Кабинет"><span>Кабинет</span></a>
+            </li>
+            <li class="header__action header__action--compare">
+              <a href="#" aria-label="Сравнение"><img src="img/header/ves.png"
+                  src="Сравнение"><span>Сравнение</span></a>
+            </li>
+            <li class="header__action header__action--favorite">
+              <a href="#" aria-label="Избранное"><img src="img/header/heart.png"
+                  src="Избранное"><span>Избранное</span></a>
+            </li>
+            <li class="header__action header__action--cart">
+              <a href="#" aria-label="Корзина"><img src="img/header/cart.png" src="Корзина"><span>Корзина</span></a>
+            </li>
+          </ul>
+
+
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="breadcrumbs">
+    <div class="container">
+      <ul class="breadcrumbs-list">
+        <li class="breadcrumbs-item">
+          <a class="breadcrumbs-link" href="#">Главная</a>
+        </li>
+        <li class="breadcrumbs-item">
+          <a class="breadcrumbs-link" href="#">О нас</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="page">
+      <!-- Sidebar -->
+      <nav class="sidebar">
+        <ul class="sidebar__list">
+          <li class="sidebar__item"><a class="sidebar__link sidebar__link--active" href="about.html">О компании</a></li>
+          <li class="sidebar__item"><a class="sidebar__link" href="contacts.html">Контакты</a></li>
+          <li class="sidebar__item">
+            <a class="sidebar__link" href="#">Поставщикам</a>
+          </li>
+          <li class="sidebar__item">
+            <a class="sidebar__link" href="#">Оптовикам</a>
+          </li>
+          <li class="sidebar__item">
+            <a class="sidebar__link" href="#">Возврат</a>
+          </li>
+          <li class="sidebar__item">
+            <a class="sidebar__link" href="#">Трейд‑ин</a>
+          </li>
+          <li class="sidebar__item">
+            <a class="sidebar__link" href="delivery.html">Доставка и оплата</a>
+          </li>
+          <li class="sidebar__item">
+            <a class="sidebar__link" href="#">Клубная карта</a>
+          </li>
+          <li class="sidebar__item">
+            <a class="sidebar__link" href="#">Обмен и возврат</a>
+          </li>
+          <li class="sidebar__item">
+            <a class="sidebar__link" href="#">Гарантия низкой цены</a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Main content -->
+      <main class="page__main">
+        <section class="company">
+          <h1 class="company__title">О компании</h1>
+
+          <!-- Три карточки -->
+          <div class="company__cards">
+            <article class="card company__card">
+              <div class="card__image">
+                <img src="/img/about/1.png" alt="Вход в магазин TOP DISC" />
+              </div>
+              <p class="card__text">
+                TOP DISC — это супермаркет электроники, который состоит из
+                нескольких локаций с огромным количеством товаров и расположен в самом
+                центре города по адресу:<br /><strong>г. Пенза, ул. Ставского 4.</strong>
+              </p>
+            </article>
+
+            <article class="card company__card">
+              <div class="card__image">
+                <img src="/img/about/2.png" alt="Парковка у магазина" />
+              </div>
+              <p class="card__text">
+                Рядом с магазином расположена удобная парковка для посетителей. Она
+                находится по левую сторону от локации «Платформа».
+              </p>
+            </article>
+
+            <article class="card company__card">
+              <div class="card__image">
+                <img src="/img/about/3.png" alt="Парковка во внутреннем дворе" />
+              </div>
+              <p class="card__text">
+                Также вы можете припарковать своё авто во внутреннем дворе (въезд с
+                правой стороны от центрального входа).
+              </p>
+            </article>
+          </div>
+
+          <!-- Горизонтальный блок с изображением и текстом -->
+          <div class="company__hero">
+            <div class="company__hero-image">
+              <img src="/img/about/4.png" alt="Центральный вход локации Платформа" />
+            </div>
+            <div class="company__hero-content">
+              <p>
+                Попасть в магазин можно через центральный вход со стороны улицы
+                Ставского. Для большего удобства есть 2‑й вход без ступенек со стороны
+                улицы Революционной и 3‑й выход во внутреннем дворе, через который вы
+                можете попасть на парковку или к зданию локации «Технопорт».
+              </p>
+            </div>
+          </div>
+        </section>
+        <div class="company__wrapper">
+
+          <section class="location">
+            <div class="location__gallery">
+              <figure class="location__photo">
+                <img src="/img/about/5.png" alt="Вход в локацию " />
+              </figure>
+
+            </div>
+
+            <div class="location__top-row">
+              <div class="location__features">
+                <h2 class="location__title">В локации Технопорт представлены:</h2>
+                <ol class="location__list">
+                  <li class="location__item">
+                    <span class="location__num">01</span>
+                    <a class="location__link" href="#">
+                      крупная бытовая техника
+                    </a>
+                  </li>
+                  <li class="location__item">
+                    <span class="location__num">02</span>
+                    <a class="location__link" href="#">кухонная техника</a>
+                  </li>
+                  <li class="location__item">
+                    <span class="location__num">03</span>
+                    <a class="location__link" href="#">компьютеры и ноутбуки</a>
+                  </li>
+                  <li class="location__item">
+                    <span class="location__num">04</span>
+                    <a class="location__link" href="#">телевизоры</a>
+                  </li>
+                  <li class="location__item">
+                    <span class="location__num">05</span>
+                    <a class="location__link" href="#">электросамокаты</a>
+                    <span class="location__etc">и многое другое</span>
+                  </li>
+                </ol>
+              </div>
+
+              <aside class="location__access">
+                <div class="location__access-icon">
+                  <img src="img/about/8.png" alt="Точка на карте" />
+                </div>
+                <p class="location__access-text">
+                  Так же в локацию Технопорт вы можете пройти с улицы Захарова.
+                </p>
+              </aside>
+            </div>
+
+            <div class="location__description">
+              <p>
+                В TOP DISC большой выбор <a href="#" class="link">электротранспорта</a>
+                различных моделей и расцветок на любой вкус. А также
+                <a href="#" class="link">самокаты</a> не только для взрослых, но и для
+                детей. Сделайте подарок себе и близким и испытайте незабываемые эмоции от
+                катания.
+              </p>
+              <p>
+                Если Вы давно мечтаете о новом смартфоне, но не хотите переплачивать за
+                него, то мы рады предложить Вам весь ассортимент продукции
+                <a href="#" class="link">Apple</a>, <a href="#" class="link">XIAOMI</a>,
+                <a href="#" class="link">Samsung</a>, <a href="#" class="link">Honor</a>,
+                <a href="#" class="link">Huawei</a> и <a href="#" class="link">Realme</a>
+                по низким ценам. Также в наличии смарт‑часы и фитнес‑браслеты.
+              </p>
+              <p>
+                У нас Вы можете приобрести <a href="#" class="link">любую технику
+                  Apple</a>, либо из наличия магазина, либо предварительно оформив заказ, если
+                данной техники нет в наличии. На всю продукцию, приобретённую в нашем
+                магазине, действует гарантия.
+              </p>
+            </div>
+
+            <div class="location__row">
+              <div class="location__row-image">
+                <img src="/img/about/9.png" alt="Зона выдачи покупок" />
+              </div>
+              <div class="location__row-content">
+                <p>
+                  В нашем магазине Вы найдёте бытовую технику для дома различных
+                  производителей. <a href="#" class="link">Робот‑пылесос</a> станет Вашим
+                  незаменимым помощником. А новая <a href="#" class="link">техника для
+                    кухни</a> по привлекательной цене поможет приготовить не только вкусную,
+                  но и полезную еду для всей семьи. Так же представлена техника для
+                  <a href="#" class="link">поддержания красоты и Вашего здоровья</a>.
+                </p>
+                <p>
+                  В продаже представлены <a href="#" class="link">телевизоры</a> различной
+                  диагонали и все <a href="#" class="link">необходимые для просмотра
+                    аксессуары</a>.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Ассортимент и пункты выдачи -->
+          <section class="assortment">
+            <div class="assortment__text">
+              <p>
+                А так же у нас огромный ассортимент
+                <a href="#" class="link">кабелей и зарядных устройств для мобильных
+                  телефонов</a>, аксессуаров и комплектующих для компьютеров.
+              </p>
+              <p>
+                В продаже имеются игровые приставки
+                <a href="#" class="link">Sega</a>, <a href="#" class="link">Dendy</a>,
+                <a href="#" class="link">Sony Playstation</a>,
+                <a href="#" class="link">XBOX</a>, <a href="#" class="link">Nintendo</a>,
+                аксессуары и <a href="#" class="link">видеоигры</a> к ним.
+              </p>
+              <p>
+                Настольные игры, транспорт на радиоуправлении, конструкторы, мягкие игрушки…
+                У нас Вы найдёте подарок на любой вкус и возраст!
+              </p>
+              <p>
+                Огромный выбор <a href="#" class="link">защитных плёнок и стекол</a>, а так
+                же <a href="#" class="link">чехлов</a> для самых популярных моделей
+                смартфонов.
+              </p>
+            </div>
+
+            <div class="assortment__row">
+              <div class="assortment__row-image">
+                <img src="/img/about/10.png" alt="Вывеска пунктов выдачи" />
+              </div>
+              <div class="assortment__row-content">
+                <p>
+                  В TOP DISC также есть пункты выдачи сервиса доставки «Boxberry»,
+                  «Wildberries», «Ozon», «СДЭК».
+                </p>
+              </div>
+            </div>
+            <div class="assortment__row-bottom">
+              <div class="assortment__about">
+                <p>
+                  Мы работаем только с проверенными поставщиками и производителями, поэтому
+                  весь товар отвечает строгим стандартам качества и имеет официальную
+                  гарантию от производителя. Профессиональные консультанты всегда помогут
+                  Вам в выборе интересующего Вас товара. Низкие цены и гибкая система скидок,
+                  несомненно, порадуют Вас и позволят существенно сэкономить на покупке.
+                </p>
+                <p>
+                  В скором времени у нас планируется расширение. Откроется новая локация
+                  «Депо», где будут представлены игрушки, товары для спорта и отдыха и многое
+                  другое!
+                </p>
+              </div>
+
+              <div class="assortment__footer">
+                <figure class="assortment__footer-image">
+                  <img src="/img/about/bot.png" alt="Робот с коробками" />
+                </figure>
+                <div class="assortment__footer-content">
+                  <p class="assortment__footer-title">
+                    Весь ассортимент<br>товаров Вы можете<br>посмотреть здесь
+                  </p>
+                  <a href="#catalog" class="button button--primary">В каталог</a>
+                </div>
+              </div>
+            </div>
+
+            <p class="assortment__note">
+              Документ о происхождении СОУТ № 271585 от 17.02.2021
+            </p>
+          </section>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <footer class="mobile-bar">
+
+
+    <!-- BOTTOM NAV -->
+    <nav class="mobile-nav">
+      <a class="mobile-nav__item nav-main">
+        <span>Главная</span>
+      </a>
+      <a class="mobile-nav__item nav-cart">
+        <span>Корзина</span>
+      </a>
+      <a class="mobile-nav__item nav-favorite">
+        <span>Избранное</span>
+      </a>
+      <a class="mobile-nav__item is-active nav-catalog">
+        <span>Каталог</span>
+      </a>
+      <a class="mobile-nav__item nav-user">
+        <span>Кабинет</span>
+      </a>
+    </nav>
+
+  </footer>
+  <footer>
+    <div class="container">
+      <div class="footer__row">
+        <div class="footer__left">
+          <a href="/"><img src="/img/footer/logo.png" alt="logo" class="footer__logo"></a>
+          <div class="footer__text">Индивидуальный Предприниматель<br>Ханакин Павел Алексеевич</div>
+          <div class="footer__data">
+            <div class="footer__data-item">ОГРНИП <span>304583636600069</span></div>
+
+            <div class="footer__data-item">ИНН <span>583609230963</span></div>
+          </div>
+          <div class="footer__copyright">
+            © 2007-2024 Top Disc.<br>Все права защищены
+          </div>
+        </div>
+        <div class="footer__right">
+          <div class="footer__top"></div>
+          <div class="footer__bottom">
+            <div class="footer__nav">
+              <div class="footer__nav-left">
+                <div class="footer__title">Компания</div>
+                <nav>
+                  <ul>
+                    <li><a href="#">О нас</a></li>
+                    <li><a href="#">Бренды</a></li>
+                    <li><a href="#">Поставщикам</a></li>
+                    <li><a href="#">Оптовикам</a></li>
+                    <li><a href="#">Вакансии</a></li>
+                    <li><a href="#">Контакты</a></li>
+                  </ul>
+                </nav>
+              </div>
+              <div class="footer__nav-right">
+                <div class="footer__title">Покупателям</div>
+                <nav>
+                  <ul>
+                    <li><a href="#">Статьи</a></li>
+                    <li><a href="#">Клубная карта</a></li>
+                    <li><a href="#">Доставка</a></li>
+                    <li><a href="#">Оплата</a></li>
+                    <li><a href="#">Обмен и возврат</a></li>
+                    <li><a href="#">Трейд-ин</a></li>
+                    <li><a href="#">Гарантия низкой цены</a></li>
+                  </ul>
+                </nav>
+              </div>
+            </div>
+            <div class="footer__contacts">
+              <div class="footer__contacts-left">
+                <div class="footer__title">Контакты</div>
+                <a class="footer__phone" href="tel:8(800)500-21-41">8 (800) 500-21-41</a>
+                <div class="footer__address">Пенза, улица Ставского, 4, корп. 1</div>
+                <div class="footer__worktime">Ежедневно 9:00-21:00</div>
+                <button class="callback_btn">
+                  Обратный звонок
+                </button>
+              </div>
+              <div class="footer__contacts-right">
+                <div class="footer__socials-row">
+                  <a href="#" class="footer__socials-item">
+                    <img src="img/footer/wp.svg" alt="whatsapp">
+                  </a>
+                  <a href="#" class="footer__socials-item">
+                    <img src="img/footer/tg.svg" alt="telegram">
+                  </a>
+                  <a href="#" class="footer__socials-item">
+                    <img src="img/footer/mail.svg" alt="mail">
+                  </a>
+                  <a href="#" class="footer__socials-item">
+                    <img src="img/footer/vk.svg" alt="vk">
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+  <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=5cac17b6-1a2d-41ba-bdf4-1a42146f3768"
+    type="text/javascript"></script>
+  <script src="js/script.js"></script>
+</body>
+
+</html>
