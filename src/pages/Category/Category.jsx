@@ -23,6 +23,7 @@ function Category() {
   const [breadcrumbsPath, setBreadcrumbsPath] = useState([])
   const [totalPages, setTotalPages] = useState(1)
   const [isProductListPage, setIsProductListPage] = useState(false)
+  const [childSubcategories, setChildSubcategories] = useState([])
   const abortControllerRef = useRef(null)
   
   // Читаем currentPage из URL (?PAGEN_1=2)
@@ -166,6 +167,7 @@ function Category() {
     setIsProductListPage(false)
     setTotalPages(1)
     setMainCategory(null)
+    setChildSubcategories([])
   }, [categoryId])
 
   // Прокрутка к началу страницы при смене пагинации
@@ -248,23 +250,27 @@ function Category() {
         let needProducts = false
         let subcatsData = []
         
-        if (level === 0) {
-          // УРОВЕНЬ 1: Всегда подкатегории, товары НЕ нужны
-          const subcategoriesResponse = await axios.get(
-            `https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.categoryId.json?id=${foundCategory.id}`,
-            { signal: abortControllerRef.current.signal }
-          )
-          subcatsData = subcategoriesResponse.data.result || []
-          
+        // Всегда запрашиваем дочерние подкатегории текущей категории
+        const childrenResponse = await axios.get(
+          `https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.categoryId.json?id=${foundCategory.id}`,
+          { signal: abortControllerRef.current.signal }
+        )
+        const childrenData = childrenResponse.data.result || []
+
+        if (level === 0 && childrenData.length > 0) {
+          // УРОВЕНЬ 1 с подкатегориями: показыва сетку подкатегорий
+          subcatsData = childrenData
           setSubcategories(subcatsData)
+          setChildSubcategories([])
           setProducts([])
           setTotalPages(1)
           showProductList = false
           needProducts = false
           
         } else {
-          // УРОВЕНЬ 2+: Всегда товары, подкатегории НЕ запрашиваем
+          // УРОВЕНЬ 2+ или категория без дочерних: показываем товары
           setSubcategories([])
+          setChildSubcategories(childrenData)
           showProductList = true
           needProducts = true
         }
@@ -729,6 +735,20 @@ function Category() {
 
               {/* СПИСОК ТОВАРОВ */}
               <div className="catalog__main">
+                {/* Дочерние подкатегории текущей категории */}
+                {childSubcategories.length > 0 && (
+                  <div className="catalog__main-bars">
+                    {childSubcategories.map((sub) => (
+                      <Link
+                        key={sub.id}
+                        to={`/category/${sub.code}/`}
+                        className="catalog__main-bar"
+                      >
+                        {sub.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
                 {/* Открыть фильтры на мобильном */}
                 <button className="catalog__filters-btn desktop-hidden" data-filters-open>
                   Фильтры

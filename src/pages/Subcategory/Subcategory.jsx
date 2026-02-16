@@ -1,7 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchProducts } from '../../store/slices/productsSlice'
+import { fetchCategories } from '../../store/slices/categoriesSlice'
 import ProductCard from '../../components/ProductCard/ProductCard'
 import { useMatchHeight } from '../../hooks/useMatchHeight'
 
@@ -9,9 +10,32 @@ function Subcategory() {
   const { subcategoryId } = useParams()
   const dispatch = useDispatch()
   const { items: products, loading } = useSelector((state) => state.products)
+  const { items: categories } = useSelector((state) => state.categories)
+
+  // Находим родительскую категорию и список подкатегорий
+  const { parentCategory, siblingSubcategories } = useMemo(() => {
+    for (const category of categories) {
+      if (category.subcategories && category.subcategories.length > 0) {
+        const found = category.subcategories.some(
+          (sub) => String(sub.id) === String(subcategoryId)
+        )
+        if (found) {
+          return {
+            parentCategory: category,
+            siblingSubcategories: category.subcategories,
+          }
+        }
+      }
+    }
+    return { parentCategory: null, siblingSubcategories: [] }
+  }, [categories, subcategoryId])
 
   // Выравнивание высоты заголовков товаров
   useMatchHeight('.catalog__main-title', [products, loading])
+
+  useEffect(() => {
+    dispatch(fetchCategories())
+  }, [dispatch])
 
   useEffect(() => {
     dispatch(fetchProducts({ subcategoryId }))
@@ -117,14 +141,20 @@ function Subcategory() {
 
             {/* ОСНОВНАЯ ЧАСТЬ */}
             <div className="catalog__main">
-              {/* Бары фильтрации */}
-              <div className="catalog__main-bars">
-                <div className="catalog__main-bar">iPhone 11</div>
-                <div className="catalog__main-bar active">iPhone 12</div>
-                <div className="catalog__main-bar">iPhone 13</div>
-                <div className="catalog__main-bar">iPhone 14</div>
-                <div className="catalog__main-bar">iPhone 15</div>
-              </div>
+              {/* Список подкатегорий родительской категории */}
+              {siblingSubcategories.length > 0 && (
+                <div className="catalog__main-bars">
+                  {siblingSubcategories.map((sub) => (
+                    <Link
+                      key={sub.id}
+                      to={`/subcategory/${sub.id}/`}
+                      className={`catalog__main-bar${String(sub.id) === String(subcategoryId) ? ' active' : ''}`}
+                    >
+                      {sub.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
 
               {/* Панель сортировки и вида */}
               <div className="catalog__main-filters">
