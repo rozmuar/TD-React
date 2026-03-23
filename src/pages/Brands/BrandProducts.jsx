@@ -143,12 +143,14 @@ function BrandProducts() {
       <div className="catalog">
         <div className="container">
           <div className="brand-header">
-            {brand?.image && brand.image !== 'https://topdisc.ru' && (
-              <div className="brand-header__logo">
-                <img src={brand.image} alt={brandName} />
-              </div>
-            )}
-            <h1>{brandName}</h1>
+            <div className="brand-header__top">
+              {brand?.image && brand.image !== 'https://topdisc.ru' && (
+                <div className="brand-header__logo">
+                  <img src={brand.image} alt={brandName} />
+                </div>
+              )}
+              <h1>{brandName}</h1>
+            </div>
             {brand?.description && (
               <p className="brand-header__desc">{brand.description}</p>
             )}

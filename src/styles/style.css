@@ -4423,10 +4423,16 @@ footer {
     margin-bottom: 30px;
 }
 
+.brand-header__top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
 .brand-header__logo {
-    max-width: 160px;
+    width: 60px;
     height: 60px;
-    margin-bottom: 16px;
+    flex-shrink: 0;
 }
 
 .brand-header__logo img {
@@ -4439,7 +4445,6 @@ footer {
     font-size: 15px;
     color: #555;
     line-height: 1.5;
-    max-width: 720px;
     margin: 8px 0 0;
 }
 
