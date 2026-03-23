@@ -144,17 +144,13 @@ function BrandProducts() {
         <div className="container">
           <h1>{brandName}</h1>
 
-          <div className="catalog__top-bar">
-            <div className="catalog__sort">
-              <label>Сортировка:</label>
-              <select value={sortOrder} onChange={handleSortChange}>
-                <option value="">По умолчанию</option>
-                <option value="price_asc">Сначала дешевые</option>
-                <option value="price_desc">Сначала дорогие</option>
-                <option value="popular">По популярности</option>
-                <option value="new">Новинки</option>
-              </select>
-            </div>
+          <div className="catalog__controls">
+            <select className="catalog__sort" value={sortOrder} onChange={handleSortChange}>
+              <option value="">Популярное</option>
+              <option value="new">Новинки</option>
+              <option value="price_asc">Дешевле</option>
+              <option value="price_desc">Дороже</option>
+            </select>
           </div>
 
           <div className="catalog__main-list">
