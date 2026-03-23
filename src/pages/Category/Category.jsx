@@ -7,6 +7,7 @@ import { Navigation } from 'swiper/modules'
 import ProductCard from '../../components/ProductCard/ProductCard'
 import { useMatchHeight } from '../../hooks/useMatchHeight'
 import { sanitizeHtml } from '../../utils/sanitizeHtml'
+import { decodeHtml } from '../../utils/decodeHtml'
 
 // Кеш категорий для ускорения навигации
 const categoryCache = new Map()
@@ -625,11 +626,11 @@ function Category() {
             </li>
             {breadcrumbsPath.map((crumb) => (
               <li key={crumb.id} className="breadcrumbs-item">
-                <Link className="breadcrumbs-link" to={`/category/${crumb.code}/`}>{crumb.name}</Link>
+                <Link className="breadcrumbs-link" to={`/category/${crumb.code}/`}>{decodeHtml(crumb.name)}</Link>
               </li>
             ))}
             <li className="breadcrumbs-item">
-              <span className="breadcrumbs-link">{mainCategory.name}</span>
+              <span className="breadcrumbs-link">{decodeHtml(mainCategory.name)}</span>
             </li>
           </ul>
         </div>
@@ -641,7 +642,7 @@ function Category() {
         <>
           <div className="subcategory-page">
             <div className="container">
-              <h1 className="subcategory__title">{mainCategory.name}</h1>
+              <h1 className="subcategory__title">{decodeHtml(mainCategory.name)}</h1>
 
               {subcategories.length > 0 && (
                 <div className="subcategory__grid">
@@ -713,7 +714,7 @@ function Category() {
         /* УРОВЕНЬ 2: СПИСОК ТОВАРОВ С ФИЛЬТРАМИ */
         <div className="catalog">
           <div className="container">
-            <h1>{mainCategory.name}</h1>
+            <h1>{decodeHtml(mainCategory.name)}</h1>
             <div className="catalog__row">
               {/* ФИЛЬТРЫ */}
               <aside ref={filtersAsideRef} className={`catalog__filters${filtersOpen ? ' is-open' : ' mobile-hidden'}`} data-filters style={{ position: 'relative' }}>

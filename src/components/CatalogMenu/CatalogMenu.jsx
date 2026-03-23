@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { getMenu } from '../../services/apiClient'
+import { decodeHtml } from '../../utils/decodeHtml'
 
 let menuCache = null
 
@@ -98,7 +99,7 @@ function CatalogMenu({ isOpen, onClose }) {
               onMouseEnter={() => handleL1Enter(item.id)}
               onClick={handleNavigate}
             >
-              <span>{item.text}</span>
+              <span>{decodeHtml(item.text)}</span>
               {item.is_parent && (
                 <svg className="catalog-menu__arrow" width="6" height="10" viewBox="0 0 6 10" fill="none">
                   <path d="M1 1l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -119,7 +120,7 @@ function CatalogMenu({ isOpen, onClose }) {
                 onMouseEnter={() => handleL2Enter(item.id)}
                 onClick={handleNavigate}
               >
-                <span>{item.text}</span>
+                <span>{decodeHtml(item.text)}</span>
                 {item.children?.length > 0 && (
                   <svg className="catalog-menu__arrow" width="6" height="10" viewBox="0 0 6 10" fill="none">
                     <path d="M1 1l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -140,7 +141,7 @@ function CatalogMenu({ isOpen, onClose }) {
                 className="catalog-menu__l3-item"
                 onClick={handleNavigate}
               >
-                {item.text}
+                {decodeHtml(item.text)}
               </Link>
             ))}
           </div>

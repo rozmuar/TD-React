@@ -180,7 +180,7 @@ function Product() {
             </li>
             {category && (
               <li className="breadcrumbs-item">
-                <Link className="breadcrumbs-link" to={`/category/${category.code}/`}>{category.name}</Link>
+                <Link className="breadcrumbs-link" to={`/category/${category.code}/`}>{decodeHtml(category.name)}</Link>
               </li>
             )}
           </ul>
@@ -377,8 +377,8 @@ function Product() {
                 .filter(prop => prop.name !== 'Галерея' && prop.name !== 'Артикул')
                 .map((prop, index) => (
                   <div key={index} className={`specs__row ${!showAllSpecs && index >= 6 ? 'specs__row--extra' : ''}`}>
-                    <dt>{prop.name}</dt>
-                    <dd>{prop.value}</dd>
+                    <dt>{decodeHtml(prop.name)}</dt>
+                    <dd>{decodeHtml(prop.value)}</dd>
                   </div>
                 ))}
             </dl>

@@ -4,10 +4,8 @@ import axios from 'axios'
 const BITRIX_REST_URL = import.meta.env.VITE_BITRIX_REST_URL || 'https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e'
 
 // Filter API base URL (separate service)
-// In dev mode, use Vite proxy to avoid CORS issues
-const FILTER_API_URL = import.meta.env.DEV
-  ? '/api/mobile/v1'
-  : (import.meta.env.VITE_FILTER_API_URL || 'https://topdisc.ru/mobile/v1')
+// Всегда через прокси — и в dev (Vite proxy), и в prod (nginx proxy)
+const FILTER_API_URL = '/api/mobile/v1'
 
 export const bitrixClient = axios.create({
   baseURL: BITRIX_REST_URL,

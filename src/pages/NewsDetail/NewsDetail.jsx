@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async'
 import { getNewsList, getNewsDetail } from '../../services/apiClient'
 import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
 import { sanitizeHtml } from '../../utils/sanitizeHtml'
+import { decodeHtml } from '../../utils/decodeHtml'
 
 function NewsDetail() {
   const { newsCode } = useParams()
@@ -161,7 +162,7 @@ function NewsDetail() {
               <Link className="breadcrumbs-link" to="/company/news/">Новости</Link>
             </li>
             <li className="breadcrumbs-item">
-              <span className="breadcrumbs-link">{newsItem.name}</span>
+              <span className="breadcrumbs-link">{decodeHtml(newsItem.name)}</span>
             </li>
           </ul>
         </div>

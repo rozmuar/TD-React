@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import { fetchProducts } from '../../store/slices/productsSlice'
 import { addToCart } from '../../store/slices/cartSlice'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Pagination } from 'swiper/modules'
@@ -14,7 +13,6 @@ import { sanitizeHtml } from '../../utils/sanitizeHtml'
 
 function Home() {
   const dispatch = useDispatch()
-  const { items: products, loading } = useSelector((state) => state.products)
   const [banners, setBanners] = useState([])
   const [bannersLoading, setBannersLoading] = useState(true)
   const [forYouProducts, setForYouProducts] = useState([])
@@ -24,14 +22,12 @@ function Home() {
   const [dataLoading, setDataLoading] = useState(true)
 
   // Выравнивание высоты заголовков товаров
-  useMatchHeight('.catalog__main-title', [forYouProducts, hurryToBuyProducts, products, loading, dataLoading])
+  useMatchHeight('.catalog__main-title', [forYouProducts, hurryToBuyProducts, dataLoading])
   
   // Выравнивание высоты заголовков новостей
   useMatchHeight('.news-card__title', [news])
 
   useEffect(() => {
-    dispatch(fetchProducts())
-    
     const fetchHomeData = async () => {
       try {
         const [bannersResponse, forYouResponse, categoriesResponse, hurryToBuyResponse, newsResponse] = await Promise.all([
@@ -78,12 +74,12 @@ function Home() {
   }, [dispatch])
 
   useEffect(() => {
-    if (!loading && !bannersLoading && !dataLoading) {
+    if (!bannersLoading && !dataLoading) {
       // Флаг для prerender скрипта
       const root = document.getElementById('root')
       if (root) root.dataset.ready = 'true'
     }
-  }, [loading, bannersLoading, dataLoading])
+  }, [bannersLoading, dataLoading])
 
   const handleAddToCart = (product) => {
     dispatch(addToCart(product))
@@ -104,8 +100,8 @@ function Home() {
   
   const getCategoryClass = (code) => categoryClassMap[code] || 'card--electronics'
 
-  // Используем forYouProducts или fallback на products
-  const displayedForYou = (forYouProducts.length > 0 ? forYouProducts : products).slice(0, 20)
+  // Товары "для вас"
+  const displayedForYou = forYouProducts.slice(0, 20)
 
   return (
     <>

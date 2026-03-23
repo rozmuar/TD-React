@@ -1,5 +1,5 @@
 import React from 'react'
-import { createRoot, hydrateRoot } from 'react-dom/client'
+import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
@@ -28,9 +28,6 @@ const app = (
   </React.StrictMode>
 )
 
-// Используем hydrate для pre-rendered контента, иначе render
-if (rootElement.hasChildNodes()) {
-  hydrateRoot(rootElement, app)
-} else {
-  createRoot(rootElement).render(app)
-}
+// Всегда createRoot — hydrate вызывает mismatch из-за динамического контента
+rootElement.innerHTML = ''
+createRoot(rootElement).render(app)
