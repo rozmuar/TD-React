@@ -31,7 +31,7 @@ function App() {
         <Route path="company/news/" element={<NewsList />} />
         <Route path="company/news/:newsCode/" element={<NewsDetail />} />
         <Route path="category/:categoryId/" element={<Category />} />
-        <Route path="catalog/:categoryCode/" element={<Category />} />
+        <Route path="catalog/:categoryId/" element={<Category />} />
         <Route path="catalog_oth/:categoryId/" element={<Category />} />
         <Route path="catalog/:categoryCode/:productCode/" element={<Product />} />
         <Route path="catalog_oth/:categoryCode/:productCode/" element={<Product />} />
