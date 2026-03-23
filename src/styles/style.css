@@ -7540,6 +7540,26 @@ p.region-delivery__note {
   position: relative;
 }
 
+.cart-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--accent, #44BD31);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+.header__action--cart {
+  position: relative;
+}
+
 @media (max-width: 768px) {
   .compare__product {
     flex: 0 0 150px;

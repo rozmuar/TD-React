@@ -93,7 +93,7 @@ function CatalogMenu({ isOpen, onClose }) {
           {menu?.map(item => (
             <Link
               key={item.id}
-              to={`/category/${item.code}/`}
+              to={item.link}
               className={`catalog-menu__l1-item${item.id === activeL1 ? ' is-active' : ''}`}
               onMouseEnter={() => handleL1Enter(item.id)}
               onClick={handleNavigate}
@@ -114,7 +114,7 @@ function CatalogMenu({ isOpen, onClose }) {
             {l2Items.map(item => (
               <Link
                 key={item.id}
-                to={`/category/${item.code}/`}
+                to={item.link}
                 className={`catalog-menu__l2-item${item.id === activeL2 ? ' is-active' : ''}`}
                 onMouseEnter={() => handleL2Enter(item.id)}
                 onClick={handleNavigate}
@@ -136,7 +136,7 @@ function CatalogMenu({ isOpen, onClose }) {
             {l3Items.map(item => (
               <Link
                 key={item.id}
-                to={`/category/${item.code}/`}
+                to={item.link}
                 className="catalog-menu__l3-item"
                 onClick={handleNavigate}
               >
