@@ -161,8 +161,16 @@ function BrandProducts() {
                 <ProductCard key={product.id} product={product} />
               ))
             ) : (
-              <div className="catalog__empty">
-                <p>У этого бренда пока нет товаров</p>
+              <div className="brand-empty">
+                <svg className="brand-empty__icon" width="80" height="80" viewBox="0 0 80 80" fill="none">
+                  <circle cx="40" cy="40" r="38" stroke="#E0E0E0" strokeWidth="2" />
+                  <path d="M28 44c0-6.627 5.373-12 12-12s12 5.373 12 12" stroke="#BFBFBF" strokeWidth="2" strokeLinecap="round" />
+                  <circle cx="32" cy="34" r="2.5" fill="#BFBFBF" />
+                  <circle cx="48" cy="34" r="2.5" fill="#BFBFBF" />
+                </svg>
+                <p className="brand-empty__title">Товары скоро появятся</p>
+                <p className="brand-empty__text">Мы уже работаем над пополнением ассортимента этого бренда</p>
+                <Link to="/brands/" className="brand-empty__btn">Ко всем брендам</Link>
               </div>
             )}
           </div>

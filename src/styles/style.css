@@ -4370,6 +4370,52 @@ footer {
     }
 }
 
+/* ── Пустой бренд ────────────────────────────────────────── */
+.brand-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    grid-column: 1 / -1;
+    text-align: center;
+}
+
+.brand-empty__icon {
+    margin-bottom: 24px;
+    opacity: .7;
+}
+
+.brand-empty__title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1A1A1A;
+    margin: 0 0 8px;
+}
+
+.brand-empty__text {
+    font-size: 15px;
+    color: #888;
+    margin: 0 0 24px;
+    max-width: 320px;
+}
+
+.brand-empty__btn {
+    display: inline-block;
+    padding: 12px 28px;
+    background: #44BD31;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: background .2s;
+}
+
+.brand-empty__btn:hover {
+    background: #3aa829;
+}
+
 .news {
     margin: 190px 0;
 }
