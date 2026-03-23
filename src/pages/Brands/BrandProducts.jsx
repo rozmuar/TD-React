@@ -142,7 +142,17 @@ function BrandProducts() {
 
       <div className="catalog">
         <div className="container">
-          <h1>{brandName}</h1>
+          <div className="brand-header">
+            {brand?.image && brand.image !== 'https://topdisc.ru' && (
+              <div className="brand-header__logo">
+                <img src={brand.image} alt={brandName} />
+              </div>
+            )}
+            <h1>{brandName}</h1>
+            {brand?.description && (
+              <p className="brand-header__desc">{brand.description}</p>
+            )}
+          </div>
 
           <div className="catalog__controls">
             <select className="catalog__sort" value={sortOrder} onChange={handleSortChange}>
