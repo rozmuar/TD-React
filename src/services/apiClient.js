@@ -99,6 +99,15 @@ export const getFilters = (categoryId, opts) =>
   filterClient.get(`/filter/4/${categoryId}`, opts)
 
 // ============================================================
+// Бренды
+// ============================================================
+export const getBrandList = (page = 1, opts) =>
+  bitrixClient.get('/app_mobile.brandList.json', { params: { page }, ...opts })
+
+export const getBrandProducts = (params, opts) =>
+  bitrixClient.get('/app_mobile.brandProducts.json', { params, ...opts })
+
+// ============================================================
 // Авторизация
 // ============================================================
 // Нормализация номера: 79xx → +79xx, 89xx → +79xx

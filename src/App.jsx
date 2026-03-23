@@ -9,6 +9,8 @@ import Product from './pages/Product/Product'
 import NewsList from './pages/NewsList/NewsList'
 import NewsDetail from './pages/NewsDetail/NewsDetail'
 import NotFound from './pages/NotFound/NotFound'
+import BrandList from './pages/Brands/BrandList'
+import BrandProducts from './pages/Brands/BrandProducts'
 import Compare from './pages/Compare/Compare'
 import Favorites from './pages/Favorites/Favorites'
 import Cart from './pages/Cart/Cart'
@@ -37,6 +39,8 @@ function App() {
         <Route path="catalog_oth/:categoryCode/:productCode/" element={<Product />} />
         <Route path="compare/" element={<Compare />} />
         <Route path="favorites/" element={<Favorites />} />
+        <Route path="brands/" element={<BrandList />} />
+        <Route path="brands/:brandCode/" element={<BrandProducts />} />
         <Route path="cart/" element={<Cart />} />
         <Route path="cart/checkout/" element={<Checkout />} />
         <Route path="cart/success/" element={<OrderSuccess />} />

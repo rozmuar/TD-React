@@ -57,7 +57,7 @@ function Footer() {
                     <nav>
                       <ul>
                         <li><Link to="/about/">О нас</Link></li>
-                        <li><a href="#">Бренды</a></li>
+                        <li><Link to="/brands/">Бренды</Link></li>
                         <li><a href="#">Поставщикам</a></li>
                         <li><a href="#">Оптовикам</a></li>
                         <li><a href="#">Вакансии</a></li>
