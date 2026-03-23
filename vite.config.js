@@ -22,4 +22,13 @@ export default defineConfig({
       },
     },
   },
+  server: {
+    proxy: {
+      '/api/mobile': {
+        target: 'https://topdisc.ru',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/mobile/, '/mobile'),
+      },
+    },
+  },
 })

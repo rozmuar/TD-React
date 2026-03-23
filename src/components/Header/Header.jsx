@@ -1,8 +1,23 @@
+import { useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
+import { logout } from '../../store/slices/authSlice'
+import AuthPopup from '../AuthPopup/AuthPopup'
+import CatalogMenu from '../CatalogMenu/CatalogMenu'
 
 function Header() {
   const cartCount = useSelector((state) => state.cart.totalCount)
+  const compareCount = useSelector((state) => state.compare.items.length)
+  const favoritesCount = useSelector((state) => state.favorites.items.length)
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
+  const dispatch = useDispatch()
+  const [authOpen, setAuthOpen] = useState(false)
+  const [catalogOpen, setCatalogOpen] = useState(false)
+
+  const openAuth = useCallback(() => setAuthOpen(true), [])
+  const closeAuth = useCallback(() => setAuthOpen(false), [])
+  const toggleCatalog = useCallback(() => setCatalogOpen(prev => !prev), [])
+  const closeCatalog = useCallback(() => setCatalogOpen(false), [])
 
   return (
     <header className="header">
@@ -39,12 +54,18 @@ function Header() {
             </Link>
 
             {/* Каталог */}
-            <Link to="/catalog/" className="header__catalog">
+            <button type="button" className={`header__catalog${catalogOpen ? ' is-active' : ''}`} onClick={toggleCatalog}>
               <span className="header__catalog-icon">
-                <img src="/img/header/burger.png" alt="Каталог" />
+                {catalogOpen ? (
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                    <path d="M4 4l10 10M14 4L4 14" stroke="#fff" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                ) : (
+                  <img src="/img/header/burger.png" alt="Каталог" />
+                )}
               </span>
               <span className="header__catalog-text">Каталог</span>
-            </Link>
+            </button>
 
             {/* Поиск */}
             <form className="header__search" onSubmit={(e) => e.preventDefault()}>
@@ -55,21 +76,30 @@ function Header() {
             {/* Иконки действий справа */}
             <ul className="header__actions">
               <li className="header__action header__action--account">
-                <Link to="/profile/" aria-label="Кабинет">
-                  <img src="/img/header/user.png" alt="Кабинет" />
-                  <span>Кабинет</span>
-                </Link>
+                {isAuthenticated ? (
+                  <Link to="/personal/" aria-label="Кабинет">
+                    <img src="/img/header/user.png" alt="Кабинет" />
+                    <span>Кабинет</span>
+                  </Link>
+                ) : (
+                  <button type="button" className="header__action-btn" onClick={openAuth} aria-label="Войти">
+                    <img src="/img/header/user.png" alt="Войти" />
+                    <span>Войти</span>
+                  </button>
+                )}
               </li>
               <li className="header__action header__action--compare">
                 <Link to="/compare/" aria-label="Сравнение">
                   <img src="/img/header/ves.png" alt="Сравнение" />
                   <span>Сравнение</span>
+                  {compareCount > 0 && <span className="compare-count">{compareCount}</span>}
                 </Link>
               </li>
               <li className="header__action header__action--favorite">
                 <Link to="/favorites/" aria-label="Избранное">
                   <img src="/img/header/heart.png" alt="Избранное" />
                   <span>Избранное</span>
+                  {favoritesCount > 0 && <span className="favorites-count">{favoritesCount}</span>}
                 </Link>
               </li>
               <li className="header__action header__action--cart">
@@ -83,6 +113,8 @@ function Header() {
           </div>
         </div>
       </div>
+      <CatalogMenu isOpen={catalogOpen} onClose={closeCatalog} />
+      <AuthPopup isOpen={authOpen} onClose={closeAuth} />
     </header>
   )
 }

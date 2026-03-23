@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import { Link, useSearchParams, useLocation } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import axios from 'axios'
+import { getNewsList } from '../../services/apiClient'
 import { useMatchHeight } from '../../hooks/useMatchHeight'
 import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
 
@@ -21,10 +21,7 @@ function NewsList() {
     const fetchNews = async () => {
       try {
         setLoading(true)
-        const response = await axios.get(
-          `https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.newsList.json`,
-          { params: { limit: 20, page: currentPage } }
-        )
+        const response = await getNewsList({ limit: 20, page: currentPage })
         
         if (response.data.result?.data) {
           setNews(response.data.result.data)

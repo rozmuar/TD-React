@@ -1,0 +1,953 @@
+{
+  "info": {
+    "_postman_id": "9c8116a7-4c99-4276-925d-67cbc7eddbb2",
+    "name": "topdisk personal_section",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "31921365"
+  },
+  "item": [
+    {
+      "name": "auth",
+      "item": [
+        {
+          "name": "auth by login/pass",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const responseJson = pm.response.json();",
+                  "",
+                  "if (responseJson && responseJson.message && responseJson.message.Authorization) {",
+                  "",
+                  "    const authToken = responseJson.message.Authorization;",
+                  "",
+                  "    // Устанавливаем глобальную переменную bearer_token",
+                  "    pm.globals.set(\"bearer_token\", authToken);",
+                  "",
+                  "    console.log(\"Bearer Token set:\", pm.globals.get(\"bearer_token\"));",
+                  "} else {",
+                  "    console.log(\"Authorization token not found in the response.\");",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearer_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\t\"login\": \"test_mobile\",\n    \"password\": \"GyjdT4mG1\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/auth",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "auth"
+              ]
+            },
+            "description": "Реализует авторизацию пользователя.  \nОбязательные поля:\n\n- **login**\n    \n- **password**"
+          },
+          "response": []
+        },
+        {
+          "name": "/v1/auth/smscode",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "phone",
+                  "value": "79673443589",
+                  "type": "text",
+                  "uuid": "cbfe10e2-ef2c-4235-aebe-0130f8d1233b"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/auth/smscode",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "auth",
+                "smscode"
+              ]
+            },
+            "description": "Генерирует и отправляет SMS-код для указанного номера телефона."
+          },
+          "response": []
+        },
+        {
+          "name": "/v1/auth/smscode/verify",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const responseJson = pm.response.json();",
+                  "",
+                  "if (responseJson && responseJson.message && responseJson.message.Authorization) {",
+                  "",
+                  "    const authToken = responseJson.message.Authorization;",
+                  "",
+                  "    // Устанавливаем глобальную переменную bearer_token",
+                  "    pm.globals.set(\"bearer_token\", authToken);",
+                  "",
+                  "    console.log(\"Bearer Token set:\", pm.globals.get(\"bearer_token\"));",
+                  "} else {",
+                  "    console.log(\"Authorization token not found in the response.\");",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "phone",
+                  "value": "+79673443589",
+                  "type": "text",
+                  "uuid": "4ad81cb7-6910-4941-8725-52e506dde7a1"
+                },
+                {
+                  "key": "code",
+                  "value": "523666",
+                  "type": "text",
+                  "uuid": "900b3196-7632-458e-a664-c31eccdc17e2"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/auth/smscode/verify",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "auth",
+                "smscode",
+                "verify"
+              ]
+            },
+            "description": "Проверяет SMS-код и авторизует пользователя."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "user",
+      "item": [
+        {
+          "name": "/v1/user/profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearer_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/user/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "user",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/v1/user/profile",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearer_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Иван",
+                  "type": "text"
+                },
+                {
+                  "key": "last_name",
+                  "value": "Фёдоров",
+                  "type": "text"
+                },
+                {
+                  "key": "email",
+                  "value": "",
+                  "type": "text"
+                },
+                {
+                  "key": "phone",
+                  "value": "+70000000000",
+                  "type": "text"
+                },
+                {
+                  "key": "gender",
+                  "value": "M",
+                  "type": "text",
+                  "description": "M / F"
+                },
+                {
+                  "key": "photo",
+                  "type": "file",
+                  "src": "/Users/vitmarg/Library/CloudStorage/GoogleDrive-mobcae@gmail.com/Мой диск/linux.png"
+                },
+                {
+                  "key": "photo_delete",
+                  "value": "",
+                  "description": "Y",
+                  "type": "text",
+                  "uuid": "ded637b2-39ff-4940-b884-893f4c840e03"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/user/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "user",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/v1/user/password/change",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearer_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "old_password",
+                  "value": "GyjdT4mG",
+                  "type": "text",
+                  "uuid": "736f125c-8a10-48e8-b9ae-a0042996d422"
+                },
+                {
+                  "key": "new_password",
+                  "value": "GyjdT4mG1",
+                  "type": "text",
+                  "uuid": "6e033996-c3c0-4530-a030-a145181bd498"
+                },
+                {
+                  "key": "confirm_password",
+                  "value": "GyjdT4mG1",
+                  "type": "text",
+                  "uuid": "949a6a2f-1853-4480-b170-0be160961b0f"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/user/password/change",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "user",
+                "password",
+                "change"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/v1/user/logout",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearer_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": []
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/user/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "user",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "sale",
+      "item": [
+        {
+          "name": "/v1/sale/statuses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/sale/statuses",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "sale",
+                "statuses"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/v1/sale/paysystems",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/sale/paysystems",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "sale",
+                "paysystems"
+              ]
+            },
+            "description": "Возвращает список платежных систем"
+          },
+          "response": []
+        },
+        {
+          "name": "/v1/sale/stores",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/sale/stores",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "sale",
+                "stores"
+              ]
+            },
+            "description": "Возвращает список доступных складов.\n\nАвторизация не требуется."
+          },
+          "response": []
+        },
+        {
+          "name": "/v1/sale/deliveries",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/sale/deliveries",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "sale",
+                "deliveries"
+              ]
+            },
+            "description": "Возвращает список служб доставки"
+          },
+          "response": []
+        },
+        {
+          "name": "/v1/sale/persontypes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/sale/persontypes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "sale",
+                "persontypes"
+              ]
+            },
+            "description": "Возвращает список типов плательщика"
+          },
+          "response": []
+        },
+        {
+          "name": "/v1/sale/basket",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/sale/basket",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "sale",
+                "basket"
+              ]
+            },
+            "description": "Получение содержимого корзины.\nВозвращает массив basket и total_price.\nАвторизация не требуется (корзина определяется по текущему пользователю/сессии)."
+          },
+          "response": []
+        },
+        {
+          "name": "/v1/sale/basket/add",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "product_id",
+                  "value": "359226",
+                  "type": "text",
+                  "uuid": "d3357d86-5fe4-4bf0-ab43-7852e86561e2"
+                },
+                {
+                  "key": "quantity",
+                  "value": "3",
+                  "type": "text",
+                  "uuid": "d64d1ef0-3edd-4f89-a33c-9b4e7e8a657a"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/sale/basket/add",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "sale",
+                "basket",
+                "add"
+              ]
+            },
+            "description": "Добавление товара в корзину.\nПоля body (form-data): product_id (обязательно), quantity (обязательно, > 0).\nПри успехе возвращает success=true и сообщение."
+          },
+          "response": []
+        },
+        {
+          "name": "/v1/sale/basket/delete",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "product_id",
+                  "value": "359226",
+                  "type": "text",
+                  "uuid": "d3357d86-5fe4-4bf0-ab43-7852e86561e2"
+                },
+                {
+                  "key": "mode",
+                  "value": "decrement",
+                  "type": "text",
+                  "uuid": "1a2b547b-608e-414e-90a5-6678fa4708e5",
+                  "disabled": true
+                },
+                {
+                  "key": "mode",
+                  "value": "full",
+                  "type": "text",
+                  "uuid": "4654e281-bf1a-47d1-8c75-a9c73c704aef"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/sale/basket/delete",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "sale",
+                "basket",
+                "delete"
+              ]
+            },
+            "description": "Удаление товара из корзины.\nПоля body (form-data): product_id (обязательно), mode (опционально: full|decrement).\nmode=full — удалить товар полностью, mode=decrement — уменьшить количество на 1."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "orders",
+      "item": [
+        {
+          "name": "/v1/orders/{id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/orders/{{order_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "orders",
+                "{{order_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/v1/orders[?filter]",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "orders"
+              ]
+            },
+            "description": "<p><br><br><br><br><br><br></p><p><br><br><br></p><table><tbody><tr><td><div>Свойство заказа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Описание</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>ID</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Номер заказа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>LID</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Код сайта</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>ACCOUNT_NUMBER</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Код заказа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>TRACKING_NUMBER</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Трек-номер заказа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>PAY_SYSTEM_ID</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Идентификатор платежной системы</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>DELIVERY_ID</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Идентификатор службы доставки</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>DATE_INSERT</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Дата добавления заказа в формате текущего сайта</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>DATE_UPDATE</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Дата последнего изменения заказа в формате текущего сайта</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>PERSON_TYPE_ID</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Идентификатор плательщика</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>USER_ID</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Идентификатор пользователя, за кем закреплен заказ</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>PAYED</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Флаг оплаченности заказа (Y/N)</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>DATE_PAYED</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Дата оплаты заказа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>EMP_PAYED_ID</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Идентификатор пользователя оплатившего заказ</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>DEDUCTED</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Флаг отгруженности заказа (Y/N)</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>DATE_DEDUCTED</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Дата отгрузки заказа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>EMP_DEDUCTED_ID</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Идентификатор пользователя, отгрузившего заказ</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>REASON_UNDO_DEDUCTED</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Комментарий причины отмены отгрузки заказа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>STATUS_ID</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Код статуса заказа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>DATE_STATUS</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Дата изменения статуса заказа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>EMP_STATUS_ID</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>ID пользователя, изменивший статус заказа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>MARKED</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Флаг проблемности заказа (Y/N)</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>DATE_MARKED</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Дата выставления флага проблемности заказа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>EMP_MARKED_ID</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Идентификатор пользователя, установивший флаг проблемности заказа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>REASON_MARKED</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Комментарий причины проблемности заказа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>PRICE_DELIVERY</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Стоимость доставки</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>ALLOW_DELIVERY</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Флаг разрешена ли отгрузка заказа (Y/N)</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>DATE_ALLOW_DELIVERY</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Дата выставления флага разрешения отгрузки заказа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>EMP_ALLOW_DELIVERY_ID</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Идентификатор пользователя, установивший флаг разрешение отгрузки заказа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>RESERVED</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Флаг зарезервировано ли всё кол-во товара в заказе (Y/N)</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>PRICE</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Стоимость заказа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>CURRENCY</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Валюта заказа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>DISCOUNT_VALUE</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Значение скидки заказа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>TAX_VALUE</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Размер налога на заказ</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>SUM_PAID</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Сумма оплаченного заказа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>USER_DESCRIPTION</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Комментарий пользователя оформившего заказ</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>PAY_VOUCHER_NUM</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Номер документа оплаты</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>PAY_VOUCHER_DATE</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Дата оплаты документа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>ADDITIONAL_INFO</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Дополнительная информация заказа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>COMMENTS</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Комментарии к заказу</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>COMPANY_ID</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Идентификатор компании, к которой привязан заказ</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>CREATED_BY</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Идентификатор пользователя, кто создал заказ</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>RESPONSIBLE_ID</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Идентификатор ответственного пользователя</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>STAT_GID</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Код статистики</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>DATE_PAY_BEFORE</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Дата предоплаты</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>DATE_BILL</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Дата выставления счета</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>IS_RECURRING</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div></div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>RECURRING_ID</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div></div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>LOCKED_BY</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Флаг, кто заблокировал заказ</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>DATE_LOCK</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Дата, когда был заблокирован заказ</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>RECOUNT_FLAG</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div></div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>AFFILIATE_ID</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Идентификатор аффилиата</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>DELIVERY_DOC_NUM</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Номер документа отгрузки</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>DELIVERY_DOC_DATE</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Дата документа отгрузки</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>UPDATED_1C</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Флаг обновления данных в 1C</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>ORDER_TOPIC</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Идентификатор темы на форуме, к которому привязан заказ</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>XML_ID</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Внешний код заказа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>ID_1C</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Код в 1С</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>VERSION_1C</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Версия обмена</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>VERSION</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div></div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>EXTERNAL_ORDER</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Флаг, определяющий является ли заказ внешним</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>STORE_ID</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Код склада</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>CANCELED</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Флаг отмены заказа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>EMP_CANCELED_ID</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Идентификатор пользователя, кто отменил заказ</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>DATE_CANCELED</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Дата отмены заказа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>REASON_CANCELED</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div>Причина отмены заказа</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>BX_USER_ID</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div></div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>SEARCH_CONTENT</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div></div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr><tr><td><div>RUNNING</div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td><td><div></div><div contenteditable=\"false\"><div><div><div></div></div></div><div></div></div></td></tr></tbody></table>"
+          },
+          "response": []
+        },
+        {
+          "name": "/v1/orders/status/{id}",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/orders/status/{{order_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "orders",
+                "status",
+                "{{order_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "exec": [
+              ""
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "favorites",
+      "description": "Favorites API (инструкции для разработчика):\n1) Для всех запросов в этой папке обязателен заголовок Authorization: Bearer {{bearer_token}}.\n2) Для add/delete используйте только одно входное поле: product_id (целое число, обязательное).\n3) list возвращает единый список избранного, общий с сайтом: favorites[] и count.\n4) Формат элемента favorites[]: product_id, name, imageUrl, oldPrice, price.\n5) count — общее количество позиций в избранном (не quantity из корзины).\n6) Источник данных — хранилище избранного Bitlate (UF_NL_FAVORITES для авторизованного пользователя).",
+      "item": [
+        {
+          "name": "/v1/favorites/list",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearer_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/favorites/list",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "favorites",
+                "list"
+              ]
+            },
+            "description": "Получение списка избранного.\nТребует Bearer-токен.\nВозвращает массив favorites[] с полями: product_id, name, imageUrl, oldPrice, price и общее count."
+          },
+          "response": []
+        },
+        {
+          "name": "/v1/favorites/delete",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearer_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "product_id",
+                  "value": "359226",
+                  "type": "text",
+                  "uuid": "74b4c993-3eda-4996-9620-05da36243da0"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/favorites/delete",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "favorites",
+                "delete"
+              ]
+            },
+            "description": "Удаление товара из избранного.\nТребует Bearer-токен.\nВ body передается только product_id (form-data).\nЕсли товар отсутствует, вернется success со статусом not_found."
+          },
+          "response": []
+        },
+        {
+          "name": "/v1/favorites/add",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{bearer_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "product_id",
+                  "value": "359226",
+                  "type": "text",
+                  "uuid": "328d2e2b-21e1-4dc9-b13f-be46dfc1157b"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/favorites/add",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "favorites",
+                "add"
+              ]
+            },
+            "description": "Добавление товара в избранное.\nТребует Bearer-токен.\nВ body передается только product_id (form-data).\nПри повторном добавлении вернется success со статусом exists."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "forms",
+      "item": [
+        {
+          "name": "/v1/forms/agreement/list",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/forms/agreement/list",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "forms",
+                "agreement",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "/v1/forms/agreement/{id:[0-9]+}",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/forms/agreement/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "forms",
+                "agreement",
+                "1"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "/v1/{iblockId:[0-9]+}/{sectionId:[0-9]+}",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/v1/filter/4/12342",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "filter",
+            "4",
+            "12342"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "/v1/forms/agreement/list",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/v1/forms/agreement/list",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "forms",
+            "agreement",
+            "list"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "/v1/forms/agreement/{id:[0-9]+}",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/v1/forms/agreement/1",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "v1",
+            "forms",
+            "agreement",
+            "1"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearer_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://topdisc.ru/mobile",
+      "type": "string"
+    },
+    {
+      "key": "order_id",
+      "value": "49111",
+      "type": "string"
+    },
+    {
+      "key": "bearer_token",
+      "value": "",
+      "type": "string",
+      "disabled": true
+    }
+  ]
+}

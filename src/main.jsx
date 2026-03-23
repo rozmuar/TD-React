@@ -4,12 +4,18 @@ import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 import { store } from './store/store'
+import { fetchFavorites } from './store/slices/favoritesSlice'
 import './styles/normalize.css'
 import './styles/bootstrap-grid.css'
 import './styles/style.css'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
+
+// Если пользователь авторизован — загружаем избранное из API
+if (store.getState().auth.isAuthenticated) {
+  store.dispatch(fetchFavorites())
+}
 
 const rootElement = document.getElementById('root')
 const app = (

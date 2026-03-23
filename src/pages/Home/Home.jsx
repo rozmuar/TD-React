@@ -6,10 +6,11 @@ import { fetchProducts } from '../../store/slices/productsSlice'
 import { addToCart } from '../../store/slices/cartSlice'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Pagination } from 'swiper/modules'
-import axios from 'axios'
+import { getBigBanners, getForYou, getPopularCategories, getHurryToBuy, getNewsForHome } from '../../services/apiClient'
 import { useMatchHeight } from '../../hooks/useMatchHeight'
 import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
 import { decodeHtml } from '../../utils/decodeHtml'
+import { sanitizeHtml } from '../../utils/sanitizeHtml'
 
 function Home() {
   const dispatch = useDispatch()
@@ -33,14 +34,12 @@ function Home() {
     
     const fetchHomeData = async () => {
       try {
-        const API_BASE = 'https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e'
-        
         const [bannersResponse, forYouResponse, categoriesResponse, hurryToBuyResponse, newsResponse] = await Promise.all([
-          axios.get(`${API_BASE}/app_mobile.bigBaner.json`),
-          axios.get(`${API_BASE}/app_mobile.forYou.json?limit=20`),
-          axios.get(`${API_BASE}/app_mobile.popularCategories.json?limit=9`),
-          axios.get(`${API_BASE}/app_mobile.hurryToBuy.json?limit=20`),
-          axios.get(`${API_BASE}/app_mobile.news.json?limit=6`)
+          getBigBanners(),
+          getForYou(20),
+          getPopularCategories(9),
+          getHurryToBuy(20),
+          getNewsForHome(6)
         ])
         
         // Баннеры
@@ -250,7 +249,7 @@ function Home() {
                           )}
                         </div>
                         <div className="catalog__main-score">
-                          <div className="catalog__main-score-num">740</div>
+                          <div className="catalog__main-score-num">{Math.round(price * 0.03)}</div>
                           <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
                         </div>
                       </div>
@@ -280,7 +279,7 @@ function Home() {
                 className={`popular-card ${index === 0 ? 'popular-card--xl' : ''} ${getCategoryClass(category.code)}`}
                 style={category.ico ? { backgroundImage: `url(${category.ico})` } : {}}
               >
-                <span className="popular-card__title" dangerouslySetInnerHTML={{ __html: category.name.replace(/ /g, '<br />') }} />
+                <span className="popular-card__title" dangerouslySetInnerHTML={{ __html: sanitizeHtml(category.name.replace(/ /g, '<br />')) }} />
               </Link>
             ))}
           </div>

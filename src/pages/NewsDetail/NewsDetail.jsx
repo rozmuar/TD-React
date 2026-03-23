@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import axios from 'axios'
+import { getNewsList, getNewsDetail } from '../../services/apiClient'
 import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
+import { sanitizeHtml } from '../../utils/sanitizeHtml'
 
 function NewsDetail() {
   const { newsCode } = useParams()
@@ -84,10 +85,7 @@ function NewsDetail() {
         setError(null)
         
         // Сначала получаем список новостей, чтобы найти ID по code
-        const listResponse = await axios.get(
-          `https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.newsList.json`,
-          { params: { limit: 100, page: 1 } }
-        )
+        const listResponse = await getNewsList({ limit: 100, page: 1 })
         
         const newsListData = listResponse.data.result?.data || []
         const newsFromList = newsListData.find(item => item.code === newsCode)
@@ -99,10 +97,7 @@ function NewsDetail() {
         }
         
         // Теперь получаем полную информацию о новости по ID
-        const detailResponse = await axios.get(
-          `https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.newsDetail.json`,
-          { params: { id: newsFromList.id } }
-        )
+        const detailResponse = await getNewsDetail({ id: newsFromList.id })
         
         if (detailResponse.data.result) {
           setNewsItem(detailResponse.data.result)
@@ -213,7 +208,7 @@ function NewsDetail() {
           {newsItem.detail_text && (
             <div 
               className="news-detail__content"
-              dangerouslySetInnerHTML={{ __html: processDetailText(newsItem.detail_text) }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(processDetailText(newsItem.detail_text)) }}
               onClick={handleContentClick}
             />
           )}

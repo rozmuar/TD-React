@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import axios from 'axios'
+import { getCategoryFirst } from '../../services/apiClient'
+import { sanitizeHtml } from '../../utils/sanitizeHtml'
 
 function Catalog() {
   const [categories, setCategories] = useState([])
@@ -10,7 +11,7 @@ function Catalog() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.categoryFirst.json')
+        const response = await getCategoryFirst()
         setCategories(response.data.result || [])
       } catch (error) {
         console.error('Ошибка загрузки категорий:', error)
@@ -73,7 +74,7 @@ function Catalog() {
                   className={`catalog__card ${index === 0 ? 'catalog__card--xl' : ''}`}
                   style={{ '--pic': `url(${category.ico})` }}
                 >
-                  <span className="catalog__name" dangerouslySetInnerHTML={{ __html: category.name.replace(/\s/g, ' ') }} />
+                  <span className="catalog__name" dangerouslySetInnerHTML={{ __html: sanitizeHtml(category.name.replace(/\s/g, ' ')) }} />
                 </Link>
               ))}
             </div>

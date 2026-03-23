@@ -1,0 +1,333 @@
+{
+  "info": {
+    "_postman_id": "e8916cce-6cdd-43e0-97d2-472a67d4fff3",
+    "name": "Topdisk",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "26380248"
+  },
+  "item": [
+    {
+      "name": "test",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "товар по id",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.product.json?id=543878",
+          "protocol": "https",
+          "host": [
+            "topdisc",
+            "ru"
+          ],
+          "path": [
+            "rest",
+            "28531",
+            "ky7kc0zinte6jb7e",
+            "app_mobile.product.json"
+          ],
+          "query": [
+            {
+              "key": "id",
+              "value": "543878"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "список разделов",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.category.json",
+          "protocol": "https",
+          "host": [
+            "topdisc",
+            "ru"
+          ],
+          "path": [
+            "rest",
+            "28531",
+            "ky7kc0zinte6jb7e",
+            "app_mobile.category.json"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "каталог с товарами и пагинацией",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.product_list.json?cat=2382&page=1&prods=3",
+          "protocol": "https",
+          "host": [
+            "topdisc",
+            "ru"
+          ],
+          "path": [
+            "rest",
+            "28531",
+            "ky7kc0zinte6jb7e",
+            "app_mobile.product_list.json"
+          ],
+          "query": [
+            {
+              "key": "cat",
+              "value": "2382"
+            },
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "prods",
+              "value": "3"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "товар по id 1с",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "категории 1 уровня",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.categoryFirst.json",
+          "protocol": "https",
+          "host": [
+            "topdisc",
+            "ru"
+          ],
+          "path": [
+            "rest",
+            "28531",
+            "ky7kc0zinte6jb7e",
+            "app_mobile.categoryFirst.json"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "категория по id родителя",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.categoryId.json?id=9592",
+          "protocol": "https",
+          "host": [
+            "topdisc",
+            "ru"
+          ],
+          "path": [
+            "rest",
+            "28531",
+            "ky7kc0zinte6jb7e",
+            "app_mobile.categoryId.json"
+          ],
+          "query": [
+            {
+              "key": "id",
+              "value": "9592"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "bigBaner",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.bigBaner.json",
+          "protocol": "https",
+          "host": [
+            "topdisc",
+            "ru"
+          ],
+          "path": [
+            "rest",
+            "28531",
+            "ky7kc0zinte6jb7e",
+            "app_mobile.bigBaner.json"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "miniBaner",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.miniBaner.json",
+          "protocol": "https",
+          "host": [
+            "topdisc",
+            "ru"
+          ],
+          "path": [
+            "rest",
+            "28531",
+            "ky7kc0zinte6jb7e",
+            "app_mobile.miniBaner.json"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "New Request",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "Получение просмотренных товаров",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {
+              "key": "id",
+              "value": "38191",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.viewedProducts.json",
+          "protocol": "https",
+          "host": [
+            "topdisc",
+            "ru"
+          ],
+          "path": [
+            "rest",
+            "28531",
+            "ky7kc0zinte6jb7e",
+            "app_mobile.viewedProducts.json"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "фильтр",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://topdisc.ru/mobile/v1/filter/4/12342",
+          "protocol": "https",
+          "host": [
+            "topdisc",
+            "ru"
+          ],
+          "path": [
+            "mobile",
+            "v1",
+            "filter",
+            "4",
+            "12342"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Поиск",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
+    },
+    {
+      "name": "блок для вас",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.forYou.json?limit=20",
+          "protocol": "https",
+          "host": [
+            "topdisc",
+            "ru"
+          ],
+          "path": [
+            "rest",
+            "28531",
+            "ky7kc0zinte6jb7e",
+            "app_mobile.forYou.json"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "20"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "новости для главной",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.news.json?limit=6",
+          "protocol": "https",
+          "host": [
+            "topdisc",
+            "ru"
+          ],
+          "path": [
+            "rest",
+            "28531",
+            "ky7kc0zinte6jb7e",
+            "app_mobile.news.json"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "6"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}

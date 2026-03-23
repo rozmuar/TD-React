@@ -1,18 +1,22 @@
-import { useEffect, useState, useRef, useMemo } from 'react'
+import { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import { useParams, Link, useSearchParams, useLocation } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import axios from 'axios'
+import { getCategoryFirst, getCategoryById, getCategoryByCode, getProductList, getFilters } from '../../services/apiClient'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation } from 'swiper/modules'
 import ProductCard from '../../components/ProductCard/ProductCard'
 import { useMatchHeight } from '../../hooks/useMatchHeight'
+import { sanitizeHtml } from '../../utils/sanitizeHtml'
 
 // Кеш категорий для ускорения навигации
 const categoryCache = new Map()
+// Кеш промежуточных запросов (categoryFirst, categoryId)
+let cachedMainCategories = null
+const childrenCache = new Map()
 
 function Category() {
   const { categoryId } = useParams()
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const location = useLocation()
   const [subcategories, setSubcategories] = useState([])
   const [products, setProducts] = useState([])
@@ -24,134 +28,167 @@ function Category() {
   const [totalPages, setTotalPages] = useState(1)
   const [isProductListPage, setIsProductListPage] = useState(false)
   const [childSubcategories, setChildSubcategories] = useState([])
+  const [activeFilters, setActiveFilters] = useState({})
+  const [appliedFilters, setAppliedFilters] = useState({})
+  const [sortOrder, setSortOrder] = useState('')
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const [floatingBtnPos, setFloatingBtnPos] = useState(null)
+  const filtersAsideRef = useRef(null)
   const abortControllerRef = useRef(null)
+  const filtersInitRef = useRef(false)
   
   // Читаем currentPage из URL (?PAGEN_1=2)
   const currentPage = parseInt(searchParams.get('PAGEN_1') || '1', 10)
 
+  // Восстанавливаем фильтры из URL при первом рендере
+  useEffect(() => {
+    if (filtersInitRef.current) return
+    filtersInitRef.current = true
+    const restored = {}
+    for (const [key, value] of searchParams.entries()) {
+      if (key === 'PAGEN_1' || key === 'sort') continue
+      if (key === 'price_min') {
+        restored._price = { ...(restored._price || {}), min: Number(value) }
+      } else if (key === 'price_max') {
+        restored._price = { ...(restored._price || {}), max: Number(value) }
+      } else if (key === 'inStock') {
+        restored._inStock = value === '1'
+      } else {
+        // Обычные фильтры: может быть несколько значений через повторяющиеся params
+        if (!restored[key]) restored[key] = []
+        restored[key].push(value)
+      }
+    }
+    if (searchParams.has('sort')) {
+      setSortOrder(searchParams.get('sort'))
+    }
+    const hasFilters = Object.keys(restored).length > 0
+    if (hasFilters) {
+      setActiveFilters(restored)
+      setAppliedFilters(restored)
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Синхронизация appliedFilters и sortOrder в URL
+  const syncFiltersToUrl = useCallback((newApplied, newSort) => {
+    const params = new URLSearchParams()
+    const page = parseInt(searchParams.get('PAGEN_1') || '1', 10)
+    if (page > 1) params.set('PAGEN_1', page)
+    if (newSort) params.set('sort', newSort)
+    for (const [key, values] of Object.entries(newApplied)) {
+      if (key === '_price') {
+        if (values?.min !== undefined) params.set('price_min', values.min)
+        if (values?.max !== undefined) params.set('price_max', values.max)
+      } else if (key === '_inStock') {
+        if (values) params.set('inStock', '1')
+      } else if (Array.isArray(values)) {
+        values.forEach(v => params.append(key, v))
+      }
+    }
+    setSearchParams(params, { replace: true })
+  }, [searchParams, setSearchParams])
+
+  // Применить фильтры
+  const applyFilters = useCallback(() => {
+    const newApplied = { ...activeFilters }
+    setAppliedFilters(newApplied)
+    setFiltersOpen(false)
+    setFloatingBtnPos(null)
+    syncFiltersToUrl(newApplied, sortOrder)
+  }, [activeFilters, sortOrder, syncFiltersToUrl])
+
   // Выравнивание высоты заголовков товаров
   useMatchHeight('.catalog__main-title', [products, loading])
 
-  // Поиск категории по code с использованием categoryIdByCode API
+  // Получение закешированных детей категории
+  const getCachedChildren = async (parentId) => {
+    if (childrenCache.has(parentId)) return childrenCache.get(parentId)
+    const resp = await getCategoryById(parentId)
+    const children = resp.data.result || []
+    childrenCache.set(parentId, children)
+    return children
+  }
+
+  // Получение закешированных категорий первого уровня
+  const getCachedMainCategories = async () => {
+    if (cachedMainCategories) return cachedMainCategories
+    const resp = await getCategoryFirst()
+    cachedMainCategories = resp.data.result || []
+    return cachedMainCategories
+  }
+
+  // Поиск категории по code с кешированием промежуточных результатов
   const findCategory = async (code) => {
-    // Проверяем кеш
-    if (categoryCache.has(code)) {
-      console.log('Категория из кеша:', code)
-      return categoryCache.get(code)
-    }
+    if (categoryCache.has(code)) return categoryCache.get(code)
 
     try {
-      // Быстро получаем ID и базовую информацию по code
-      const categoryByCodeResponse = await axios.get(
-        `https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.categoryIdByCode.json?code=${code}`
-      )
+      const categoryByCodeResponse = await getCategoryByCode(code)
       
       if (categoryByCodeResponse.data.result.error !== 0) {
-        console.error('Категория не найдена:', code)
         return null
       }
 
       const category = categoryByCodeResponse.data.result
+      const mainCategories = await getCachedMainCategories()
       
-      // Теперь определяем уровень: проверяем является ли категория главной
-      const mainResponse = await axios.get(
-        'https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.categoryFirst.json'
-      )
-      const mainCategories = mainResponse.data.result || []
-      
-      // Проверяем есть ли в главных категориях
-      const isMainCategory = mainCategories.some(cat => cat.id == category.id)
-      
-      if (isMainCategory) {
-        // Уровень 1 - главная категория
+      // Уровень 1?
+      if (mainCategories.some(cat => cat.id == category.id)) {
         const result = { category, path: [] }
         categoryCache.set(code, result)
         return result
       }
       
-      // Уровень 2 - нужно найти родительскую категорию
-      // Ищем параллельно во всех главных категориях
-      const parentSearchPromises = mainCategories.map(async (mainCat) => {
-        try {
-          const subResponse = await axios.get(
-            `https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.categoryId.json?id=${mainCat.id}`
-          )
-          const subCategories = subResponse.data.result || []
-          
-          // Проверяем есть ли наша категория среди подкатегорий
-          const found = subCategories.some(subCat => subCat.id == category.id)
-          if (found) {
-            return { id: mainCat.id, name: mainCat.name, code: mainCat.code }
-          }
-          return null
-        } catch (error) {
-          return null
-        }
-      })
-      
-      const parents = await Promise.all(parentSearchPromises)
-      const parent = parents.find(p => p !== null)
+      // Уровень 2? — ищем параллельно во всех level-1
+      const level2Results = await Promise.all(
+        mainCategories.map(async (mainCat) => {
+          try {
+            const children = await getCachedChildren(mainCat.id)
+            if (children.some(sub => sub.id == category.id)) {
+              return { id: mainCat.id, name: mainCat.name, code: mainCat.code }
+            }
+            return null
+          } catch { return null }
+        })
+      )
+      const parent = level2Results.find(p => p !== null)
       
       if (parent) {
-        // Нашли родителя - это уровень 2
-        const result = {
-          category,
-          path: [parent]
-        }
+        const result = { category, path: [parent] }
         categoryCache.set(code, result)
         return result
       }
       
-      // Не нашли среди подкатегорий уровня 1 → это может быть уровень 3
-      // Ищем во всех подкатегориях уровня 2
-      const level3SearchPromises = mainCategories.map(async (mainCat) => {
+      // Уровень 3? — ищем в подкатегориях уровня 2
+      for (const mainCat of mainCategories) {
         try {
-          const level2Response = await axios.get(
-            `https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.categoryId.json?id=${mainCat.id}`
+          const level2Cats = await getCachedChildren(mainCat.id)
+          const level3Results = await Promise.all(
+            level2Cats.map(async (l2) => {
+              try {
+                const level3Cats = await getCachedChildren(l2.id)
+                if (level3Cats.some(cat => cat.id == category.id)) {
+                  return {
+                    mainCat: { id: mainCat.id, name: mainCat.name, code: mainCat.code },
+                    level2Cat: { id: l2.id, name: l2.name, code: l2.code }
+                  }
+                }
+                return null
+              } catch { return null }
+            })
           )
-          const level2Categories = level2Response.data.result || []
-          
-          for (const level2Cat of level2Categories) {
-            const level3Response = await axios.get(
-              `https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.categoryId.json?id=${level2Cat.id}`
-            )
-            const level3Categories = level3Response.data.result || []
-            
-            const found = level3Categories.some(cat => cat.id == category.id)
-            if (found) {
-              return {
-                mainCat: { id: mainCat.id, name: mainCat.name, code: mainCat.code },
-                level2Cat: { id: level2Cat.id, name: level2Cat.name, code: level2Cat.code }
-              }
-            }
+          const found = level3Results.find(r => r !== null)
+          if (found) {
+            const result = { category, path: [found.mainCat, found.level2Cat] }
+            categoryCache.set(code, result)
+            return result
           }
-          return null
-        } catch (error) {
-          return null
-        }
-      })
-      
-      const level3Results = await Promise.all(level3SearchPromises)
-      const level3Parent = level3Results.find(r => r !== null)
-      
-      if (level3Parent) {
-        // Уровень 3 - путь с двумя родителями
-        const result = {
-          category,
-          path: [level3Parent.mainCat, level3Parent.level2Cat]
-        }
-        categoryCache.set(code, result)
-        return result
+        } catch { /* skip */ }
       }
       
-      // Не нашли нигде - возвращаем как есть
-      const result = {
-        category,
-        path: []
-      }
+      // Не определён уровень
+      const result = { category, path: [] }
       categoryCache.set(code, result)
       return result
-      
     } catch (error) {
       console.error('Ошибка поиска категории:', error)
       return null
@@ -168,6 +205,10 @@ function Category() {
     setTotalPages(1)
     setMainCategory(null)
     setChildSubcategories([])
+    setActiveFilters({})
+    setAppliedFilters({})
+    setFloatingBtnPos(null)
+    filtersInitRef.current = false
   }, [categoryId])
 
   // Прокрутка к началу страницы при смене пагинации
@@ -251,10 +292,7 @@ function Category() {
         let subcatsData = []
         
         // Всегда запрашиваем дочерние подкатегории текущей категории
-        const childrenResponse = await axios.get(
-          `https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.categoryId.json?id=${foundCategory.id}`,
-          { signal: abortControllerRef.current.signal }
-        )
+        const childrenResponse = await getCategoryById(foundCategory.id, { signal: abortControllerRef.current.signal })
         const childrenData = childrenResponse.data.result || []
 
         if (level === 0 && childrenData.length > 0) {
@@ -280,10 +318,7 @@ function Category() {
         // Загрузка фильтров
         if (needProducts) {
           try {
-            const filtersResponse = await axios.get(
-              `https://topdisc.ru/mobile/v1/filter/4/${foundCategory.id}`,
-              { signal: abortControllerRef.current.signal }
-            )
+            const filtersResponse = await getFilters(foundCategory.id, { signal: abortControllerRef.current.signal })
             // Берем только объект filter из ответа
             const filtersData = filtersResponse.data?.filter || null
             setFilters(filtersData)
@@ -306,8 +341,25 @@ function Category() {
 
         // Товары запрашиваем ТОЛЬКО если они нужны для отображения
         if (needProducts) {
-          const productsResponse = await axios.get(
-            `https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.product_list.json?cat=${foundCategory.id}&page=${currentPage}&prods=20&sort`,
+          // Собираем фильтры для API
+          const filterParams = []
+          for (const [key, values] of Object.entries(appliedFilters)) {
+            if (key.startsWith('_')) continue
+            if (!values || !values.length) continue
+            // API поддерживает одно значение на ключ (берёт последнее)
+            // Если выбрано одно значение — отправляем. Если несколько — не отправляем (фильтруем клиентски)
+            if (values.length === 1) {
+              filterParams.push(`${key}=${values[0]}`)
+            }
+          }
+
+          const productParams = { cat: foundCategory.id, page: currentPage, prods: 20, sort: sortOrder }
+          if (filterParams.length > 0) {
+            productParams.filters = filterParams
+          }
+
+          const productsResponse = await getProductList(
+            productParams,
             { signal: abortControllerRef.current.signal }
           )
           
@@ -343,7 +395,7 @@ function Category() {
         abortControllerRef.current.abort()
       }
     }
-  }, [categoryId, currentPage])
+  }, [categoryId, currentPage, sortOrder, appliedFilters])
 
   // Мемоизация кнопок пагинации
   const paginationButtons = useMemo(() => {
@@ -354,7 +406,14 @@ function Category() {
     const showEllipsisEnd = currentPage < totalPages - 2
     
     const getPageUrl = (page) => {
-      return page === 1 ? location.pathname : `${location.pathname}?PAGEN_1=${page}`
+      const params = new URLSearchParams(searchParams)
+      if (page <= 1) {
+        params.delete('PAGEN_1')
+      } else {
+        params.set('PAGEN_1', page)
+      }
+      const qs = params.toString()
+      return qs ? `${location.pathname}?${qs}` : location.pathname
     }
     
     // Первая страница
@@ -408,34 +467,94 @@ function Category() {
     }
     
     return pages
-  }, [currentPage, totalPages, location.pathname])
+  }, [currentPage, totalPages, location.pathname, searchParams])
 
-  // Показываем заглушку если категория еще загружается (для SSG)
-  if (!mainCategory) {
-    return (
-      <>
-        <Helmet>
-          <title>Загрузка... - TopDisk</title>
-        </Helmet>
-        <div className="breadcrumbs">
-          <div className="container">
-            <ul className="breadcrumbs-list">
-              <li className="breadcrumbs-item">
-                <Link className="breadcrumbs-link" to="/">Главная</Link>
-              </li>
-              <li className="breadcrumbs-item">
-                <Link className="breadcrumbs-link" to="/catalog/">Каталог</Link>
-              </li>
-            </ul>
-          </div>
-        </div>
-        <div className="container">
-          <div className="catalog__loading">Загрузка категории...</div>
-        </div>
-      </>
-    )
-  }
-  
+  // === ЛОГИКА ФИЛЬТРОВ ===
+  // Показ плавающей кнопки рядом с изменённым элементом
+  const showFloatingBtn = useCallback((e) => {
+    if (!filtersAsideRef.current) return
+    const target = e?.target || e?.currentTarget
+    if (!target) return
+    const aside = filtersAsideRef.current
+    const asideRect = aside.getBoundingClientRect()
+    const targetRect = target.closest('.filter')?.getBoundingClientRect() || target.getBoundingClientRect()
+    setFloatingBtnPos(targetRect.bottom - asideRect.top + aside.scrollTop + 8)
+  }, [])
+
+  const handleFilterChange = useCallback((filterKey, value, checked, e) => {
+    setActiveFilters(prev => {
+      const current = prev[filterKey] || []
+      const next = checked
+        ? [...current, value]
+        : current.filter(v => v !== value)
+      return { ...prev, [filterKey]: next }
+    })
+    if (e) showFloatingBtn(e)
+  }, [showFloatingBtn])
+
+  const handlePriceChange = useCallback((field, value) => {
+    setActiveFilters(prev => ({
+      ...prev,
+      _price: { ...(prev._price || {}), [field]: value === '' ? undefined : Number(value) }
+    }))
+  }, [])
+
+  const handleInStockChange = useCallback((checked) => {
+    setActiveFilters(prev => ({ ...prev, _inStock: checked }))
+  }, [])
+
+  const handleResetFilters = useCallback(() => {
+    setActiveFilters({})
+    setAppliedFilters({})
+    setFloatingBtnPos(null)
+    setSearchParams(new URLSearchParams(), { replace: true })
+  }, [setSearchParams])
+
+  // Фильтрация товаров на клиенте (цена, наличие, мультизначения)
+  const filteredProducts = useMemo(() => {
+    if (!products.length) return products
+
+    // Мультизначные CODE-фильтры (не отправленные в API)
+    const multiValueFilters = {}
+    for (const [key, values] of Object.entries(appliedFilters)) {
+      if (key.startsWith('_')) continue
+      if (values && values.length > 1) {
+        multiValueFilters[key] = values
+      }
+    }
+
+    const hasPrice = appliedFilters._price && (appliedFilters._price.min !== undefined || appliedFilters._price.max !== undefined)
+    const hasInStock = appliedFilters._inStock === true
+    const hasMultiValue = Object.keys(multiValueFilters).length > 0
+
+    if (!hasPrice && !hasInStock && !hasMultiValue) return products
+
+    return products.filter(product => {
+      // Фильтр по цене
+      if (hasPrice) {
+        const price = parseFloat(product.price)
+        if (appliedFilters._price.min !== undefined && price < appliedFilters._price.min) return false
+        if (appliedFilters._price.max !== undefined && price > appliedFilters._price.max) return false
+      }
+      // Фильтр «В наличии»
+      if (hasInStock) {
+        const hasStore = product.store && Array.isArray(product.store) &&
+          product.store.some(s => parseInt(s.AMOUNT) > 0)
+        const inStock = product.inStock !== undefined ? product.inStock : hasStore
+        if (!inStock) return false
+      }
+      // Мультизначные фильтры — клиентская фильтрация по свойствам товара
+      if (hasMultiValue && product.properties) {
+        for (const [code, allowedValues] of Object.entries(multiValueFilters)) {
+          const prop = product.properties.find(p => p.CODE === code)
+          if (prop && !allowedValues.includes(prop.VALUE)) return false
+        }
+      }
+      return true
+    })
+  }, [products, appliedFilters])
+
+  // Категория не найдена (загрузка завершена, но данных нет)
   if (!mainCategory && !loading) {
     return (
       <>
@@ -456,6 +575,32 @@ function Category() {
         </div>
         <div className="container">
           <h1>Категория не найдена</h1>
+        </div>
+      </>
+    )
+  }
+
+  // Показываем заглушку пока категория загружается
+  if (!mainCategory) {
+    return (
+      <>
+        <Helmet>
+          <title>Загрузка... - TopDisk</title>
+        </Helmet>
+        <div className="breadcrumbs">
+          <div className="container">
+            <ul className="breadcrumbs-list">
+              <li className="breadcrumbs-item">
+                <Link className="breadcrumbs-link" to="/">Главная</Link>
+              </li>
+              <li className="breadcrumbs-item">
+                <Link className="breadcrumbs-link" to="/catalog/">Каталог</Link>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div className="container">
+          <div className="catalog__loading">Загрузка категории...</div>
         </div>
       </>
     )
@@ -507,7 +652,7 @@ function Category() {
                       className={`subcategory__card ${index === 6 ? 'subcategory__card--xl' : ''}`}
                       style={{ '--pic': `url(${subcat.ico})` }}
                     >
-                      <span className="subcategory__name" dangerouslySetInnerHTML={{ __html: subcat.name.replace(/\s/g, '<br />') }} />
+                      <span className="subcategory__name" dangerouslySetInnerHTML={{ __html: sanitizeHtml(subcat.name.replace(/\s/g, '<br />')) }} />
                     </Link>
                   ))}
                 </div>
@@ -539,7 +684,7 @@ function Category() {
                       1280: { slidesPerView: 5 }
                     }}
                   >
-                    {products.map(product => (
+                    {filteredProducts.map(product => (
                       <SwiperSlide key={product.id}>
                         <ProductCard product={product} />
                       </SwiperSlide>
@@ -558,7 +703,7 @@ function Category() {
               <div className="container">
                 <div 
                   className="category-seo__content" 
-                  dangerouslySetInnerHTML={{ __html: categoryDescription }} 
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(categoryDescription) }} 
                 />
               </div>
             </section>
@@ -571,8 +716,13 @@ function Category() {
             <h1>{mainCategory.name}</h1>
             <div className="catalog__row">
               {/* ФИЛЬТРЫ */}
-              <aside className="catalog__filters mobile-hidden" data-filters>
-                <div className="desktop-hidden filters-title">Фильтры</div>
+              <aside ref={filtersAsideRef} className={`catalog__filters${filtersOpen ? ' is-open' : ' mobile-hidden'}`} data-filters style={{ position: 'relative' }}>
+                <div className="desktop-hidden filters-title">
+                  Фильтры
+                  <button className="filters-close" type="button" onClick={() => setFiltersOpen(false)}>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
+                  </button>
+                </div>
                 
                 {/* Динамические фильтры */}
                 {(() => {
@@ -602,7 +752,7 @@ function Category() {
                   })
                   
                   return sortedFilters.map((filterData, index) => {
-                    const filterKey = filterData.ID || filterData.CODE || index
+                    const filterKey = filterData.CODE || filterData.ID || String(index)
                     const isPrice = filterData.NAME === 'Цена' || filterData.NAME.toLowerCase().includes('цена')
                     const isColor = filterData.NAME === 'Цвет' || filterData.NAME.toLowerCase().includes('цвет')
                   
@@ -620,14 +770,22 @@ function Category() {
                             {isPrice ? (
                               <>
                                 <div className="price-inputs">
-                                  <input className="price-input" type="number" min="0" step="1" defaultValue="0" placeholder="0" />
+                                  <input className="price-input" type="number" min="0" step="1"
+                                    value={activeFilters._price?.min ?? ''}
+                                    onChange={(e) => handlePriceChange('min', e.target.value)}
+                                    placeholder="0" />
                                   <span className="price-dash">—</span>
-                                  <input className="price-input" type="number" min="0" step="1" placeholder="10000" />
+                                  <input className="price-input" type="number" min="0" step="1"
+                                    value={activeFilters._price?.max ?? ''}
+                                    onChange={(e) => handlePriceChange('max', e.target.value)}
+                                    placeholder="∞" />
                                 </div>
                                 {/* В наличии под ценой */}
                                 <div style={{ marginTop: '16px' }}>
                                   <label className="filter-checkbox">
-                                    <input type="checkbox" defaultChecked />
+                                    <input type="checkbox"
+                                      checked={activeFilters._inStock ?? false}
+                                      onChange={(e) => handleInStockChange(e.target.checked)} />
                                     <span className="checkbox-custom"></span>
                                     <span>В наличии</span>
                                   </label>
@@ -647,7 +805,9 @@ function Category() {
                                         id={inputId} 
                                         type="checkbox" 
                                         style={{ display: 'none' }}
+                                        checked={(activeFilters[filterKey] || []).includes(displayValue)}
                                         onChange={(e) => {
+                                          handleFilterChange(filterKey, displayValue, e.target.checked, e)
                                           const label = e.target.nextElementSibling
                                           if (e.target.checked) {
                                             label.style.borderColor = '#333'
@@ -691,7 +851,9 @@ function Category() {
                                       const displayValue = typeof valueItem === 'string' ? valueItem : (valueItem.VALUE || valueItem.NAME || valueItem)
                                       return (
                                         <li key={idx}>
-                                          <input id={inputId} type="checkbox" />
+                                          <input id={inputId} type="checkbox"
+                                            checked={(activeFilters[filterKey] || []).includes(displayValue)}
+                                            onChange={(e) => handleFilterChange(filterKey, displayValue, e.target.checked, e)} />
                                           <label htmlFor={inputId}>{displayValue}</label>
                                         </li>
                                       )
@@ -702,7 +864,9 @@ function Category() {
                                     const displayValue = typeof valueItem === 'string' ? valueItem : (valueItem.VALUE || valueItem.NAME || valueItem)
                                     return (
                                       <label key={idx} className="filter-checkbox">
-                                        <input type="checkbox" />
+                                        <input type="checkbox"
+                                          checked={(activeFilters[filterKey] || []).includes(displayValue)}
+                                          onChange={(e) => handleFilterChange(filterKey, displayValue, e.target.checked, e)} />
                                         <span className="checkbox-custom"></span>
                                         <span>{displayValue}</span>
                                       </label>
@@ -724,13 +888,25 @@ function Category() {
                 {/* Кнопки фильтров */}
                 <div className="filter-divider"></div>
                 <div className="filters__actions">
-                  <button className="filter__button desktop-hidden filters__apply" type="button">
+                  <button className="filter__button filters__apply" type="button" onClick={applyFilters}>
                     Применить
                   </button>
-                  <button className="filter__button filters__reset" type="button">
+                  <button className="filter__button filters__reset" type="button" onClick={() => { handleResetFilters(); setFiltersOpen(false) }}>
                     Сбросить
                   </button>
                 </div>
+
+                {/* Плавающая кнопка Применить */}
+                {floatingBtnPos !== null && (
+                  <button
+                    className="filter__floating-apply"
+                    type="button"
+                    style={{ top: floatingBtnPos }}
+                    onClick={applyFilters}
+                  >
+                    Применить
+                  </button>
+                )}
               </aside>
 
               {/* СПИСОК ТОВАРОВ */}
@@ -750,50 +926,37 @@ function Category() {
                   </div>
                 )}
                 {/* Открыть фильтры на мобильном */}
-                <button className="catalog__filters-btn desktop-hidden" data-filters-open>
+                <button className="catalog__filters-btn desktop-hidden" onClick={() => setFiltersOpen(true)}>
                   Фильтры
                   <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                     <path d="M2 4h14M4 9h10M6 14h6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                   </svg>
                 </button>
 
-                {/* Сортировка и вид */}
+                {/* Сортировка */}
                 <div className="catalog__controls">
-                  <select className="catalog__sort">
-                    <option>Популярное</option>
-                    <option>Новинки</option>
-                    <option>Дешевле</option>
-                    <option>Дороже</option>
+                  <select
+                    className="catalog__sort"
+                    value={sortOrder}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      setSortOrder(val)
+                      syncFiltersToUrl(appliedFilters, val)
+                    }}
+                  >
+                    <option value="">Популярное</option>
+                    <option value="new">Новинки</option>
+                    <option value="price_asc">Дешевле</option>
+                    <option value="price_desc">Дороже</option>
                   </select>
-
-                  <div className="catalog__view">
-                    <input type="radio" name="view" id="view-grid" defaultChecked />
-                    <label htmlFor="view-grid">
-                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <rect x="2" y="2" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-                        <rect x="12" y="2" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-                        <rect x="2" y="12" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-                        <rect x="12" y="12" width="6" height="6" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-                      </svg>
-                    </label>
-
-                    <input type="radio" name="view" id="view-list" />
-                    <label htmlFor="view-list">
-                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                        <rect x="2" y="4" width="16" height="3" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-                        <rect x="2" y="10" width="16" height="3" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-                        <rect x="2" y="16" width="16" height="3" rx="1" stroke="currentColor" strokeWidth="1.5"/>
-                      </svg>
-                    </label>
-                  </div>
                 </div>
 
                 {/* Товары */}
                 <div className="catalog__main-list">
-                  {loading && products.length === 0 ? (
+                  {loading && filteredProducts.length === 0 ? (
                     <div className="catalog__loading">Загрузка товаров...</div>
-                  ) : products.length > 0 ? (
-                    products.map(product => (
+                  ) : filteredProducts.length > 0 ? (
+                    filteredProducts.map(product => (
                       <ProductCard key={product.id} product={product} />
                     ))
                   ) : (
@@ -815,7 +978,7 @@ function Category() {
                       </span>
                     ) : (
                       <Link
-                        to={currentPage === 2 ? location.pathname : `${location.pathname}?PAGEN_1=${currentPage - 1}`}
+                        to={(() => { const p = new URLSearchParams(searchParams); if (currentPage <= 2) p.delete('PAGEN_1'); else p.set('PAGEN_1', currentPage - 1); const qs = p.toString(); return qs ? `${location.pathname}?${qs}` : location.pathname })()}
                         className="pagination__btn pagination__btn--prev"
                         aria-label="Предыдущая страница"
                       >
@@ -834,7 +997,7 @@ function Category() {
                       </span>
                     ) : (
                       <Link
-                        to={`${location.pathname}?PAGEN_1=${currentPage + 1}`}
+                        to={(() => { const p = new URLSearchParams(searchParams); p.set('PAGEN_1', currentPage + 1); return `${location.pathname}?${p.toString()}` })()}
                         className="pagination__btn pagination__btn--next"
                         aria-label="Следующая страница"
                       >

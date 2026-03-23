@@ -38,7 +38,7 @@ function Subcategory() {
   }, [dispatch])
 
   useEffect(() => {
-    dispatch(fetchProducts({ subcategoryId }))
+    dispatch(fetchProducts({ subcategory: subcategoryId }))
   }, [dispatch, subcategoryId])
 
   useEffect(() => {

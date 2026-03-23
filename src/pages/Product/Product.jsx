@@ -1,13 +1,16 @@
 import { useEffect, useState, useRef } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { addToCart } from '../../store/slices/cartSlice'
+import { addToCompare, removeFromCompare } from '../../store/slices/compareSlice'
+import { toggleFavorite } from '../../store/slices/favoritesSlice'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Pagination, Thumbs } from 'swiper/modules'
 import { Helmet } from 'react-helmet-async'
-import axios from 'axios'
+import { getCategoryByCode, getProductIdByCode, getProductById } from '../../services/apiClient'
 import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
 import { decodeHtml } from '../../utils/decodeHtml'
+import { sanitizeHtml } from '../../utils/sanitizeHtml'
 
 function Product() {
   const { categoryCode, productCode } = useParams()
@@ -22,6 +25,24 @@ function Product() {
   const [showAllSpecs, setShowAllSpecs] = useState(false)
   const [sostText, setSostText] = useState([])
   const abortControllerRef = useRef(null)
+  const compareItems = useSelector((s) => s.compare.items)
+  const isInCompare = product ? compareItems.some((i) => i.id === product.id) : false
+  const favoriteItems = useSelector((s) => s.favorites.items)
+  const isInFavorites = product ? favoriteItems.some((i) => i.id === product.id) : false
+
+  const handleToggleFavorite = () => {
+    if (!product) return
+    dispatch(toggleFavorite({ id: product.id, name: product.name, code: product.code, section_code: categoryCode, image: product.image, price: product.price, oldPrice: product.oldPrice }))
+  }
+
+  const handleToggleCompare = () => {
+    if (!product) return
+    if (isInCompare) {
+      dispatch(removeFromCompare(product.id))
+    } else {
+      dispatch(addToCompare({ id: product.id, name: product.name, code: product.code, section_code: categoryCode, image: product.image, price: product.price, oldPrice: product.oldPrice }))
+    }
+  }
 
   // Сброс состояния при смене товара
   useEffect(() => {
@@ -45,14 +66,8 @@ function Product() {
         
         // Параллельно загружаем данные категории и товара
         const [categoryByCodeResponse, codeResponse] = await Promise.all([
-          axios.get(
-            `https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.categoryIdByCode.json?code=${categoryCode}`,
-            { signal: abortControllerRef.current.signal }
-          ),
-          axios.get(
-            `https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.getProductIdByCode.json?code=${productCode}`,
-            { signal: abortControllerRef.current.signal }
-          )
+          getCategoryByCode(categoryCode, { signal: abortControllerRef.current.signal }),
+          getProductIdByCode(productCode, { signal: abortControllerRef.current.signal })
         ])
         
         // Устанавливаем данные категории
@@ -68,32 +83,10 @@ function Product() {
         const productId = codeResponse.data.result.id
         
         // Затем загружаем товар по ID
-        const response = await axios.get(
-          `https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.product.json?id=${productId}`,
-          { signal: abortControllerRef.current.signal }
-        )
+        const response = await getProductById(productId, { signal: abortControllerRef.current.signal })
         
         if (response.data.result) {
           const productData = response.data.result
-          
-          // Выводим все данные товара в консоль (только один раз при загрузке)
-          console.log('=== ВСЕ ДАННЫЕ ТОВАРА ===')
-          console.log('Полный объект:', productData)
-          console.log('Имя:', productData.name)
-          console.log('ID:', productData.id)
-          console.log('Code:', productData.code)
-          console.log('Category:', productData.category)
-          console.log('Category ID:', productData.category_id)
-          console.log('Category Code:', productData.category_code)
-          console.log('Количество свойств:', productData.properties?.length)
-          console.log('Свойства (properties):', productData.properties)
-          console.log('Other color:', productData.other_color)
-          console.log('Sost_text:', productData.sost_text)
-          console.log('Detail_text:', productData.detail_text)
-          if (productData.store) {
-            console.log('Store (склады):', productData.store)
-          }
-          console.log('========================')
           
           setProduct(productData)
           
@@ -203,8 +196,8 @@ function Product() {
                 <button onClick={() => navigate(-1)} className="action-btn back" aria-label="назад"></button>
               </div>
               <div className="catalog__main-item-action-buttons">
-                <button className="action-btn favorite" type="button" aria-label="Добавить в избранное"></button>
-                <button className="action-btn compare" type="button" aria-label="Добавить к сравнению"></button>
+                <button className={`action-btn favorite${isInFavorites ? ' is-active' : ''}`} type="button" aria-label="Добавить в избранное" onClick={handleToggleFavorite}></button>
+                <button className="action-btn compare" type="button" aria-label="Добавить к сравнению" onClick={handleToggleCompare} style={isInCompare ? { backgroundColor: '#44BD31' } : {}}></button>
               </div>
             </div>
 
@@ -263,13 +256,13 @@ function Product() {
               <div className="product__row-badge">
                 <span className="product__badge product__badge--hit">Хит</span>
                 <span className="product__bonus mobile-hidden">
-                  740 <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
+                  {Math.round(parseFloat(product.price) * 0.03)} <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
                 </span>
               </div>
               <h1 className="product__title">
                 {decodeHtml(product.name)}
                 <span className="product__bonus desktop-hidden">
-                  740 <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
+                  {Math.round(parseFloat(product.price) * 0.03)} <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
                 </span>
               </h1>
             </header>
@@ -288,8 +281,8 @@ function Product() {
                   5.0
                 </span>
                 <div className="catalog__main-item-action-buttons mobile-hidden">
-                  <button className="action-btn favorite" type="button" aria-label="Добавить в избранное"></button>
-                  <button className="action-btn compare" type="button" aria-label="Добавить к сравнению"></button>
+                  <button className={`action-btn favorite${isInFavorites ? ' is-active' : ''}`} type="button" aria-label="Добавить в избранное" onClick={handleToggleFavorite}></button>
+                  <button className="action-btn compare" type="button" aria-label="Добавить к сравнению" onClick={handleToggleCompare} style={isInCompare ? { backgroundColor: '#44BD31' } : {}}></button>
                 </div>
               </div>
             </div>
@@ -419,7 +412,7 @@ function Product() {
                     <div className="description-col" style={{maxWidth: '592px'}}>
                       <div className="description-block">
                         {title && <h5>{title}</h5>}
-                        {text && <p dangerouslySetInnerHTML={{__html: text}} />}
+                        {text && <p dangerouslySetInnerHTML={{__html: sanitizeHtml(text)}} />}
                       </div>
                     </div>
                     {image && (
@@ -444,7 +437,7 @@ function Product() {
           <div className="product-description">
             <div className="description-wrapper">
               <div className="description-block">
-                <div dangerouslySetInnerHTML={{__html: product.detail_text}} />
+                <div dangerouslySetInnerHTML={{__html: sanitizeHtml(product.detail_text)}} />
               </div>
             </div>
           </div>

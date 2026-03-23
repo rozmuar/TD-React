@@ -1,15 +1,33 @@
 import { Link } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { memo, useMemo } from 'react'
 import { addToCart } from '../../store/slices/cartSlice'
+import { addToCompare, removeFromCompare } from '../../store/slices/compareSlice'
+import { toggleFavorite } from '../../store/slices/favoritesSlice'
 import ImageWithFallback from '../ImageWithFallback/ImageWithFallback'
 import { decodeHtml } from '../../utils/decodeHtml'
 
 function ProductCard({ product }) {
   const dispatch = useDispatch()
+  const compareItems = useSelector((s) => s.compare.items)
+  const isInCompare = compareItems.some((i) => i.id === product.id)
+  const favoriteItems = useSelector((s) => s.favorites.items)
+  const isInFavorites = favoriteItems.some((i) => i.id === product.id)
 
   const handleAddToCart = () => {
     dispatch(addToCart(product))
+  }
+
+  const handleToggleCompare = () => {
+    if (isInCompare) {
+      dispatch(removeFromCompare(product.id))
+    } else {
+      dispatch(addToCompare(product))
+    }
+  }
+
+  const handleToggleFavorite = () => {
+    dispatch(toggleFavorite(product))
   }
 
   // Кешируем форматирование цен
@@ -23,12 +41,18 @@ function ProductCard({ product }) {
     [product.oldPrice]
   )
 
+  // Баллы = 3% от цены
+  const score = useMemo(() => 
+    Math.round(parseFloat(product.price) * 0.03),
+    [product.price]
+  )
+
   return (
     <div className="catalog__main-item">
       <div className="catalog__main-imagewrapper">
         <div className="catalog__main-item-action-buttons">
-          <button className="action-btn favorite" type="button" aria-label="Добавить в избранное"></button>
-          <button className="action-btn compare" type="button" aria-label="Добавить к сравнению"></button>
+          <button className={`action-btn favorite${isInFavorites ? ' is-active' : ''}`} type="button" aria-label="Добавить в избранное" onClick={handleToggleFavorite}></button>
+          <button className="action-btn compare" type="button" aria-label="Добавить к сравнению" onClick={handleToggleCompare} style={isInCompare ? { backgroundColor: 'var(--accent, #44BD31)' } : undefined}></button>
         </div>
         <Link to={`/catalog/${product.section_code}/${product.code}/`}>
             <ImageWithFallback className="catalog__main-image" alt={decodeHtml(product.name)} src={product.image} />
@@ -43,7 +67,7 @@ function ProductCard({ product }) {
           )}
         </div>
         <div className="catalog__main-score">
-          <div className="catalog__main-score-num">740</div>
+          <div className="catalog__main-score-num">{score}</div>
           <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
         </div>
       </div>

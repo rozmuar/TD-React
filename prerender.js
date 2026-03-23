@@ -8,6 +8,8 @@ import axios from 'axios'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
+const BITRIX_REST_URL = process.env.VITE_BITRIX_REST_URL || 'https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e'
+
 let previewServer = null
 
 async function getRoutes() {
@@ -15,7 +17,7 @@ async function getRoutes() {
   
   try {
     const response = await axios.get(
-      'https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e/app_mobile.categoryFirst.json'
+      `${BITRIX_REST_URL}/app_mobile.categoryFirst.json`
     )
     
     const categories = response.data.result || []
