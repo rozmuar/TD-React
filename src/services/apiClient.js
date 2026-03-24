@@ -235,29 +235,38 @@ export const deleteServerBasketItem = (productId, mode = 'full') => {
 
 /** Синхронизировать локальную корзину на сервер */
 export async function syncCartToServer(items) {
+  console.log('[syncCart] start, local items:', JSON.stringify(items.map(i => ({ id: i.id, qty: i.quantity }))))
   // Очищаем серверную корзину
   try {
     const basketRes = await getServerBasket()
+    console.log('[syncCart] server basket before clear:', basketRes.data)
     const serverItems = basketRes.data?.data || basketRes.data?.result?.data || []
     await Promise.all(
       serverItems.map((si) => deleteServerBasketItem(si.product_id || si.id).catch(() => {}))
     )
-  } catch {}
+  } catch (e) {
+    console.warn('[syncCart] getServerBasket/clear error:', e.response?.data || e.message)
+  }
   // Добавляем все локальные товары
   const results = await Promise.allSettled(
     items.map((item) => addToServerBasket(item.id, item.quantity))
   )
+  results.forEach((r, i) => {
+    if (r.status === 'fulfilled') {
+      console.log('[syncCart] add OK:', items[i].id, r.value?.data)
+    } else {
+      console.warn('[syncCart] add FAIL:', items[i].id, r.reason?.response?.status, r.reason?.response?.data || r.reason?.message)
+    }
+  })
   const failed = results.filter((r) => r.status === 'rejected')
-  if (failed.length) {
-    console.warn('syncCartToServer: failed to add', failed.length, 'of', items.length, 'items')
-    failed.forEach((r) => {
-      const resp = r.reason?.response
-      console.warn('  basket/add error:', resp?.status, resp?.data || r.reason?.message)
-    })
-  }
   if (failed.length === items.length && items.length > 0) {
     throw new Error('Не удалось добавить товары в серверную корзину')
   }
+  // Проверяем итоговую корзину
+  try {
+    const checkRes = await getServerBasket()
+    console.log('[syncCart] server basket after sync:', checkRes.data)
+  } catch {}
 }
 
 // ============================================================
