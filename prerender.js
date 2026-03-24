@@ -26,9 +26,11 @@ async function getRoutes() {
     const routes = [
       '/',
       '/catalog/',
-      '/about/',
-      '/delivery/',
-      '/contacts/'
+      '/o-nas/',
+      '/dostavka/',
+      '/contacts/',
+      '/payment/',
+      '/company/news/',
     ]
    for (const category of categories.slice(0, 10)) {
       routes.push(`/category/${category.code}/`)
@@ -37,7 +39,7 @@ async function getRoutes() {
     return routes
   } catch (error) {
     console.error('❌ Error fetching categories:', error.message)
-    return ['/', '/catalog/', '/about/', '/delivery/', '/contacts/']
+    return ['/', '/catalog/', '/o-nas/', '/dostavka/', '/contacts/']
   }
 }
 
