@@ -4,11 +4,13 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { clearCart } from '../../store/slices/cartSlice'
 import {
-  createBitrixOrder, isOnlinePayment,
-  sendOrderSms, verifyOrderSms,
-  getBitrixDeliveryList, getBitrixPaymentList, getBitrixStoreList,
+  getLocationCode, getCheckoutContext, calculateCheckout, submitCheckout,
+  syncCartToServer,
+  sendSmsCode, verifySmsCode,
+  getBitrixStoreList,
   getUserProfile,
 } from '../../services/apiClient'
+import { setToken } from '../../store/slices/authSlice'
 import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
 import { decodeHtml } from '../../utils/decodeHtml'
 
@@ -59,58 +61,6 @@ async function suggestCity(query) {
     kladr: s.data.kladr_id || '',
     fias: s.data.fias_id || '',
   }))
-}
-
-// ── Фоллбэки: способы доставки / оплаты (если API не ответит) ─────
-const FALLBACK_DELIVERY_PENZA = [
-  { id: '4', name: 'Самовывоз', description: '', children: [] },
-  { id: '77', name: 'Самовывоз Ставского 4', description: '', children: [] },
-  { id: '2', name: 'Курьерская служба доставки по г. Пенза', description: '', children: [] },
-  { id: '30', name: 'Отправка на такси в течение 1 часа по г. Пенза', description: '', children: [] },
-  { id: '38', name: 'Грузовая доставка по г. Пенза', description: '', children: [] },
-  { id: '71', name: 'СДЭК', description: '', children: [
-    { id: '72', name: 'Доставка курьером', description: '' },
-    { id: '73', name: 'Самовывоз', description: '' },
-    { id: '74', name: 'Постамат', description: '' },
-  ] },
-]
-
-const FALLBACK_DELIVERY_OTHER = [
-  { id: '71', name: 'СДЭК', description: '', children: [
-    { id: '72', name: 'Доставка курьером', description: '' },
-    { id: '73', name: 'Самовывоз', description: '' },
-    { id: '74', name: 'Постамат', description: '' },
-  ] },
-]
-
-const FALLBACK_PAYMENT_LOCAL = [
-  { id: '29', name: 'Наличные при получении' },
-  { id: '40', name: 'Картой при получении' },
-  { id: '43', name: 'Т-Банк оплата картой' },
-  { id: '56', name: 'Онлайн картой' },
-  { id: '57', name: 'Яндекс Пэй' },
-  { id: '52', name: 'Рассрочки и кредиты от Тинькофф' },
-  { id: '59', name: 'Частями' },
-]
-
-const FALLBACK_PAYMENT_REMOTE = [
-  { id: '43', name: 'Т-Банк оплата картой' },
-  { id: '56', name: 'Онлайн картой' },
-  { id: '57', name: 'Яндекс Пэй' },
-  { id: '52', name: 'Рассрочки и кредиты от Тинькофф' },
-  { id: '59', name: 'Частями' },
-]
-
-// ── Фильтрация по городу и способу доставки ───────────────
-const isPenzaCity = (city) => (city || '').toLowerCase().includes('пенза')
-
-// ID оплат, доступных только при локальной доставке (наличные / карта при получении)
-const CASH_PAYMENT_IDS = new Set(['29', '38', '40', '58'])
-
-// Проверяет, является ли доставка локальной (Пенза)
-const isLocalDeliveryName = (name) => {
-  const n = (name || '').toLowerCase()
-  return n.includes('пенза') || (n.startsWith('самовывоз') && !n.includes('сдэк')) || n.includes('такси')
 }
 
 // ── Утилита: очистка HTML-тегов из описаний ────────────────
@@ -242,12 +192,10 @@ function Checkout() {
     return () => { cancelled = true }
   }, [isAuthenticated])
 
-  // ── Шаг 2: доставка (загружается после подтверждения города) ──
+  // ── Шаг 2: доставка ──────────────────────────────────────
   const [deliveryMethods, setDeliveryMethods] = useState([])
   const [deliveryLoading, setDeliveryLoading] = useState(false)
   const [deliveryMethod, setDeliveryMethod] = useState(null)
-  const [courierServices, setCourierServices] = useState([])
-  const [courierService, setCourierService] = useState(null)
   const [stores, setStores] = useState(DEFAULT_STORES)
   const [selectedStore, setSelectedStore] = useState(null)
   const [storePickerOpen, setStorePickerOpen] = useState(false)
@@ -255,30 +203,38 @@ function Checkout() {
   const [deliveryDate, setDeliveryDate] = useState('')
   const [deliveryTime, setDeliveryTime] = useState('')
 
-  // ── Шаг 3: оплата (загружается после выбора доставки) ───
+  // ── Шаг 3: оплата ──────────────────────────────────────
   const [paymentMethods, setPaymentMethods] = useState([])
   const [paymentLoading, setPaymentLoading] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState(null)
 
+  // ── Checkout API state ─────────────────────────────────
+  const [locationCode, setLocationCode] = useState('')
+  const [personTypeId, setPersonTypeId] = useState(null)
+  const [checkoutProperties, setCheckoutProperties] = useState([])
+  const [totals, setTotals] = useState(null)
+  const [canSubmit, setCanSubmit] = useState(false)
+  const [checkoutErrors, setCheckoutErrors] = useState([])
+
   // ── SMS / Submit ────────────────────────────────────────
   const [smsModalOpen, setSmsModalOpen] = useState(false)
-  const [smsCode, setSmsCode] = useState(['', '', '', ''])
+  const [smsCode, setSmsCode] = useState(['', '', '', '', '', ''])
   const [smsSending, setSmsSending] = useState(false)
   const [smsError, setSmsError] = useState('')
   const [submitting, setSubmitting] = useState(false)
 
   // ── Computed ────────────────────────────────────────────
-  const totalAmount = items.reduce((s, i) => s + Number(i.price) * i.quantity, 0)
+  const totalAmount = totals ? totals.basket_price : items.reduce((s, i) => s + Number(i.price) * i.quantity, 0)
   const totalOldAmount = items.reduce((s, i) => s + Number(i.oldPrice || i.price) * i.quantity, 0)
   const totalCount = items.reduce((s, i) => s + i.quantity, 0)
-  const savings = totalOldAmount - totalAmount
-  const points = Math.round(totalAmount * 0.03)
-  const activeDelivery = deliveryMethods.find((d) => d.id === deliveryMethod)
-  const activeCourier = courierServices.find((c) => c.id === courierService)
-  const deliveryPrice = activeCourier?.price ?? activeDelivery?.price ?? 0
+  const savings = totalOldAmount - (totals?.basket_price ?? totalAmount)
+  const points = Math.round((totals?.basket_price ?? totalAmount) * 0.03)
+  const activeDelivery = deliveryMethods.find((d) => String(d.id) === String(deliveryMethod))
+  const deliveryPrice = totals ? totals.delivery_price : 0
+  const totalPrice = totals ? totals.total_price : totalAmount + deliveryPrice
 
   const fmt = (n) => Math.floor(n).toLocaleString('ru-RU')
-  const priceLabel = (p) => (p > 0 ? `${fmt(p)} ₽` : 'Рассчитывается')
+  const priceLabel = (p) => (p > 0 ? `${fmt(p)} ₽` : 'Бесплатно')
 
   // ── Redirect если корзина пуста ─────────────────────────
   useEffect(() => {
@@ -320,56 +276,84 @@ function Checkout() {
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
-  // ── Загрузка доставок при подтверждении города ──────────
+  // ── Утилита применения checkout ответа ───────────────────
+  const applyCheckoutResponse = (data) => {
+    const co = data.checkout || data
+    if (co.available_deliveries) {
+      const deliveries = co.available_deliveries.filter((d) => d.available !== false)
+      setDeliveryMethods(deliveries)
+      const selected = deliveries.find((d) => d.selected) || deliveries[0]
+      if (selected && String(selected.id) !== String(deliveryMethod)) {
+        setDeliveryMethod(String(selected.id))
+      } else if (!deliveryMethod && selected) {
+        setDeliveryMethod(String(selected.id))
+      }
+    }
+    if (co.available_pay_systems) {
+      const payments = co.available_pay_systems.filter((p) => p.available !== false)
+      setPaymentMethods(payments)
+      const selected = payments.find((p) => p.selected) || payments[0]
+      if (selected && String(selected.id) !== String(paymentMethod)) {
+        setPaymentMethod(String(selected.id))
+      } else if (!paymentMethod && selected) {
+        setPaymentMethod(String(selected.id))
+      }
+    }
+    if (co.person_types?.length && !personTypeId) {
+      setPersonTypeId(co.person_types[0].id)
+    }
+    if (co.selected?.person_type_id && !personTypeId) {
+      setPersonTypeId(co.selected.person_type_id)
+    }
+    if (co.properties) setCheckoutProperties(co.properties)
+    if (co.totals) setTotals(co.totals)
+    if (typeof data.can_submit !== 'undefined') setCanSubmit(data.can_submit)
+    if (data.errors?.length) setCheckoutErrors(data.errors)
+    else setCheckoutErrors([])
+  }
+
+  // ── Получаем location code при подтверждении города ─────
   useEffect(() => {
     if (!cityConfirmed) return
+    let cancelled = false
+    ;(async () => {
+      try {
+        const locRes = await getLocationCode(cityConfirmed)
+        if (!cancelled) setLocationCode(locRes.data?.data?.location_code || '')
+      } catch {
+        if (!cancelled) setLocationCode('')
+      }
+    })()
+    return () => { cancelled = true }
+  }, [cityConfirmed])
+
+  // ── Загрузка контекста checkout (нужна авторизация) ─────
+  useEffect(() => {
+    if (!cityConfirmed || !isAuthenticated) return
     let cancelled = false
     setDeliveryLoading(true)
     setDeliveryMethod(null)
     setPaymentMethods([])
     setPaymentMethod(null)
+    setTotals(null)
 
-    const penza = isPenzaCity(cityConfirmed)
-    const fallback = penza ? FALLBACK_DELIVERY_PENZA : FALLBACK_DELIVERY_OTHER
+    ;(async () => {
+      try {
+        // Синхронизируем локальную корзину на сервер
+        await syncCartToServer(items)
 
-    getBitrixDeliveryList()
-      .then((res) => {
+        const params = {}
+        if (locationCode) params.location = locationCode
+        const ctxRes = await getCheckoutContext(params)
         if (cancelled) return
-        const all = res.data?.result || []
-        // Только активные верхнего уровня (PARENT_ID=0)
-        const active = all.filter((d) => d.ACTIVE === 'Y' && String(d.PARENT_ID) === '0')
-        const parsed = active.map((d) => ({
-          id: String(d.ID),
-          name: d.NAME,
-          description: stripHtml(d.DESCRIPTION),
-          children: all
-            .filter((ch) => String(ch.PARENT_ID) === String(d.ID) && ch.ACTIVE === 'Y')
-            .map((ch) => ({ id: String(ch.ID), name: ch.NAME, description: stripHtml(ch.DESCRIPTION) })),
-        }))
-        // Фильтрация по городу + скрыть опт (только для юр.лиц)
-        const hideIds = new Set(['1']) // «Без доставки»
-        const isOpt = (name) => name.toLowerCase().includes('опт')
-        const filtered = penza
-          ? parsed.filter((d) => !hideIds.has(d.id) && !isOpt(d.name))
-          : parsed.filter((d) => {
-              if (hideIds.has(d.id) || isOpt(d.name)) return false
-              const name = d.name.toLowerCase()
-              if (name.includes('пенза')) return false
-              if (name.startsWith('самовывоз') && !name.includes('сдэк')) return false
-              return true
-            })
-        if (filtered.length) {
-          setDeliveryMethods(filtered)
-          setDeliveryMethod(filtered[0].id)
-        } else {
-          setDeliveryMethods(fallback)
-          setDeliveryMethod(fallback[0].id)
-        }
-      })
-      .catch(() => {
-        if (!cancelled) { setDeliveryMethods(fallback); setDeliveryMethod(fallback[0].id) }
-      })
-      .finally(() => { if (!cancelled) setDeliveryLoading(false) })
+        applyCheckoutResponse(ctxRes.data)
+      } catch (err) {
+        console.error('checkout context error:', err)
+        const errMsg = err.response?.data?.errors || err.response?.data?.message || err.message
+        setCheckoutErrors(Array.isArray(errMsg) ? errMsg : [String(errMsg)])
+      }
+      if (!cancelled) setDeliveryLoading(false)
+    })()
 
     // Магазины (самовывоз) — из Bitrix catalog.store.list
     getBitrixStoreList()
@@ -405,129 +389,136 @@ function Checkout() {
       .catch(() => {})
 
     return () => { cancelled = true }
-  }, [cityConfirmed])
+  }, [cityConfirmed, isAuthenticated, locationCode])
 
-  // ── Загрузка способов оплаты при выборе доставки ────────
+  // ── Пересчёт при смене доставки ─────────────────────────
   useEffect(() => {
-    if (!deliveryMethod) return
+    if (!deliveryMethod || !cityConfirmed) return
     let cancelled = false
     setPaymentLoading(true)
-    setPaymentMethod(null)
 
-    // Определяем тип доставки: локальная (Пенза) или удалённая
-    const currentDelivery = deliveryMethods.find((d) => d.id === deliveryMethod)
-    const isLocal = isLocalDeliveryName(currentDelivery?.name)
-    const payFallback = isLocal ? FALLBACK_PAYMENT_LOCAL : FALLBACK_PAYMENT_REMOTE
-
-    getBitrixPaymentList()
-      .then((res) => {
-        if (cancelled) return
-        const all = res.data?.result || []
-        // Только активные, для розничных типов (PERSON_TYPE_ID = 5, null или без привязки)
-        const active = all.filter((p) => {
-          if (p.ACTIVE !== 'Y') return false
-          const pt = p.PERSON_TYPE_ID
-          return !pt || pt === '5' || pt === null
-        })
-        const parsed = active.map((p) => ({
-          id: String(p.ID),
-          name: p.PSA_NAME || p.NAME,
-          logo: p.LOGOTYPE ? `https://topdisc.ru/upload/resize_cache/${p.LOGOTYPE}/100_50_1/` : null,
-        }))
-        // Фильтрация по способу доставки:
-        // Удалённая доставка (СДЭК и т.п.) → только онлайн-оплата
-        // Локальная (Пенза) → все способы оплаты
-        const filtered = isLocal
-          ? parsed
-          : parsed.filter((p) => !CASH_PAYMENT_IDS.has(p.id))
-        if (filtered.length) {
-          setPaymentMethods(filtered)
-          setPaymentMethod(filtered[0].id)
-        } else {
-          setPaymentMethods(payFallback)
-          setPaymentMethod(payFallback[0].id)
+    ;(async () => {
+      try {
+        const data = {
+          delivery_id: Number(deliveryMethod),
+          location: locationCode || undefined,
+          properties: {
+            PHONE: phone.replace(/\D/g, '') || undefined,
+            EMAIL: email || undefined,
+          },
         }
-      })
-      .catch(() => {
-        if (!cancelled) { setPaymentMethods(payFallback); setPaymentMethod(payFallback[0].id) }
-      })
-      .finally(() => { if (!cancelled) setPaymentLoading(false) })
-
-    // Дочерние способы (СДЭК и т.п.)
-    const current = deliveryMethods.find((d) => d.id === deliveryMethod)
-    if (current?.children?.length) {
-      setCourierServices(current.children)
-      setCourierService(current.children[0]?.id || null)
-    } else {
-      setCourierServices([])
-      setCourierService(null)
-    }
+        if (personTypeId) data.person_type_id = personTypeId
+        if (paymentMethod) data.pay_system_id = Number(paymentMethod)
+        const res = await calculateCheckout(data)
+        if (!cancelled) applyCheckoutResponse(res.data)
+      } catch (err) {
+        console.error('checkout calculate (delivery) error:', err)
+      }
+      if (!cancelled) setPaymentLoading(false)
+    })()
 
     return () => { cancelled = true }
-  }, [deliveryMethod, cityConfirmed, deliveryMethods])
+  }, [deliveryMethod])
+
+  // ── Пересчёт при смене оплаты ──────────────────────────
+  const paymentCalculateTimer = useRef(null)
+  useEffect(() => {
+    if (!paymentMethod || !deliveryMethod || !cityConfirmed) return
+    clearTimeout(paymentCalculateTimer.current)
+    paymentCalculateTimer.current = setTimeout(async () => {
+      try {
+        const data = {
+          delivery_id: Number(deliveryMethod),
+          pay_system_id: Number(paymentMethod),
+          location: locationCode || undefined,
+          properties: {
+            PHONE: phone.replace(/\D/g, '') || undefined,
+            EMAIL: email || undefined,
+          },
+        }
+        if (personTypeId) data.person_type_id = personTypeId
+        const res = await calculateCheckout(data)
+        applyCheckoutResponse(res.data)
+      } catch (err) {
+        console.error('checkout calculate (payment) error:', err)
+      }
+    }, 300)
+    return () => clearTimeout(paymentCalculateTimer.current)
+  }, [paymentMethod])
 
   // Сброс выбранного магазина при смене способа доставки
   useEffect(() => {
     setSelectedStore(null)
   }, [deliveryMethod])
 
+  // ── SMS авторизация для неавторизованных ───────────────
+  const handleSendSms = async () => {
+    if (!phone.trim() || phone.replace(/\D/g, '').length < 11) {
+      setSmsError('Укажите корректный номер телефона')
+      return
+    }
+    setSmsSending(true)
+    setSmsError('')
+    try {
+      await sendSmsCode(phone)
+      setSmsModalOpen(true)
+    } catch (err) {
+      setSmsError(err.response?.data?.message || 'Ошибка отправки SMS')
+    }
+    setSmsSending(false)
+  }
+
   // ── Submit ──────────────────────────────────────────────
   const handleSubmitOrder = async () => {
     if (!phone.trim()) { alert('Укажите телефон'); return }
     if (!cityConfirmed) { alert('Выберите город из подсказок'); return }
     if (isPickup && !selectedStore) { alert('Выберите магазин для самовывоза'); return }
-
-    if (!isAuthenticated) {
-      setSmsSending(true)
-      setSmsError('')
-      try { await sendOrderSms(phone) } catch { /* demo */ }
-      setSmsSending(false)
-      setSmsModalOpen(true)
-      return
-    }
     await doCreateOrder()
   }
 
   const doCreateOrder = async () => {
     setSubmitting(true)
     try {
-      // Получаем ID текущего пользователя из профиля
-      let userId
-      try {
-        const profileRes = await getUserProfile()
-        const profile = profileRes.data?.message || profileRes.data
-        console.log('User profile for order:', profile)
-        userId = profile?.id || profile?.ID || profile?.user_id || profile?.USER_ID
-        console.log('Resolved userId:', userId)
-      } catch (e) { console.warn('getUserProfile failed:', e.message) }
+      // Делаем финальный calculate перед submit (рекомендация API)
+      const submitData = {
+        person_type_id: personTypeId || 1,
+        delivery_id: Number(deliveryMethod),
+        pay_system_id: Number(paymentMethod),
+        location: locationCode || undefined,
+        properties: {
+          PHONE: phone.replace(/\D/g, ''),
+          EMAIL: email || undefined,
+          FIO: [lastName, firstName].filter(Boolean).join(' ') || undefined,
+          LOCATION: locationCode || undefined,
+        },
+        comment: comment || undefined,
+      }
 
-      const result = await createBitrixOrder({
-        items: items.map((i) => ({ id: i.id, name: decodeHtml(i.name), price: i.price, quantity: i.quantity })),
-        totalPrice: totalAmount,
-        phone: phone.replace(/\D/g, ''),
-        email,
-        firstName,
-        lastName,
-        city: cityConfirmed,
-        comment,
-        deliveryId: courierService || deliveryMethod,
-        paySystemId: paymentMethod,
-        userId,
-      })
+      const result = await submitCheckout(submitData)
+      const data = result.data
+
+      if (!data.success && data.errors?.length) {
+        alert('Ошибка: ' + data.errors.join(', '))
+        setSubmitting(false)
+        return
+      }
+
       dispatch(clearCart())
 
-      // Онлайн-оплата → переходим на страницу оплаты Bitrix
-      if (result.paymentUrl) {
-        window.location.href = result.paymentUrl
+      // Проверяем наличие онлайн-оплаты
+      const payment = data.payment?.find((p) => !p.paid)
+      if (payment) {
+        const payUrl = `https://topdisc.ru/personal/order/payment/?ORDER_ID=${data.order.id}&PAYMENT_ID=${payment.id}`
+        window.location.href = payUrl
         return
       }
 
       // Оффлайн-оплата → страница успеха
       navigate('/cart/success/', {
         state: {
-          orderNumber: result.accountNumber,
+          orderNumber: data.order?.account_number || String(data.order?.id),
           items,
-          totalAmount,
+          totalAmount: data.order?.price || totalPrice,
           deliveryName: activeDelivery?.name || '',
           selectedStore,
           firstName,
@@ -536,20 +527,31 @@ function Checkout() {
         },
       })
     } catch (err) {
-      alert('Ошибка при создании заказа: ' + (err.message || 'Попробуйте позже'))
+      const msg = err.response?.data?.errors?.join(', ') || err.message || 'Попробуйте позже'
+      alert('Ошибка при создании заказа: ' + msg)
     }
     setSubmitting(false)
   }
 
   const handleSmsConfirm = async () => {
     const code = smsCode.join('')
-    if (code.length < 4) return
+    if (code.length < 6) return
     setSmsSending(true)
     setSmsError('')
-    try { await verifyOrderSms(phone, code) } catch { /* demo */ }
-    setSmsModalOpen(false)
+    try {
+      const res = await verifySmsCode(phone, code)
+      const token = res.data?.message?.Authorization
+      if (token) {
+        dispatch(setToken(token))
+        setSmsModalOpen(false)
+        setSmsCode(['', '', '', '', '', ''])
+      } else {
+        setSmsError('Неверный код')
+      }
+    } catch (err) {
+      setSmsError(err.response?.data?.message || 'Неверный код')
+    }
     setSmsSending(false)
-    await doCreateOrder()
   }
 
   const handleSmsInput = (index, value) => {
@@ -558,7 +560,7 @@ function Checkout() {
     const next = [...smsCode]
     next[index] = value
     setSmsCode(next)
-    if (value && index < 3) document.getElementById(`sms-digit-${index + 1}`)?.focus()
+    if (value && index < 5) document.getElementById(`sms-digit-${index + 1}`)?.focus()
   }
 
   const handleSmsKeyDown = (index, e) => {
@@ -571,8 +573,6 @@ function Checkout() {
     const name = activeDelivery?.name?.toLowerCase() || ''
     return deliveryMethod === 'pickup' || name.includes('самовывоз')
   })()
-
-  const isCourier = courierServices.length > 0
 
   // Курьерская доставка по Пензе (не СДЭК)
   const isCourierPenza = (() => {
@@ -697,7 +697,21 @@ function Checkout() {
                   <div className="checkout__form-grid">
                     <div className="checkout__field">
                       <label>Телефон</label>
-                      <input type="tel" value={phone} onChange={(e) => setPhone(formatPhoneInput(e.target.value))} placeholder="+7" />
+                      <div className="checkout__phone-row">
+                        <input type="tel" value={phone} onChange={(e) => setPhone(formatPhoneInput(e.target.value))} placeholder="+7" />
+                        {!isAuthenticated && cityConfirmed && (
+                          <button
+                            className="checkout__sms-send-btn"
+                            onClick={handleSendSms}
+                            disabled={smsSending || !phone.trim()}
+                          >
+                            {smsSending ? '...' : 'Подтвердить'}
+                          </button>
+                        )}
+                      </div>
+                      {!isAuthenticated && cityConfirmed && smsError && (
+                        <p className="checkout__sms-error" style={{marginTop:4}}>{smsError}</p>
+                      )}
                     </div>
                     <div className="checkout__field">
                       <label>E-mail</label>
@@ -720,14 +734,20 @@ function Checkout() {
               </div>
 
               {/* ▸▸▸ ШАГ 2: Доставка ▸▸▸ */}
-              <div className={`checkout__step${!cityConfirmed ? ' is-disabled' : ''}`}>
+              <div className={`checkout__step${(!cityConfirmed || !isAuthenticated) ? ' is-disabled' : ''}`}>
                 <div className="checkout__step-badge">Шаг 2</div>
                 <h3 className="checkout__block-title">Способ доставки</h3>
 
                 {!cityConfirmed ? (
                   <div className="checkout__disabled-hint">Сначала укажите город доставки</div>
+                ) : !isAuthenticated ? (
+                  <div className="checkout__disabled-hint">Подтвердите номер телефона</div>
                 ) : deliveryLoading ? (
                   <div className="checkout__loading">Загрузка способов доставки…</div>
+                ) : checkoutErrors.length > 0 && deliveryMethods.length === 0 ? (
+                  <div className="checkout__errors">
+                    {checkoutErrors.map((e, i) => <p key={i} className="checkout__error-msg">{e}</p>)}
+                  </div>
                 ) : (
                   <>
                     <div className="checkout__block">
@@ -735,38 +755,21 @@ function Checkout() {
                         {deliveryMethods.map((d) => (
                           <button
                             key={d.id}
-                            className={`checkout__delivery-btn${deliveryMethod === d.id ? ' is-active' : ''}`}
-                            onClick={() => { setDeliveryMethod(d.id); setCourierService(null) }}
+                            className={`checkout__delivery-btn${String(deliveryMethod) === String(d.id) ? ' is-active' : ''}`}
+                            onClick={() => setDeliveryMethod(String(d.id))}
                           >
+                            {d.logotip && <img src={d.logotip} alt="" className="checkout__delivery-logo" />}
                             <span className="checkout__delivery-label">{d.name}</span>
-                            {d.description && (
-                              <span className="checkout__delivery-desc">{d.description}</span>
+                            {d.price_formatted && (
+                              <span className="checkout__delivery-price">{d.price_formatted}</span>
+                            )}
+                            {d.period_text && (
+                              <span className="checkout__delivery-desc">{d.period_text}</span>
                             )}
                           </button>
                         ))}
                       </div>
                     </div>
-
-                    {/* Курьер → СДЭК варианты */}
-                    {isCourier && (
-                      <div className="checkout__block">
-                        <h3 className="checkout__block-title">Способ получения</h3>
-                        <div className="checkout__courier-services">
-                          {courierServices.map((s) => (
-                            <button
-                              key={s.id}
-                              className={`checkout__courier-btn${courierService === s.id ? ' is-active' : ''}`}
-                              onClick={() => setCourierService(s.id)}
-                            >
-                              <span>{s.name}</span>
-                              {s.description && (
-                                <span className="checkout__courier-desc">{s.description}</span>
-                              )}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
 
                     {/* Курьерская по Пензе → дата и время доставки */}
                     {isCourierPenza && (
@@ -880,9 +883,10 @@ function Checkout() {
                     {paymentMethods.map((pm) => (
                       <button
                         key={pm.id}
-                        className={`checkout__payment-btn${paymentMethod === pm.id ? ' is-active' : ''}`}
-                        onClick={() => setPaymentMethod(pm.id)}
+                        className={`checkout__payment-btn${String(paymentMethod) === String(pm.id) ? ' is-active' : ''}`}
+                        onClick={() => setPaymentMethod(String(pm.id))}
                       >
+                        {pm.logotip && <img src={pm.logotip} alt="" className="checkout__payment-logo" />}
                         <span className="checkout__payment-label">{pm.name}</span>
                       </button>
                     ))}
@@ -918,12 +922,12 @@ function Checkout() {
                 )}
                 <div className="cart__summary-row">
                   <span>Доставка:</span>
-                  <span className="cart__summary-green">{priceLabel(deliveryPrice)}</span>
+                  <span className="cart__summary-green">{deliveryPrice > 0 ? priceLabel(deliveryPrice) : (cityConfirmed && deliveryMethod ? 'Бесплатно' : 'Рассчитывается')}</span>
                 </div>
-                {savings > 0 && (
+                {(totals?.discount_price > 0 || savings > 0) && (
                   <div className="cart__summary-row">
-                    <span>Экономия:</span>
-                    <span className="cart__summary-green">{fmt(savings)} ₽</span>
+                    <span>Скидка:</span>
+                    <span className="cart__summary-green">{fmt(totals?.discount_price || savings)} ₽</span>
                   </div>
                 )}
                 <div className="cart__summary-row">
@@ -947,13 +951,19 @@ function Checkout() {
 
                 <div className="cart__summary-total">
                   <span>Итого:</span>
-                  <strong>{fmt(totalAmount + deliveryPrice)} ₽</strong>
+                  <strong>{fmt(totalPrice)} ₽</strong>
                 </div>
+
+                {checkoutErrors.length > 0 && (
+                  <div className="checkout__errors">
+                    {checkoutErrors.map((e, i) => <p key={i} className="checkout__error-msg">{e}</p>)}
+                  </div>
+                )}
 
                 <button
                   className="cart__checkout-btn"
                   onClick={handleSubmitOrder}
-                  disabled={submitting || !cityConfirmed || !deliveryMethod}
+                  disabled={submitting || !isAuthenticated || !cityConfirmed || !deliveryMethod || !paymentMethod}
                 >
                   {submitting ? 'Оформляем...' : 'Оформить заказ'}
                 </button>

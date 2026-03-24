@@ -3,10 +3,11 @@ import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { logout } from '../../store/slices/authSlice'
 import { clearFavorites } from '../../store/slices/favoritesSlice'
-import { userLogout } from '../../services/apiClient'
+import { userLogout, deleteFavorite } from '../../services/apiClient'
 
 function PersonalLayout() {
   const { isAuthenticated } = useSelector((s) => s.auth)
+  const { items: favItems } = useSelector((s) => s.favorites)
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
@@ -15,7 +16,11 @@ function PersonalLayout() {
   }, [isAuthenticated, navigate])
 
   const handleLogout = async () => {
-    try { await userLogout() } catch { /* ignore */ }
+    try { await userLogout() } catch {}
+    // Удаляем избранное с сервера (best-effort)
+    await Promise.allSettled(
+      favItems.map((item) => deleteFavorite(item.id).catch(() => {}))
+    )
     dispatch(clearFavorites())
     dispatch(logout())
     navigate('/')

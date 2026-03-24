@@ -77,12 +77,6 @@ const favoritesSlice = createSlice({
   },
   reducers: {
     clearFavorites: (state) => {
-      // При авторизации удаляем каждый товар из API
-      if (isAuth()) {
-        state.items.forEach((item) => {
-          try { deleteFavorite(item.id) } catch {}
-        })
-      }
       state.items = []
       localStorage.removeItem(LOCAL_KEY)
     },

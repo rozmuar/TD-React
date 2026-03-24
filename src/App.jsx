@@ -16,6 +16,21 @@ import Favorites from './pages/Favorites/Favorites'
 import Cart from './pages/Cart/Cart'
 import Checkout from './pages/Cart/Checkout'
 import OrderSuccess from './pages/Cart/OrderSuccess'
+import InfoLayout from './pages/Info/InfoLayout'
+import About from './pages/Info/About'
+import Contacts from './pages/Info/Contacts'
+import Delivery from './pages/Info/Delivery'
+import Payment from './pages/Info/Payment'
+import Suppliers from './pages/Info/Suppliers'
+import Wholesale from './pages/Info/Wholesale'
+import Vacancy from './pages/Info/Vacancy'
+import ClubCard from './pages/Info/ClubCard'
+import Exchange from './pages/Info/Exchange'
+import TradeIn from './pages/Info/TradeIn'
+import LowPrice from './pages/Info/LowPrice'
+import Rules from './pages/Info/Rules'
+import Privacy from './pages/Info/Privacy'
+import Oferta from './pages/Info/Oferta'
 
 const PersonalLayout = lazy(() => import('./pages/Personal/PersonalLayout'))
 const PersonalHome = lazy(() => import('./pages/Personal/PersonalHome'))
@@ -44,6 +59,22 @@ function App() {
         <Route path="cart/" element={<Cart />} />
         <Route path="cart/checkout/" element={<Checkout />} />
         <Route path="cart/success/" element={<OrderSuccess />} />
+        <Route element={<InfoLayout />}>
+          <Route path="o-nas/" element={<About />} />
+          <Route path="contacts/" element={<Contacts />} />
+          <Route path="suppliers/" element={<Suppliers />} />
+          <Route path="opt/" element={<Wholesale />} />
+          <Route path="vacancy/" element={<Vacancy />} />
+          <Route path="dostavka/" element={<Delivery />} />
+          <Route path="payment/" element={<Payment />} />
+          <Route path="club-card/" element={<ClubCard />} />
+          <Route path="obmen-i-vozvraty/" element={<Exchange />} />
+          <Route path="tradein/" element={<TradeIn />} />
+          <Route path="low-price/" element={<LowPrice />} />
+          <Route path="pravila/" element={<Rules />} />
+          <Route path="politika-konfidentsialnosti/" element={<Privacy />} />
+          <Route path="dogovor-oferty/" element={<Oferta />} />
+        </Route>
         <Route path="personal/" element={<Suspense fallback={<div />}><PersonalLayout /></Suspense>}>
           <Route index element={<Suspense fallback={<div />}><PersonalHome /></Suspense>} />
           <Route path="info/" element={<Suspense fallback={<div />}><PersonalInfo /></Suspense>} />

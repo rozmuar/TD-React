@@ -11,6 +11,9 @@ import { getCategoryByCode, getProductIdByCode, getProductById } from '../../ser
 import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
 import { decodeHtml } from '../../utils/decodeHtml'
 import { sanitizeHtml } from '../../utils/sanitizeHtml'
+import PreorderModal from '../../components/PreorderModal/PreorderModal'
+import FindCheaperModal from '../../components/FindCheaperModal/FindCheaperModal'
+import CreditModal from '../../components/CreditModal/CreditModal'
 
 function Product() {
   const { categoryCode, productCode } = useParams()
@@ -24,6 +27,9 @@ function Product() {
   const [selectedColor, setSelectedColor] = useState(null)
   const [showAllSpecs, setShowAllSpecs] = useState(false)
   const [sostText, setSostText] = useState([])
+  const [showPreorder, setShowPreorder] = useState(false)
+  const [showFindCheaper, setShowFindCheaper] = useState(false)
+  const [showCredit, setShowCredit] = useState(false)
   const abortControllerRef = useRef(null)
   const compareItems = useSelector((s) => s.compare.items)
   const isInCompare = product ? compareItems.some((i) => i.id === product.id) : false
@@ -150,6 +156,12 @@ function Product() {
     return product?.properties?.find(p => p.name === 'Артикул')?.value || product?.id
   }
 
+  // Доступность: цена > 0 и quantity > 0
+  const hasStock = parseInt(product?.quantity) > 0
+  const hasPrice = parseFloat(product?.price) > 0
+  const isAvailable = hasPrice && hasStock
+  console.log('[Product] полные данные:', JSON.stringify(product, null, 2))
+
   // Всегда рендерим все характеристики, скрываем через CSS
   const allSpecs = product?.properties || []
 
@@ -202,15 +214,38 @@ function Product() {
             </div>
 
             {/* Миниатюры */}
-            <div className="product-gallery__thumbs swiper">
+            <Swiper
+              modules={[Thumbs]}
+              onSwiper={setThumbsSwiper}
+              spaceBetween={16}
+              slidesPerView={5}
+              direction="vertical"
+              watchSlidesProgress={true}
+              className="product-gallery__thumbs"
+            >
+              {gallery.map((img, i) => (
+                <SwiperSlide key={i}>
+                  <ImageWithFallback src={img} alt={`${decodeHtml(product.name)} ${i + 1}`} />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+
+            {/* Большой слайдер */}
+            <div className="product-gallery__main">
+              <button className="gallery-nav gallery-prev" aria-label="prev"></button>
+
               <Swiper
-                modules={[Thumbs]}
-                onSwiper={setThumbsSwiper}
-                spaceBetween={10}
-                slidesPerView={4}
-                direction="vertical"
-                watchSlidesProgress={true}
-                className="swiper-wrapper"
+                modules={[Navigation, Pagination, Thumbs]}
+                navigation={{
+                  prevEl: '.gallery-prev',
+                  nextEl: '.gallery-next',
+                }}
+                pagination={{
+                  el: '.swiper-pagination',
+                  clickable: true,
+                }}
+                thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
+                className="product-gallery__swiper"
               >
                 {gallery.map((img, i) => (
                   <SwiperSlide key={i}>
@@ -218,33 +253,7 @@ function Product() {
                   </SwiperSlide>
                 ))}
               </Swiper>
-            </div>
-
-            {/* Большой слайдер */}
-            <div className="product-gallery__main">
-              <button className="gallery-nav gallery-prev" aria-label="prev"></button>
-
-              <div className="swiper product-gallery__swiper">
-                <Swiper
-                  modules={[Navigation, Pagination, Thumbs]}
-                  navigation={{
-                    prevEl: '.gallery-prev',
-                    nextEl: '.gallery-next',
-                  }}
-                  pagination={{
-                    el: '.swiper-pagination',
-                    clickable: true,
-                  }}
-                  thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
-                >
-                  {gallery.map((img, i) => (
-                    <SwiperSlide key={i}>
-                      <ImageWithFallback src={img} alt={`${decodeHtml(product.name)} ${i + 1}`} />
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
-                <div className="swiper-pagination"></div>
-              </div>
+              <div className="swiper-pagination"></div>
 
               <button className="gallery-nav gallery-next" aria-label="next"></button>
             </div>
@@ -255,22 +264,28 @@ function Product() {
             <header className="product__header">
               <div className="product__row-badge">
                 <span className="product__badge product__badge--hit">Хит</span>
-                <span className="product__bonus mobile-hidden">
-                  {Math.round(parseFloat(product.price) * 0.03)} <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
-                </span>
+                {isAvailable && (
+                  <span className="product__bonus mobile-hidden">
+                    {Math.round(parseFloat(product.price) * 0.03)} <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
+                  </span>
+                )}
               </div>
               <h1 className="product__title">
                 {decodeHtml(product.name)}
-                <span className="product__bonus desktop-hidden">
-                  {Math.round(parseFloat(product.price) * 0.03)} <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
-                </span>
+                {isAvailable && (
+                  <span className="product__bonus desktop-hidden">
+                    {Math.round(parseFloat(product.price) * 0.03)} <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
+                  </span>
+                )}
               </h1>
             </header>
 
             {/* ЦЕНА (mobile) */}
-            <div className="product__price-block desktop-hidden">
-              <span className="product__price">{parseFloat(product.price).toLocaleString()} ₽</span>
-            </div>
+            {isAvailable && (
+              <div className="product__price-block desktop-hidden">
+                <span className="product__price">{parseFloat(product.price).toLocaleString()} ₽</span>
+              </div>
+            )}
 
             {/* Рейтинг / Артикул */}
             <div className="product__meta">
@@ -311,9 +326,11 @@ function Product() {
             </div>
 
             {/* ЦЕНА (desktop) */}
-            <div className="product__price-block mobile-hidden">
-              <span className="product__price">{parseFloat(product.price).toLocaleString()} ₽</span>
-            </div>
+            {isAvailable && (
+              <div className="product__price-block mobile-hidden">
+                <span className="product__price">{parseFloat(product.price).toLocaleString()} ₽</span>
+              </div>
+            )}
 
             {/* НАЛИЧИЕ В МАГАЗИНАХ */}
             {product.store && Array.isArray(product.store) && product.store.length > 0 && (
@@ -341,26 +358,36 @@ function Product() {
 
             {/* КНОПКИ (desktop) */}
             <div className="product__actions mobile-hidden">
-              <button className="product__btn product__btn--primary" onClick={handleAddToCart}>
-                Добавить в корзину
-              </button>
-              <button className="product__btn product__btn--outline">Купить в 1 клик</button>
+              {isAvailable ? (
+                <>
+                  <button className="product__btn product__btn--primary" onClick={handleAddToCart}>
+                    Добавить в корзину
+                  </button>
+                  <button className="product__btn product__btn--outline">Купить в 1 клик</button>
+                </>
+              ) : (
+                <button className="product__btn product__btn--preorder" onClick={() => setShowPreorder(true)}>
+                  Хочу под заказ
+                </button>
+              )}
             </div>
           </div>
         </div>
 
         {/* БАННЕРЫ */}
-        <div className="product-banners">
-          <div className="banner1">
-            <div className="banner1-text">Кредит или рассрочка от</div>
-            <div className="banner1-price">
-              {Math.ceil(parseFloat(product.price) / 24).toLocaleString()} ₽/мес
+        {isAvailable && (
+          <div className="product-banners">
+            <div className="banner1" onClick={() => setShowCredit(true)} style={{cursor: 'pointer'}}>
+              <div className="banner1-text">Кредит или рассрочка от</div>
+              <div className="banner1-price">
+                {Math.ceil(parseFloat(product.price) / 24).toLocaleString()} ₽/мес
+              </div>
+            </div>
+            <div className="banner2" onClick={() => setShowFindCheaper(true)} style={{cursor: 'pointer'}}>
+              <div className="banner2-text">Нашли<br />дешевле?</div>
             </div>
           </div>
-          <div className="banner2">
-            <div className="banner2-text">Нашли<br />дешевле?</div>
-          </div>
-        </div>
+        )}
       </div>
 
       {/* ХАРАКТЕРИСТИКИ */}
@@ -456,10 +483,42 @@ function Product() {
         boxShadow: '0 -2px 10px rgba(0,0,0,0.1)',
         zIndex: 100
       }}>
-        <button className="product__btn product__btn--primary" onClick={handleAddToCart} style={{width: '100%'}}>
-          Добавить в корзину
-        </button>
+        {isAvailable ? (
+          <button className="product__btn product__btn--primary" onClick={handleAddToCart} style={{width: '100%'}}>
+            Добавить в корзину
+          </button>
+        ) : (
+          <button className="product__btn product__btn--preorder" onClick={() => setShowPreorder(true)} style={{width: '100%'}}>
+            Хочу под заказ
+          </button>
+        )}
       </div>
+
+      {showPreorder && (
+        <PreorderModal
+          productName={decodeHtml(product.name)}
+          productId={product.id}
+          onClose={() => setShowPreorder(false)}
+        />
+      )}
+
+      {showFindCheaper && (
+        <FindCheaperModal
+          productName={decodeHtml(product.name)}
+          productId={product.id}
+          productPrice={product.price}
+          onClose={() => setShowFindCheaper(false)}
+        />
+      )}
+
+      {showCredit && (
+        <CreditModal
+          productName={decodeHtml(product.name)}
+          productId={product.id}
+          productPrice={product.price}
+          onClose={() => setShowCredit(false)}
+        />
+      )}
     </>
   )
 }

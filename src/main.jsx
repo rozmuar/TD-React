@@ -7,10 +7,11 @@ import { store } from './store/store'
 import { fetchFavorites } from './store/slices/favoritesSlice'
 import './styles/normalize.css'
 import './styles/bootstrap-grid.css'
-import './styles/style.css'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import 'swiper/css/pagination'
+import 'swiper/css/thumbs'
+import './styles/style.css'
 
 // Если пользователь авторизован — загружаем избранное из API
 if (store.getState().auth.isAuthenticated) {

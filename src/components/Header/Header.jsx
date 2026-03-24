@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { logout } from '../../store/slices/authSlice'
 import AuthPopup from '../AuthPopup/AuthPopup'
 import CatalogMenu from '../CatalogMenu/CatalogMenu'
+import CallbackModal from '../CallbackModal/CallbackModal'
 
 function Header() {
   const cartCount = useSelector((state) => state.cart.totalCount)
@@ -13,6 +14,7 @@ function Header() {
   const dispatch = useDispatch()
   const [authOpen, setAuthOpen] = useState(false)
   const [catalogOpen, setCatalogOpen] = useState(false)
+  const [callbackOpen, setCallbackOpen] = useState(false)
 
   const openAuth = useCallback(() => setAuthOpen(true), [])
   const closeAuth = useCallback(() => setAuthOpen(false), [])
@@ -28,18 +30,18 @@ function Header() {
             {/* Навигация слева */}
             <nav className="header__nav">
               <ul className="header__nav-list">
-                <li className="header__nav-item"><Link to="/about/">О компании</Link></li>
-                <li className="header__nav-item"><a href="#">Поставщикам</a></li>
-                <li className="header__nav-item"><Link to="/delivery/">Доставка и оплата</Link></li>
-                <li className="header__nav-item"><a href="#">Трейд-ин</a></li>
-                <li className="header__nav-item"><a href="#">Возврат</a></li>
+                <li className="header__nav-item"><Link to="/o-nas/">О компании</Link></li>
+                <li className="header__nav-item"><Link to="/suppliers/">Поставщикам</Link></li>
+                <li className="header__nav-item"><Link to="/dostavka/">Доставка и оплата</Link></li>
+                <li className="header__nav-item"><Link to="/tradein/">Трейд-ин</Link></li>
+                <li className="header__nav-item"><Link to="/obmen-i-vozvraty/">Возврат</Link></li>
                 <li className="header__nav-item"><Link to="/contacts/">Контакты</Link></li>
               </ul>
             </nav>
 
             {/* «Обратный звонок» + телефон */}
             <div className="header__contacts">
-              <a href="#" className="header__callback">Обратный звонок</a>
+              <a href="#" className="header__callback" onClick={(e) => { e.preventDefault(); setCallbackOpen(true) }}>Обратный звонок</a>
               <a href="tel:+78005002141" className="header__phone">8 (800) 500-21-41</a>
             </div>
           </div>
@@ -115,6 +117,7 @@ function Header() {
       </div>
       <CatalogMenu isOpen={catalogOpen} onClose={closeCatalog} />
       <AuthPopup isOpen={authOpen} onClose={closeAuth} />
+      {callbackOpen && <CallbackModal onClose={() => setCallbackOpen(false)} />}
     </header>
   )
 }

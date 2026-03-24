@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "9c8116a7-4c99-4276-925d-67cbc7eddbb2",
+    "_postman_id": "d94107a4-2179-4bca-941b-5988be333fe1",
     "name": "topdisk personal_section",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "31921365"
@@ -389,22 +389,158 @@
           "response": []
         },
         {
-          "name": "/v1/sale/paysystems",
+          "name": "/v1/sale/location/code",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const responseJson = pm.response.json();",
+                  "",
+                  "let locationCode = null;",
+                  "if (responseJson && responseJson.success && responseJson.data) {",
+                  "    if (responseJson.data.location_code) {",
+                  "        locationCode = String(responseJson.data.location_code);",
+                  "    } else if (Array.isArray(responseJson.data.items) && responseJson.data.items.length > 0 && responseJson.data.items[0].code) {",
+                  "        locationCode = String(responseJson.data.items[0].code);",
+                  "    }",
+                  "}",
+                  "",
+                  "if (locationCode) {",
+                  "    pm.collectionVariables.set(\"checkout_location\", locationCode);",
+                  "    console.log(\"checkout_location set:\", locationCode);",
+                  "} else {",
+                  "    console.log(\"Location code not found in response\");",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/v1/sale/paysystems",
+              "raw": "{{base_url}}/v1/sale/location/code?city={{checkout_city}}",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "v1",
                 "sale",
-                "paysystems"
+                "location",
+                "code"
+              ],
+              "query": [
+                {
+                  "key": "city",
+                  "value": "{{checkout_city}}"
+                }
               ]
             },
-            "description": "Возвращает список платежных систем"
+            "description": "Возвращает код местоположения (LOCATION) по названию города.\n\nПараметры:\n- city (string, обязательно), например: Пенза\n\nРезультат:\n- data.location_code — код, который нужно передавать в checkout как location/LOCATION.\n- data.items — список найденных городов.\n\nТест-скрипт запроса автоматически записывает найденный код в переменную коллекции checkout_location."
+          },
+          "response": []
+        },
+        {
+          "name": "/v1/sale/checkout/context",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/v1/sale/checkout/context?person_type_id={{checkout_person_type_id}}&delivery_id={{checkout_delivery_id}}&location={{checkout_location}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "sale",
+                "checkout",
+                "context"
+              ],
+              "query": [
+                {
+                  "key": "person_type_id",
+                  "value": "{{checkout_person_type_id}}"
+                },
+                {
+                  "key": "delivery_id",
+                  "value": "{{checkout_delivery_id}}"
+                },
+                {
+                  "key": "pay_system_id",
+                  "value": "{{checkout_pay_system_id}}",
+                  "disabled": true
+                },
+                {
+                  "key": "location",
+                  "value": "{{checkout_location}}"
+                }
+              ]
+            },
+            "description": "Стартовый контекст checkout по текущей корзине пользователя.\n\nЧто делает:\n- Возвращает типы плательщиков (person_types).\n- Возвращает доступные доставки с расчетом и ограничениями Bitrix.\n- Возвращает доступные оплаты с ограничениями Bitrix.\n- Возвращает свойства заказа и missing_required_properties.\n- Возвращает totals и флаг can_submit.\n\nQuery-параметры (все опциональны):\n- person_type_id (int)\n- delivery_id (int)\n- pay_system_id (int)\n- location (string|int)\n\nКак получить LOCATION:\n1) Выполните `GET /v1/sale/location/code?city={{checkout_city}}`.\n2) Возьмите `data.location_code` (или используйте auto test script запроса, он пишет код в `checkout_location`).\n3) Передайте `{{checkout_location}}` в параметр `location`.\n\nКогда вызывать:\n- При открытии экрана оформления заказа.\n- При первичном получении списка доступных доставок/оплат."
+          },
+          "response": []
+        },
+        {
+          "name": "/v1/sale/checkout/calculate",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"person_type_id\": {{checkout_person_type_id}},\n  \"delivery_id\": {{checkout_delivery_id}},\n  \"pay_system_id\": {{checkout_pay_system_id}},\n  \"location\": \"{{checkout_location}}\",\n  \"properties\": {\n    \"LOCATION\": \"{{checkout_location}}\",\n    \"PHONE\": \"{{checkout_phone}}\",\n    \"NAME\": \"{{checkout_name}}\",\n    \"SURNAME\": \"{{checkout_surname}}\",\n    \"EMAIL\": \"{{checkout_email}}\",\n    \"ADDRESS\": \"{{checkout_address}}\"\n  },\n  \"comment\": \"{{checkout_comment}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/sale/checkout/calculate",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "sale",
+                "checkout",
+                "calculate"
+              ]
+            },
+            "description": "Промежуточный пересчет checkout без создания заказа.\n\nЧто делает:\n- Принимает выбор пользователя (плательщик/доставка/оплата/свойства).\n- Пересчитывает стоимость и применяет ограничения Bitrix.\n- Возвращает актуальные available_deliveries и available_pay_systems.\n- Возвращает missing_required_properties, errors и can_submit.\n\nBody (JSON):\n- person_type_id (int, рекомендуется)\n- delivery_id (int, опционально)\n- pay_system_id (int, опционально)\n- location (string|int, рекомендуется)\n- properties (object|array, опционально)\n- comment (string, опционально)\n\nКак получить LOCATION перед этим методом:\n1) Выполните `GET /v1/sale/location/code?city={{checkout_city}}`.\n2) Возьмите `data.location_code` (или используйте auto test script — он пишет код в `checkout_location`).\n3) Передайте `{{checkout_location}}` в `location` и `properties.LOCATION`.\n\nКогда вызывать:\n- После любого изменения данных в checkout (город, адрес, плательщик, доставка, оплата).\n\nВажно:\n- LOCATION напрямую влияет на доступные доставки.\n- ADDRESS может быть не обязателен для самовывоза."
+          },
+          "response": []
+        },
+        {
+          "name": "/v1/sale/checkout/submit",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"person_type_id\": {{checkout_person_type_id}},\n  \"delivery_id\": {{checkout_delivery_id}},\n  \"pay_system_id\": {{checkout_pay_system_id}},\n  \"location\": \"{{checkout_location}}\",\n  \"properties\": {\n    \"LOCATION\": \"{{checkout_location}}\",\n    \"PHONE\": \"{{checkout_phone}}\",\n    \"EMAIL\": \"{{checkout_email}}\",\n    \"ADDRESS\": \"{{checkout_address}}\"\n  },\n  \"comment\": \"{{checkout_comment}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/v1/sale/checkout/submit",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "v1",
+                "sale",
+                "checkout",
+                "submit"
+              ]
+            },
+            "description": "Финальное оформление заказа (создание заказа в Bitrix).\n\nЧто делает:\n- Повторно валидирует данные checkout.\n- Проверяет обязательные свойства и ограничения доставки/оплаты.\n- Сохраняет заказ и возвращает order + payment.\n\nBody (JSON):\nОбязательные поля:\n- person_type_id (int)\n- delivery_id (int)\n- pay_system_id (int)\n\nОпционально:\n- location (string|int)\n- properties (object|array)\n- comment (string)\n\nКак получить LOCATION перед submit:\n1) Выполните `GET /v1/sale/location/code?city={{checkout_city}}`.\n2) Возьмите `data.location_code` (или используйте auto test script — он пишет код в `checkout_location`).\n3) Передайте `{{checkout_location}}` в `location` и `properties.LOCATION`.\n\nКогда вызывать:\n- Только после успешного calculate (желательно сделать последний calculate перед submit)."
           },
           "response": []
         },
@@ -428,26 +564,6 @@
               ]
             },
             "description": "Возвращает список доступных складов.\n\nАвторизация не требуется."
-          },
-          "response": []
-        },
-        {
-          "name": "/v1/sale/deliveries",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/v1/sale/deliveries",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "v1",
-                "sale",
-                "deliveries"
-              ]
-            },
-            "description": "Возвращает список служб доставки"
           },
           "response": []
         },
@@ -501,13 +617,13 @@
               "formdata": [
                 {
                   "key": "product_id",
-                  "value": "359226",
+                  "value": "747019",
                   "type": "text",
                   "uuid": "d3357d86-5fe4-4bf0-ab43-7852e86561e2"
                 },
                 {
                   "key": "quantity",
-                  "value": "3",
+                  "value": "1",
                   "type": "text",
                   "uuid": "d64d1ef0-3edd-4f89-a33c-9b4e7e8a657a"
                 }
@@ -663,7 +779,6 @@
     },
     {
       "name": "favorites",
-      "description": "Favorites API (инструкции для разработчика):\n1) Для всех запросов в этой папке обязателен заголовок Authorization: Bearer {{bearer_token}}.\n2) Для add/delete используйте только одно входное поле: product_id (целое число, обязательное).\n3) list возвращает единый список избранного, общий с сайтом: favorites[] и count.\n4) Формат элемента favorites[]: product_id, name, imageUrl, oldPrice, price.\n5) count — общее количество позиций в избранном (не quantity из корзины).\n6) Источник данных — хранилище избранного Bitlate (UF_NL_FAVORITES для авторизованного пользователя).",
       "item": [
         {
           "name": "/v1/favorites/list",
@@ -777,7 +892,8 @@
           },
           "response": []
         }
-      ]
+      ],
+      "description": "Favorites API (инструкции для разработчика):\n1) Для всех запросов в этой папке обязателен заголовок Authorization: Bearer {{bearer_token}}.\n2) Для add/delete используйте только одно входное поле: product_id (целое число, обязательное).\n3) list возвращает единый список избранного, общий с сайтом: favorites[] и count.\n4) Формат элемента favorites[]: product_id, name, imageUrl, oldPrice, price.\n5) count — общее количество позиций в избранном (не quantity из корзины).\n6) Источник данных — хранилище избранного Bitlate (UF_NL_FAVORITES для авторизованного пользователя)."
     },
     {
       "name": "forms",
@@ -935,19 +1051,60 @@
   "variable": [
     {
       "key": "base_url",
-      "value": "https://topdisc.ru/mobile",
-      "type": "string"
+      "value": "https://topdisc.ru/mobile"
     },
     {
       "key": "order_id",
-      "value": "49111",
-      "type": "string"
+      "value": "49111"
     },
     {
       "key": "bearer_token",
       "value": "",
-      "type": "string",
       "disabled": true
+    },
+    {
+      "key": "checkout_person_type_id",
+      "value": "5"
+    },
+    {
+      "key": "checkout_delivery_id",
+      "value": "4"
+    },
+    {
+      "key": "checkout_pay_system_id",
+      "value": "40"
+    },
+    {
+      "key": "checkout_phone",
+      "value": "+7(000)000-0000"
+    },
+    {
+      "key": "checkout_email",
+      "value": ""
+    },
+    {
+      "key": "checkout_address",
+      "value": "Москва, ул. Пример, 1"
+    },
+    {
+      "key": "checkout_location",
+      "value": "0000073738"
+    },
+    {
+      "key": "checkout_city",
+      "value": "Пенза"
+    },
+    {
+      "key": "checkout_comment",
+      "value": "Позвонить за час до доставки"
+    },
+    {
+      "key": "checkout_name",
+      "value": ""
+    },
+    {
+      "key": "checkout_surname",
+      "value": ""
     }
   ]
 }

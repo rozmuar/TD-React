@@ -203,198 +203,90 @@ export const addFavorite = (id) => {
   return filterClient.post('/favorites/add', fd, { headers: authHeaders() })
 }
 
-export const deleteFavorite = (id) =>
-  filterClient.delete('/favorites/delete', { data: { product_id: id }, headers: authHeaders() })
+export const deleteFavorite = (id) => {
+  const fd = new FormData()
+  fd.append('product_id', id)
+  return filterClient.post('/favorites/delete', fd, { headers: authHeaders() })
+}
 
 // ============================================================
-// Оформление заказа
+// Серверная корзина (basket)
 // ============================================================
 
-// Bitrix REST: способы доставки и оплаты
-export const getBitrixDeliveryList = () =>
-  bitrixClient.get('/sale.delivery.getlist.json')
+/** Получить текущую серверную корзину */
+export const getServerBasket = () =>
+  filterClient.get('/sale/basket', { headers: authHeaders() })
 
-export const getBitrixPaymentList = () =>
-  bitrixClient.get('/sale.paysystem.list.json')
+/** Добавить товар в серверную корзину */
+export const addToServerBasket = (productId, quantity = 1) => {
+  const fd = new FormData()
+  fd.append('product_id', productId)
+  fd.append('quantity', quantity)
+  return filterClient.post('/sale/basket/add', fd, { headers: authHeaders() })
+}
 
+/** Удалить товар из серверной корзины */
+export const deleteServerBasketItem = (productId, mode = 'full') => {
+  const fd = new FormData()
+  fd.append('product_id', productId)
+  fd.append('mode', mode)
+  return filterClient.post('/sale/basket/delete', fd, { headers: authHeaders() })
+}
+
+/** Синхронизировать локальную корзину на сервер */
+export async function syncCartToServer(items) {
+  // Очищаем серверную корзину
+  try {
+    const basketRes = await getServerBasket()
+    const serverItems = basketRes.data?.data || basketRes.data?.result?.data || []
+    await Promise.all(
+      serverItems.map((si) => deleteServerBasketItem(si.product_id || si.id).catch(() => {}))
+    )
+  } catch {}
+  // Добавляем все локальные товары
+  const results = await Promise.allSettled(
+    items.map((item) => addToServerBasket(item.id, item.quantity))
+  )
+  const failed = results.filter((r) => r.status === 'rejected')
+  if (failed.length) {
+    console.warn('syncCartToServer: failed to add', failed.length, 'of', items.length, 'items')
+    failed.forEach((r) => {
+      const resp = r.reason?.response
+      console.warn('  basket/add error:', resp?.status, resp?.data || r.reason?.message)
+    })
+  }
+  if (failed.length === items.length && items.length > 0) {
+    throw new Error('Не удалось добавить товары в серверную корзину')
+  }
+}
+
+// ============================================================
+// Checkout API (new)
+// ============================================================
+
+/** Получение location code по названию города */
+export const getLocationCode = (city) =>
+  filterClient.get('/sale/location/code', { params: { city }, headers: authHeaders() })
+
+/** Стартовый контекст checkout: доставки, оплаты, свойства, суммы */
+export const getCheckoutContext = (params = {}) =>
+  filterClient.get('/sale/checkout/context', { params, headers: authHeaders() })
+
+/** Пересчёт checkout при изменениях пользователя */
+export const calculateCheckout = (data) =>
+  filterClient.post('/sale/checkout/calculate', data, { headers: authHeaders() })
+
+/** Финальное создание заказа */
+export const submitCheckout = (data) =>
+  filterClient.post('/sale/checkout/submit', data, { headers: authHeaders() })
+
+// Магазины самовывоза (Bitrix REST)
 export const getBitrixStoreList = () =>
   bitrixClient.get('/catalog.store.list.json', {
     params: {
       'select[]': ['ID', 'TITLE', 'ADDRESS', 'DESCRIPTION', 'PHONE', 'SCHEDULE', 'GPS_N', 'GPS_S', 'ACTIVE'],
     },
   })
-
-export const getDeliveryMethods = (city) => {
-  const fd = new FormData()
-  fd.append('city', city)
-  return filterClient.post('/order/delivery', fd, { headers: authHeaders() })
-}
-
-export const getPaymentMethods = (deliveryId) => {
-  const fd = new FormData()
-  if (deliveryId) fd.append('delivery_id', deliveryId)
-  return filterClient.post('/order/payment', fd, { headers: authHeaders() })
-}
-
-export const getPickupPoints = (city) => {
-  const fd = new FormData()
-  fd.append('city', city)
-  return filterClient.post('/order/pickup-points', fd, { headers: authHeaders() })
-}
-
-export const getCdekPoints = (city) => {
-  const fd = new FormData()
-  fd.append('city', city)
-  return filterClient.post('/order/cdek-points', fd, { headers: authHeaders() })
-}
-
-export const createOrder = (orderData) =>
-  filterClient.post('/order/create', orderData, { headers: authHeaders() })
-
-// ============================================================
-// Создание заказа через Bitrix REST API
-// ============================================================
-
-// ID свойств заказа для PERSON_TYPE_ID = 5 (Физическое лицо, сайт s2)
-const ORDER_PROP = {
-  PHONE: 51,
-  EMAIL: 38,
-  NAME: 86,
-  SURNAME: 87,
-  LOCATION: 35,
-  COMMENT: 63,
-}
-
-// Платёжные системы, считающиеся онлайн-оплатой
-const ONLINE_PAY_IDS = new Set(['43', '56', '57', '52', '59'])
-
-export function isOnlinePayment(paySystemId) {
-  return ONLINE_PAY_IDS.has(String(paySystemId))
-}
-
-/**
- * Полный цикл создания заказа через Bitrix REST:
- * 1. sale.order.add — создаём заказ
- * 2. sale.basketitem.add — добавляем товары
- * 3. sale.propertyvalue.modify — записываем контактные данные
- * 4. sale.shipment.add — привязываем способ доставки
- * 5. sale.payment.add — привязываем способ оплаты
- *
- * @returns {{ orderId, accountNumber, paymentId, paymentUrl }}
- */
-export async function createBitrixOrder({
-  items,        // [{ id, name, price, quantity }]
-  totalPrice,
-  phone,
-  email,
-  firstName,
-  lastName,
-  city,
-  comment,
-  deliveryId,
-  paySystemId,
-  userId,
-}) {
-  // 1. Создаём заказ
-  const orderFields = {
-    personTypeId: 5,
-    currency: 'RUB',
-    lid: 's2',
-    userId: userId ? Number(userId) : 1,
-    price: totalPrice,
-    comments: comment || undefined,
-  }
-
-  let orderRes
-  try {
-    orderRes = await bitrixClient.post('/sale.order.add.json', {
-      fields: orderFields,
-    })
-  } catch (err) {
-    const resp = err.response?.data
-    if (resp?.result?.order) {
-      orderRes = { data: resp }
-    } else {
-      console.error('sale.order.add error:', resp || err.message)
-      throw new Error(resp?.error_description || 'Не удалось создать заказ')
-    }
-  }
-
-  const order = orderRes.data?.result?.order
-  if (!order?.id) throw new Error(orderRes.data?.error_description || 'Не удалось создать заказ')
-  const orderId = Number(order.id)
-
-  // 2. Добавляем товары в корзину заказа
-  await Promise.all(
-    items.map((item) =>
-      bitrixClient.post('/sale.basketitem.add.json', {
-        fields: {
-          orderId,
-          productId: Number(item.id),
-          quantity: item.quantity,
-          price: Number(item.price),
-          name: item.name || `Товар #${item.id}`,
-          currency: 'RUB',
-          module: 'catalog',
-          lid: 's2',
-        },
-      })
-    )
-  )
-
-  // 3. Свойства заказа (контакт, город)
-  const propertyValues = [
-    { orderPropsId: ORDER_PROP.PHONE, value: phone },
-    { orderPropsId: ORDER_PROP.EMAIL, value: email || '' },
-    { orderPropsId: ORDER_PROP.NAME, value: firstName || '' },
-    { orderPropsId: ORDER_PROP.SURNAME, value: lastName || '' },
-    { orderPropsId: ORDER_PROP.LOCATION, value: city || '' },
-    { orderPropsId: ORDER_PROP.COMMENT, value: comment || '' },
-  ]
-  await bitrixClient.post('/sale.propertyvalue.modify.json', {
-    fields: { order: { id: orderId, propertyValues } },
-  })
-
-  // 4. Доставка (shipment)
-  if (deliveryId) {
-    await bitrixClient.post('/sale.shipment.add.json', {
-      fields: {
-        orderId,
-        deliveryId: Number(deliveryId),
-        allowDelivery: 'N',
-        deducted: 'N',
-        priceDelivery: 0,
-        currency: 'RUB',
-      },
-    })
-  }
-
-  // 5. Оплата (payment)
-  let paymentId = null
-  if (paySystemId) {
-    const payRes = await bitrixClient.post('/sale.payment.add.json', {
-      fields: {
-        orderId,
-        paySystemId: Number(paySystemId),
-        sum: totalPrice,
-        currency: 'RUB',
-      },
-    })
-    paymentId = payRes.data?.result?.payment?.id || null
-  }
-
-  // URL оплаты (для онлайн-платежей на сайте Bitrix)
-  const paymentUrl = paymentId && isOnlinePayment(paySystemId)
-    ? `https://topdisc.ru/personal/order/payment/?ORDER_ID=${orderId}&PAYMENT_ID=${paymentId}`
-    : null
-
-  return {
-    orderId,
-    accountNumber: order.accountNumber || String(orderId),
-    paymentId,
-    paymentUrl,
-  }
-}
 
 export const sendOrderSms = (phone) => {
   const fd = new FormData()

@@ -1,6 +1,9 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import CallbackModal from '../CallbackModal/CallbackModal'
 
 function Footer() {
+  const [callbackOpen, setCallbackOpen] = useState(false)
   return (
     <>
       {/* Мобильный бар */}
@@ -56,11 +59,11 @@ function Footer() {
                     <div className="footer__title">Компания</div>
                     <nav>
                       <ul>
-                        <li><Link to="/about/">О нас</Link></li>
+                        <li><Link to="/o-nas/">О нас</Link></li>
                         <li><Link to="/brands/">Бренды</Link></li>
-                        <li><a href="#">Поставщикам</a></li>
-                        <li><a href="#">Оптовикам</a></li>
-                        <li><a href="#">Вакансии</a></li>
+                        <li><Link to="/suppliers/">Поставщикам</Link></li>
+                        <li><Link to="/opt/">Оптовикам</Link></li>
+                        <li><Link to="/vacancy/">Вакансии</Link></li>
                         <li><Link to="/contacts/">Контакты</Link></li>
                       </ul>
                     </nav>
@@ -69,13 +72,13 @@ function Footer() {
                     <div className="footer__title">Покупателям</div>
                     <nav>
                       <ul>
-                        <li><a href="#">Статьи</a></li>
-                        <li><a href="#">Клубная карта</a></li>
-                        <li><Link to="/delivery/">Доставка</Link></li>
-                        <li><a href="#">Оплата</a></li>
-                        <li><a href="#">Обмен и возврат</a></li>
-                        <li><a href="#">Трейд-ин</a></li>
-                        <li><a href="#">Гарантия низкой цены</a></li>
+                        <li><Link to="/company/news/">Статьи</Link></li>
+                        <li><Link to="/club-card/">Клубная карта</Link></li>
+                        <li><Link to="/dostavka/">Доставка</Link></li>
+                        <li><Link to="/payment/">Оплата</Link></li>
+                        <li><Link to="/obmen-i-vozvraty/">Обмен и возврат</Link></li>
+                        <li><Link to="/tradein/">Трейд-ин</Link></li>
+                        <li><Link to="/low-price/">Гарантия низкой цены</Link></li>
                       </ul>
                     </nav>
                   </div>
@@ -88,7 +91,7 @@ function Footer() {
                     </a>
                     <div className="footer__address">Пенза, улица Ставского, 4, корп. 1</div>
                     <div className="footer__worktime">Ежедневно 9:00-21:00</div>
-                    <button className="callback_btn">Обратный звонок</button>
+                    <button className="callback_btn" onClick={() => setCallbackOpen(true)}>Обратный звонок</button>
                   </div>
                   <div className="footer__contacts-right">
                     <div className="footer__socials-row">
@@ -112,6 +115,7 @@ function Footer() {
           </div>
         </div>
       </footer>
+      {callbackOpen && <CallbackModal onClose={() => setCallbackOpen(false)} />}
     </>
   )
 }

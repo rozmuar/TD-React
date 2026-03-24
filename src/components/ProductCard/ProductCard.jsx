@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { memo, useMemo } from 'react'
+import { memo, useMemo, useState } from 'react'
 import { addToCart } from '../../store/slices/cartSlice'
 import { addToCompare, removeFromCompare } from '../../store/slices/compareSlice'
 import { toggleFavorite } from '../../store/slices/favoritesSlice'
 import ImageWithFallback from '../ImageWithFallback/ImageWithFallback'
 import { decodeHtml } from '../../utils/decodeHtml'
+import PreorderModal from '../PreorderModal/PreorderModal'
 
 function ProductCard({ product }) {
   const dispatch = useDispatch()
@@ -13,6 +14,7 @@ function ProductCard({ product }) {
   const isInCompare = compareItems.some((i) => i.id === product.id)
   const favoriteItems = useSelector((s) => s.favorites.items)
   const isInFavorites = favoriteItems.some((i) => i.id === product.id)
+  const [showPreorder, setShowPreorder] = useState(false)
 
   const handleAddToCart = () => {
     dispatch(addToCart(product))
@@ -29,6 +31,11 @@ function ProductCard({ product }) {
   const handleToggleFavorite = () => {
     dispatch(toggleFavorite(product))
   }
+
+  // Доступность: цена > 0 и наличие
+  const hasStock = parseInt(product.quantity) > 0
+  const hasPrice = parseFloat(product.price) > 0
+  const isAvailable = hasPrice && hasStock
 
   // Кешируем форматирование цен
   const formattedPrice = useMemo(() => 
@@ -59,19 +66,39 @@ function ProductCard({ product }) {
         </Link>
       </div>
       <Link to={`/catalog/${product.section_code}/${product.code}/`} className="catalog__main-title">{decodeHtml(product.name)}</Link>
-      <div className="catalog__main-row">
-        <div className="catalog__main-prices">
-          <div className="catalog__main-price">{formattedPrice} ₽</div>
-          {formattedOldPrice && (
-            <div className="catalog__main-oldprice">{formattedOldPrice} ₽</div>
+      {isAvailable ? (
+        <>
+          <div className="catalog__main-row">
+            <div className="catalog__main-prices">
+              <div className="catalog__main-price">{formattedPrice} ₽</div>
+              {formattedOldPrice && (
+                <div className="catalog__main-oldprice">{formattedOldPrice} ₽</div>
+              )}
+            </div>
+            <div className="catalog__main-score">
+              <div className="catalog__main-score-num">{score}</div>
+              <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
+            </div>
+          </div>
+          <button className="catalog__main-button" onClick={handleAddToCart}>В корзину</button>
+        </>
+      ) : (
+        <>
+          <div className="catalog__main-row">
+            <div className="catalog__main-prices">
+              <div className="catalog__main-price catalog__main-price--muted">Цена по запросу</div>
+            </div>
+          </div>
+          <button className="catalog__main-button catalog__main-button--preorder" onClick={() => setShowPreorder(true)}>Хочу под заказ</button>
+          {showPreorder && (
+            <PreorderModal
+              productName={decodeHtml(product.name)}
+              productId={product.id}
+              onClose={() => setShowPreorder(false)}
+            />
           )}
-        </div>
-        <div className="catalog__main-score">
-          <div className="catalog__main-score-num">{score}</div>
-          <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
-        </div>
-      </div>
-      <button className="catalog__main-button" onClick={handleAddToCart}>В корзину</button>
+        </>
+      )}
     </div>
   )
 }

@@ -2963,7 +2963,7 @@ footer {
 .product-gallery {
     display: flex;
     gap: 18px;
-    align-items: center;
+    align-items: stretch;
     max-width: 100%;
 }
 
@@ -2977,8 +2977,10 @@ footer {
 .product-gallery__thumbs {
     min-width: 80px;
     width: 80px;
+    max-width: 80px;
     margin-left: 0px;
     margin-right: 0px;
+    overflow: hidden;
 }
 
 /* 5×80 + gap */
@@ -4431,6 +4433,8 @@ footer {
     width: 60px;
     height: 60px;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
 }
 
 .brand-header__logo img {
@@ -8925,11 +8929,25 @@ a.order-card__product-name:hover {
 
 /* SMS Modal */
 
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
 .checkout__sms-modal {
   background: #fff;
   border-radius: 16px;
   padding: 40px;
-  max-width: 400px;
+  max-width: 420px;
+  width: 90%;
   text-align: center;
   position: relative;
 }
@@ -8958,18 +8976,18 @@ a.order-card__product-name:hover {
 
 .checkout__sms-digits {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   justify-content: center;
   margin-bottom: 20px;
 }
 
 .checkout__sms-digit {
-  width: 50px;
-  height: 56px;
+  width: 44px;
+  height: 52px;
   border: 2px solid #ddd;
-  border-radius: 12px;
+  border-radius: 10px;
   text-align: center;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
 }
 
@@ -8999,6 +9017,61 @@ a.order-card__product-name:hover {
 .checkout__sms-confirm:disabled {
   background: #ccc;
 }
+
+.checkout__sms-hint {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+.checkout__sms-send-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 28px;
+  background: #04B31B;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s;
+}
+.checkout__sms-send-btn:hover { background: #039416; }
+.checkout__sms-send-btn:disabled { background: #ccc; cursor: default; }
+
+.checkout__phone-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.checkout__phone-row input {
+  flex: 1;
+  min-width: 0;
+}
+.checkout__phone-row .checkout__sms-send-btn {
+  padding: 0 16px;
+  white-space: nowrap;
+  font-size: 13px;
+  border-radius: 8px;
+}
+
+.checkout__delivery-logo,
+.checkout__payment-logo {
+  max-height: 24px;
+  max-width: 60px;
+  object-fit: contain;
+  margin-right: 8px;
+}
+.checkout__delivery-price {
+  display: block;
+  font-size: 13px;
+  color: #04B31B;
+  font-weight: 600;
+}
+
+.checkout__errors { margin-bottom: 12px; }
+.checkout__error-msg { color: #e33; font-size: 13px; margin: 4px 0; }
 
 /* ===================== ORDER SUCCESS PAGE ===================== */
 
@@ -9240,11 +9313,160 @@ a.order-card__product-name:hover {
   }
 
   .checkout__sms-digit {
-    width: 44px;
-    height: 48px;
+    width: 38px;
+    height: 44px;
+    font-size: 18px;
   }
 
   .checkout__store-layout {
     grid-template-columns: 1fr;
   }
+}
+
+/* ============================================================
+   Preorder Button & Modal
+   ============================================================ */
+
+/* Кнопка «Хочу под заказ» — страница товара */
+.product__btn--preorder {
+  background: #555;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 14px 32px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.product__btn--preorder:hover {
+  background: #444;
+}
+
+/* Кнопка «Хочу под заказ» — карточка каталога */
+.catalog__main-button--preorder {
+  background: #555;
+  color: #fff;
+  border-color: #555;
+}
+.catalog__main-button--preorder:hover {
+  background: #444;
+  border-color: #444;
+}
+
+/* «Цена по запросу» */
+.catalog__main-price--muted {
+  color: #888;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+/* Preorder Modal */
+.preorder-modal {
+  background: #fff;
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 440px;
+  width: 90%;
+  position: relative;
+}
+.preorder-modal__close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  color: #999;
+}
+.preorder-modal__close:hover {
+  color: #333;
+}
+.preorder-modal__title {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+.preorder-modal__product {
+  color: #666;
+  font-size: 14px;
+  margin: 0 0 20px;
+}
+.preorder-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.preorder-modal__label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+}
+.preorder-modal__input {
+  padding: 12px 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.preorder-modal__input:focus {
+  border-color: #44BD31;
+}
+.preorder-modal__agree {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  color: #666;
+  cursor: pointer;
+  line-height: 1.4;
+}
+.preorder-modal__agree input[type="checkbox"] {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.preorder-modal__agree a {
+  color: #44BD31;
+  text-decoration: underline;
+}
+.preorder-modal__error {
+  color: #d32f2f;
+  font-size: 13px;
+}
+.preorder-modal__btn {
+  background: #555;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.preorder-modal__btn:hover:not(:disabled) {
+  background: #444;
+}
+.preorder-modal__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.preorder-modal__success {
+  text-align: center;
+}
+.preorder-modal__success h3 {
+  font-size: 20px;
+  margin: 0 0 12px;
+  color: #44BD31;
+}
+.preorder-modal__success p {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 20px;
 }
