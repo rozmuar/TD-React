@@ -340,7 +340,8 @@ function Checkout() {
     ;(async () => {
       try {
         // Синхронизируем локальную корзину на сервер
-        await syncCartToServer(items)
+        const syncResult = await syncCartToServer(items)
+        console.log('syncCartToServer done, items:', items.length, syncResult)
 
         const params = { person_type_id: 1 }
         if (locationCode) params.location = locationCode
@@ -349,6 +350,8 @@ function Checkout() {
         applyCheckoutResponse(ctxRes.data)
       } catch (err) {
         console.error('checkout context error:', err)
+        console.error('checkout context response body:', err.response?.data)
+        console.error('checkout context response status:', err.response?.status)
         const errMsg = err.response?.data?.errors || err.response?.data?.message || err.message
         setCheckoutErrors(Array.isArray(errMsg) ? errMsg : [String(errMsg)])
       }
