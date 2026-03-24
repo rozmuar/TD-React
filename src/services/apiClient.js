@@ -4,10 +4,9 @@ import axios from 'axios'
 const BITRIX_REST_URL = import.meta.env.VITE_BITRIX_REST_URL || 'https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e'
 
 // Filter API base URL (separate service)
-// В dev — через Vite proxy, в prod — напрямую
-const FILTER_API_URL = import.meta.env.DEV
-  ? '/api/mobile/v1'
-  : (import.meta.env.VITE_FILTER_API_URL || 'https://topdisc.ru/mobile/v1')
+// В dev — через Vite proxy, в prod — через nginx reverse proxy
+// Всегда используем относительный путь, чтобы избежать CORS и сохранить сессию
+const FILTER_API_URL = import.meta.env.VITE_FILTER_API_URL || '/api/mobile/v1'
 
 export const bitrixClient = axios.create({
   baseURL: BITRIX_REST_URL,
@@ -15,7 +14,6 @@ export const bitrixClient = axios.create({
 
 export const filterClient = axios.create({
   baseURL: FILTER_API_URL,
-  withCredentials: true,
 })
 
 // ============================================================
