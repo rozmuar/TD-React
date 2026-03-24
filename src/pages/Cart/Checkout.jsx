@@ -329,7 +329,7 @@ function Checkout() {
 
   // ── Загрузка контекста checkout (нужна авторизация) ─────
   useEffect(() => {
-    if (!cityConfirmed || !isAuthenticated) return
+    if (!cityConfirmed || !isAuthenticated || !locationCode) return
     let cancelled = false
     setDeliveryLoading(true)
     setDeliveryMethod(null)
@@ -342,7 +342,7 @@ function Checkout() {
         // Синхронизируем локальную корзину на сервер
         await syncCartToServer(items)
 
-        const params = {}
+        const params = { person_type_id: 1 }
         if (locationCode) params.location = locationCode
         const ctxRes = await getCheckoutContext(params)
         if (cancelled) return
