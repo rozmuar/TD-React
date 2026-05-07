@@ -134,8 +134,14 @@ export const verifySmsCode = (phone, code) => {
 // ============================================================
 // Tinkoff ID
 // ============================================================
-export const tidInit = () =>
-  filterClient.post('/auth/tid/init', new FormData())
+export const tidInit = (phone) => {
+  if (phone) {
+    return filterClient.post('/auth/tid/init', { phone: normalizePhone(phone) }, {
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+  return filterClient.post('/auth/tid/init', new FormData())
+}
 
 export const tidComplete = (code) => {
   const fd = new FormData()
@@ -179,16 +185,35 @@ export const userLogout = () =>
 // Заказы (bearer token required)
 // ============================================================
 export const getOrders = (params) =>
-  filterClient.get('/orders', { params, headers: authHeaders() })
+  filterClient.get('/user/orders', { params, headers: authHeaders() })
 
 export const getOrderById = (id) =>
-  filterClient.get(`/orders/${id}`, { headers: authHeaders() })
+  filterClient.get(`/user/orders/${id}`, { headers: authHeaders() })
 
 export const getOrderStatus = (id) =>
   filterClient.get(`/orders/status/${id}`, { headers: authHeaders() })
 
 export const getSaleStatuses = () =>
   filterClient.get('/sale/statuses', { headers: authHeaders() })
+
+// ============================================================
+// Адреса доставки (bearer token required)
+// ============================================================
+export const getUserAddresses = () =>
+  filterClient.get('/user/addresses', { headers: authHeaders() })
+
+export const addUserAddress = (data) =>
+  filterClient.post('/user/addresses', data, {
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+  })
+
+export const updateUserAddress = (id, data) =>
+  filterClient.put(`/user/addresses/${id}`, data, {
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+  })
+
+export const deleteUserAddress = (id) =>
+  filterClient.delete(`/user/addresses/${id}`, { headers: authHeaders() })
 
 // ============================================================
 // Избранное (bearer token required)
@@ -209,19 +234,56 @@ export const deleteFavorite = (id) => {
 }
 
 // ============================================================
+// Гостевая корзина (fuser_id)
+// ============================================================
+const FUSER_KEY = 'guest_fuser_id'
+
+export function getGuestFuserId() {
+  return localStorage.getItem(FUSER_KEY)
+}
+
+export function saveGuestFuserId(id) {
+  if (id) localStorage.setItem(FUSER_KEY, id)
+}
+
+export function clearGuestFuserId() {
+  localStorage.removeItem(FUSER_KEY)
+}
+
+function isAuthenticated() {
+  return !!localStorage.getItem('auth_token')
+}
+
+// ============================================================
 // Серверная корзина (basket)
 // ============================================================
 
 /** Получить текущую серверную корзину */
-export const getServerBasket = () =>
-  filterClient.get('/sale/basket', { headers: authHeaders() })
+export const getServerBasket = () => {
+  if (isAuthenticated()) {
+    return filterClient.get('/sale/basket', { headers: authHeaders() })
+  }
+  const fuserId = getGuestFuserId()
+  return filterClient.get('/sale/basket', { params: fuserId ? { fuser_id: fuserId } : {} })
+}
 
 /** Добавить товар в серверную корзину */
-export const addToServerBasket = (productId, quantity = 1) => {
+export const addToServerBasket = async (productId, quantity = 1) => {
   const fd = new FormData()
   fd.append('product_id', productId)
   fd.append('quantity', quantity)
-  return filterClient.post('/sale/basket/add', fd, { headers: authHeaders() })
+  if (!isAuthenticated()) {
+    const fuserId = getGuestFuserId()
+    if (fuserId) fd.append('fuser_id', fuserId)
+  }
+  const headers = isAuthenticated() ? authHeaders() : {}
+  const res = await filterClient.post('/sale/basket/add', fd, { headers })
+  // Сервер возвращает fuser_id для гостей — сохраняем
+  const returnedFuserId = res.data?.fuser_id || res.data?.data?.fuser_id
+  if (returnedFuserId && !isAuthenticated()) {
+    saveGuestFuserId(returnedFuserId)
+  }
+  return res
 }
 
 /** Удалить товар из серверной корзины */
@@ -229,40 +291,40 @@ export const deleteServerBasketItem = (productId, mode = 'full') => {
   const fd = new FormData()
   fd.append('product_id', productId)
   fd.append('mode', mode)
-  return filterClient.post('/sale/basket/delete', fd, { headers: authHeaders() })
+  if (!isAuthenticated()) {
+    const fuserId = getGuestFuserId()
+    if (fuserId) fd.append('fuser_id', fuserId)
+  }
+  const headers = isAuthenticated() ? authHeaders() : {}
+  return filterClient.post('/sale/basket/delete', fd, { headers })
 }
+
+/** Объединить гостевую корзину с авторизованной */
+export const mergeBasket = (guestFuserId) =>
+  filterClient.post('/sale/basket/merge', { guest_fuser_id: guestFuserId }, {
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+  })
 
 /** Синхронизировать локальную корзину на сервер */
 export async function syncCartToServer(items) {
-  console.log('[syncCart] start, local items:', JSON.stringify(items.map(i => ({ id: i.id, qty: i.quantity }))))
   // Очищаем серверную корзину
   try {
     const basketRes = await getServerBasket()
-    console.log('[syncCart] server basket before clear:', basketRes.data)
     const serverItems = basketRes.data?.data || basketRes.data?.result?.data || []
     for (const si of serverItems) {
       try {
         await deleteServerBasketItem(si.product_id || si.id)
       } catch {}
     }
-  } catch (e) {
-    console.warn('[syncCart] getServerBasket/clear error:', e.response?.data || e.message)
-  }
-  // Добавляем товары последовательно (Bitrix может не обрабатывать параллельные запросы к корзине)
+  } catch {}
+  // Добавляем товары последовательно
   for (const item of items) {
     try {
-      const res = await addToServerBasket(item.id, item.quantity)
-      console.log('[syncCart] add OK:', item.id, res?.data)
-      if (res?.data?.success === false) {
-        console.warn('[syncCart] add returned success:false:', item.id, res.data)
-      }
-    } catch (e) {
-      console.warn('[syncCart] add FAIL:', item.id, e.response?.status, e.response?.data || e.message)
-    }
+      await addToServerBasket(item.id, item.quantity)
+    } catch {}
   }
   // Проверяем итоговую корзину
   const checkRes = await getServerBasket()
-  console.log('[syncCart] server basket after sync:', checkRes.data)
   const finalItems = checkRes.data?.data || checkRes.data?.result?.data || []
   if (finalItems.length === 0 && items.length > 0) {
     throw new Error('Серверная корзина пуста после синхронизации')
@@ -310,3 +372,21 @@ export const verifyOrderSms = (phone, code) => {
   fd.append('code', code)
   return filterClient.post('/order/smscode/verify', fd)
 }
+
+// ============================================================
+// Склады и пункты самовывоза (Sale API)
+// ============================================================
+export const getSaleStores = () =>
+  filterClient.get('/sale/stores')
+
+export const getPersonTypes = () =>
+  filterClient.get('/sale/persontypes')
+
+// ============================================================
+// Соглашения и формы
+// ============================================================
+export const getAgreementList = () =>
+  filterClient.get('/forms/agreement/list')
+
+export const getAgreementById = (id) =>
+  filterClient.get(`/forms/agreement/${id}`)

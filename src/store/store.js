@@ -5,6 +5,8 @@ import cartReducer from './slices/cartSlice'
 import authReducer from './slices/authSlice'
 import compareReducer from './slices/compareSlice'
 import favoritesReducer from './slices/favoritesSlice'
+import userReducer from './slices/userSlice'
+import checkoutReducer from './slices/checkoutSlice'
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +16,8 @@ export const store = configureStore({
     auth: authReducer,
     compare: compareReducer,
     favorites: favoritesReducer,
+    user: userReducer,
+    checkout: checkoutReducer,
   },
 })
 

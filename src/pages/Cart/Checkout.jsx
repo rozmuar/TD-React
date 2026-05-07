@@ -9,6 +9,7 @@ import {
   sendSmsCode, verifySmsCode,
   getBitrixStoreList,
   getUserProfile,
+  mergeBasket, getGuestFuserId, clearGuestFuserId,
 } from '../../services/apiClient'
 import { setToken } from '../../store/slices/authSlice'
 import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
@@ -341,7 +342,6 @@ function Checkout() {
       try {
         // Синхронизируем локальную корзину на сервер
         const syncResult = await syncCartToServer(items)
-        console.log('syncCartToServer done, items:', items.length, syncResult)
 
         const params = { person_type_id: 1 }
         if (locationCode) params.location = locationCode
@@ -349,9 +349,6 @@ function Checkout() {
         if (cancelled) return
         applyCheckoutResponse(ctxRes.data)
       } catch (err) {
-        console.error('checkout context error:', err)
-        console.error('checkout context response body:', err.response?.data)
-        console.error('checkout context response status:', err.response?.status)
         const errMsg = err.response?.data?.errors || err.response?.data?.message || err.message
         setCheckoutErrors(Array.isArray(errMsg) ? errMsg : [String(errMsg)])
       }
@@ -414,9 +411,7 @@ function Checkout() {
         if (paymentMethod) data.pay_system_id = Number(paymentMethod)
         const res = await calculateCheckout(data)
         if (!cancelled) applyCheckoutResponse(res.data)
-      } catch (err) {
-        console.error('checkout calculate (delivery) error:', err)
-      }
+      } catch {}
       if (!cancelled) setPaymentLoading(false)
     })()
 
@@ -442,9 +437,7 @@ function Checkout() {
         if (personTypeId) data.person_type_id = personTypeId
         const res = await calculateCheckout(data)
         applyCheckoutResponse(res.data)
-      } catch (err) {
-        console.error('checkout calculate (payment) error:', err)
-      }
+      } catch {}
     }, 300)
     return () => clearTimeout(paymentCalculateTimer.current)
   }, [paymentMethod])
@@ -546,6 +539,12 @@ function Checkout() {
       const token = res.data?.message?.Authorization
       if (token) {
         dispatch(setToken(token))
+        // Объединяем гостевую корзину
+        const guestFuserId = getGuestFuserId()
+        if (guestFuserId) {
+          try { await mergeBasket(guestFuserId) } catch {}
+          clearGuestFuserId()
+        }
         setSmsModalOpen(false)
         setSmsCode(['', '', '', '', '', ''])
       } else {

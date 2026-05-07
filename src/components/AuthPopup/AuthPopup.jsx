@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useDispatch } from 'react-redux'
-import { setToken } from '../../store/slices/authSlice'
+import { setToken, initTidAuth, completeTidAuth } from '../../store/slices/authSlice'
 import { fetchFavorites } from '../../store/slices/favoritesSlice'
-import { sendSmsCode, verifySmsCode, tidInit, tidComplete } from '../../services/apiClient'
+import { mergeGuestCart } from '../../store/slices/cartSlice'
+import { sendSmsCode, verifySmsCode, getGuestFuserId } from '../../services/apiClient'
 
 // Маска телефона (на основе phoneinput.js — github.com/Shaadanio/phoneinput)
 function formatPhoneValue(value) {
@@ -63,8 +64,20 @@ function AuthPopup({ isOpen, onClose }) {
   }, [isOpen, onClose])
 
   // Обработка успешной авторизации
-  const handleAuthSuccess = useCallback((token) => {
+  const handleAuthSuccess = useCallback(async (token) => {
     dispatch(setToken(token))
+    
+    // Объединяем гостевую корзину с авторизованной
+    const guestFuserId = getGuestFuserId()
+    if (guestFuserId) {
+      try {
+        await dispatch(mergeGuestCart()).unwrap()
+      } catch (err) {
+        console.warn('Failed to merge guest cart:', err)
+      }
+    }
+    
+    // Загружаем избранное
     dispatch(fetchFavorites())
     onClose()
   }, [dispatch, onClose])
@@ -152,15 +165,8 @@ function AuthPopup({ isOpen, onClose }) {
   }
 
   // --- Tinkoff ID авторизация ---
-  const handleTidInit = async () => {
-    setLoading(true)
-    setError('')
-    try {
-      const res = await tidInit()
-      const msg = res.data?.message
-      const url = typeof msg === 'string' ? msg
-        : msg?.url || msg?.redirect_url || msg?.link || msg?.auth_url
-        || res.data?.url || res.data?.redirect_url || res.data?.link
+  const handleTult = await dispatch(initTidAuth()).unwrap()
+      const url = result.redirectUrl || result.redirect_url
       if (url && url.startsWith('http')) {
         setTidUrl(url)
         setStep('tid-waiting')
@@ -169,7 +175,7 @@ function AuthPopup({ isOpen, onClose }) {
         setError('Не удалось получить ссылку для авторизации')
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Ошибка инициализации Tinkoff ID')
+      setError(err || 'Ошибка инициализации Tinkoff ID')
     } finally {
       setLoading(false)
     }
@@ -181,12 +187,11 @@ function AuthPopup({ isOpen, onClose }) {
     try {
       const urlParams = new URLSearchParams(window.location.search)
       const authCode = urlParams.get('code')
-      const res = await tidComplete(authCode || undefined)
-      const token = res.data?.message?.Authorization
-      if (token) {
-        if (authCode) window.history.replaceState({}, '', window.location.pathname)
-        handleAuthSuccess(token)
-      } else {
+      const token = await dispatch(completeTidAuth(authCode || undefined)).unwrap()
+      if (authCode) window.history.replaceState({}, '', window.location.pathname)
+      handleAuthSuccess(token)
+    } catch (err) {
+      setError(err || 'Авторизация через Tinkoff ID ещё не завершена. Попробуйте снова.
         setError('Авторизация через Tinkoff ID ещё не завершена. Попробуйте снова.')
       }
     } catch (err) {

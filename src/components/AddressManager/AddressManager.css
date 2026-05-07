@@ -1,0 +1,228 @@
+.address-manager {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.address-manager__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.address-manager__header h2 {
+  font-size: 28px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.address-manager__loading {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+
+/* Форма добавления/редактирования */
+.address-form {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 30px;
+}
+
+.address-form h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+}
+
+.address-form__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group--full {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.form-group .required {
+  color: #e74c3c;
+}
+
+.form-group input {
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.address-form__actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* Список адресов */
+.address-list {
+  display: grid;
+  gap: 16px;
+}
+
+.address-list__empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+  font-size: 16px;
+}
+
+.address-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+  transition: box-shadow 0.2s;
+}
+
+.address-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.address-card__content {
+  flex: 1;
+}
+
+.address-card__city {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+.address-card__details {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.address-card__zip {
+  font-size: 13px;
+  color: #999;
+}
+
+.address-card__actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* Кнопки */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: #007bff;
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: #fff;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #545b62;
+}
+
+.btn-outline {
+  background: #fff;
+  color: #007bff;
+  border: 1px solid #007bff;
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: #007bff;
+  color: #fff;
+}
+
+.btn-danger {
+  background: #dc3545;
+  color: #fff;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #c82333;
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+/* Адаптив */
+@media (max-width: 768px) {
+  .address-manager {
+    padding: 16px;
+  }
+
+  .address-manager__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .address-form__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .address-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .address-card__actions {
+    width: 100%;
+  }
+
+  .address-card__actions .btn {
+    flex: 1;
+  }
+}
