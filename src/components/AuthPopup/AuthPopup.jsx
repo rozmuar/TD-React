@@ -165,7 +165,11 @@ function AuthPopup({ isOpen, onClose }) {
   }
 
   // --- Tinkoff ID авторизация ---
-  const handleTult = await dispatch(initTidAuth()).unwrap()
+  const handleTidInit = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const result = await dispatch(initTidAuth()).unwrap()
       const url = result.redirectUrl || result.redirect_url
       if (url && url.startsWith('http')) {
         setTidUrl(url)
@@ -190,10 +194,6 @@ function AuthPopup({ isOpen, onClose }) {
       const token = await dispatch(completeTidAuth(authCode || undefined)).unwrap()
       if (authCode) window.history.replaceState({}, '', window.location.pathname)
       handleAuthSuccess(token)
-    } catch (err) {
-      setError(err || 'Авторизация через Tinkoff ID ещё не завершена. Попробуйте снова.
-        setError('Авторизация через Tinkoff ID ещё не завершена. Попробуйте снова.')
-      }
     } catch (err) {
       setError(err.response?.data?.message || 'Ошибка проверки Tinkoff ID')
     } finally {
