@@ -106,7 +106,7 @@ function Header() {
               </li>
               <li className="header__action header__action--cart">
                 <Link to="/cart/" aria-label="Корзина">
-                  <img src="/img/header/cart.png" alt="Корзина" />
+                  <img src="/img/footer/cart.svg" alt="Корзина" />
                   <span>Корзина</span>
                   {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
                 </Link>

@@ -10,19 +10,19 @@ function Footer() {
       <footer className="mobile-bar">
         <nav>
           <Link to="/catalog/">
-            <img src="/img/footer/catalog.png" alt="Каталог" />
+            <img src="/img/footer/catalog.svg" alt="Каталог" />
             <span>Каталог</span>
           </Link>
           <Link to="/cart/">
-            <img src="/img/footer/cart.png" alt="Корзина" />
+            <img src="/img/footer/cart.svg" alt="Корзина" />
             <span>Корзина</span>
           </Link>
           <Link to="/favorites/">
-            <img src="/img/footer/favorite.png" alt="Избранное" />
+            <img src="/img/footer/favorite.svg" alt="Избранное" />
             <span>Избранное</span>
           </Link>
           <Link to="/profile/">
-            <img src="/img/footer/profile.png" alt="Кабинет" />
+            <img src="/img/footer/profile.svg" alt="Кабинет" />
             <span>Кабинет</span>
           </Link>
         </nav>
