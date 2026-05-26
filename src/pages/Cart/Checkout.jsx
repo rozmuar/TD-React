@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { clearCart } from '../../store/slices/cartSlice'
+import { fetchUserAddresses } from '../../store/slices/userSlice'
 import {
   getLocationCode, getCheckoutContext, calculateCheckout, submitCheckout,
   syncCartToServer,
@@ -173,6 +174,28 @@ function Checkout() {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [comment, setComment] = useState('')
+
+  // ── Сохранённые адреса пользователя ──────────────────────
+  const userAddresses = useSelector((s) => s.user.addresses)
+  const [selectedAddressId, setSelectedAddressId] = useState(null)
+
+  // Загрузка адресов для авторизованных пользователей
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchUserAddresses())
+    }
+  }, [isAuthenticated, dispatch])
+
+  // Обработчик выбора сохранённого адреса
+  const handleSelectAddress = (address) => {
+    setSelectedAddressId(address.id)
+    // Автозаполнение полей из выбранного адреса
+    if (address.city && !cityConfirmed) {
+      setCityInput(address.city)
+      setCityConfirmed(address.city)
+    }
+    // Можно добавить дополнительные поля если они есть в форме
+  }
 
   // ── Автозаполнение из профиля авторизованного пользователя ──
   useEffect(() => {
@@ -733,6 +756,48 @@ function Checkout() {
                     </div>
                   </div>
                 </div>
+
+                {/* Сохранённые адреса для авторизованных пользователей */}
+                {isAuthenticated && userAddresses.length > 0 && (
+                  <div className="checkout__block">
+                    <div className="checkout__saved-addresses-header">
+                      <h3 className="checkout__block-title">Мои адреса</h3>
+                      <Link to="/personal/addresses/" className="checkout__manage-addresses-link">
+                        Управление адресами
+                      </Link>
+                    </div>
+                    <div className="checkout__saved-addresses">
+                      {userAddresses.map((addr) => (
+                        <div
+                          key={addr.id}
+                          className={`checkout__saved-address${selectedAddressId === addr.id ? ' is-selected' : ''}`}
+                          onClick={() => handleSelectAddress(addr)}
+                        >
+                          <div className="checkout__saved-address-radio">
+                            <input
+                              type="radio"
+                              name="saved_address"
+                              checked={selectedAddressId === addr.id}
+                              onChange={() => handleSelectAddress(addr)}
+                            />
+                          </div>
+                          <div className="checkout__saved-address-content">
+                            <div className="checkout__saved-address-city">{addr.city}</div>
+                            <div className="checkout__saved-address-details">
+                              {addr.street}, д. {addr.house}
+                              {addr.apartment && `, кв. ${addr.apartment}`}
+                            </div>
+                            {addr.zip && (
+                              <div className="checkout__saved-address-zip">
+                                Индекс: {addr.zip}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* ▸▸▸ ШАГ 2: Доставка ▸▸▸ */}

@@ -37,6 +37,7 @@ const PersonalHome = lazy(() => import('./pages/Personal/PersonalHome'))
 const PersonalInfo = lazy(() => import('./pages/Personal/PersonalInfo'))
 const PersonalLoyalty = lazy(() => import('./pages/Personal/PersonalLoyalty'))
 const PersonalOrders = lazy(() => import('./pages/Personal/PersonalOrders'))
+const PersonalAddresses = lazy(() => import('./pages/Personal/PersonalAddresses'))
 
 function App() {
   return (
@@ -80,6 +81,7 @@ function App() {
           <Route path="info/" element={<Suspense fallback={<div />}><PersonalInfo /></Suspense>} />
           <Route path="loyalty/" element={<Suspense fallback={<div />}><PersonalLoyalty /></Suspense>} />
           <Route path="orders/" element={<Suspense fallback={<div />}><PersonalOrders /></Suspense>} />
+          <Route path="addresses/" element={<Suspense fallback={<div />}><PersonalAddresses /></Suspense>} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Route>

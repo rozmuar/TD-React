@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   fetchUserAddresses,
@@ -8,6 +8,34 @@ import {
   clearError,
 } from '../../store/slices/userSlice'
 import './AddressManager.css'
+
+// DaData API для подсказок адресов
+const DADATA_TOKEN = 'b797ba9abf3c4df0a778b1a215514b3a8d9b1382'
+const DADATA_URL = 'https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address'
+
+async function suggestAddress(query) {
+  if (!query || query.length < 3) return []
+  try {
+    const res = await fetch(DADATA_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Authorization: 'Token ' + DADATA_TOKEN,
+      },
+      body: JSON.stringify({
+        query,
+        count: 5,
+        locations: [{ country: '*' }],
+      }),
+    })
+    const json = await res.json()
+    return json.suggestions || []
+  } catch (err) {
+    console.error('DaData error:', err)
+    return []
+  }
+}
 
 export default function AddressManager() {
   const dispatch = useDispatch()
@@ -22,6 +50,13 @@ export default function AddressManager() {
     zip: '',
   })
 
+  // DaData подсказки
+  const [addressQuery, setAddressQuery] = useState('')
+  const [addressSuggestions, setAddressSuggestions] = useState([])
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const addressTimeoutRef = useRef(null)
+  const suggestionsRef = useRef(null)
+
   useEffect(() => {
     dispatch(fetchUserAddresses())
   }, [dispatch])
@@ -32,6 +67,58 @@ export default function AddressManager() {
       dispatch(clearError())
     }
   }, [error, dispatch])
+
+  // Закрытие подсказок при клике вне
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(e.target)) {
+        setShowSuggestions(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  // Поиск адресов через DaData с debounce
+  useEffect(() => {
+    if (addressTimeoutRef.current) {
+      clearTimeout(addressTimeoutRef.current)
+    }
+
+    if (addressQuery.length >= 3) {
+      addressTimeoutRef.current = setTimeout(async () => {
+        const suggestions = await suggestAddress(addressQuery)
+        setAddressSuggestions(suggestions)
+        setShowSuggestions(suggestions.length > 0)
+      }, 300)
+    } else {
+      setAddressSuggestions([])
+      setShowSuggestions(false)
+    }
+
+    return () => {
+      if (addressTimeoutRef.current) {
+        clearTimeout(addressTimeoutRef.current)
+      }
+    }
+  }, [addressQuery])
+
+  const handleAddressQueryChange = (e) => {
+    setAddressQuery(e.target.value)
+  }
+
+  const handleSelectSuggestion = (suggestion) => {
+    const data = suggestion.data
+    setFormData({
+      city: data.city || data.settlement || '',
+      street: data.street || '',
+      house: data.house || '',
+      apartment: '',
+      zip: data.postal_code || '',
+    })
+    setAddressQuery(suggestion.value)
+    setShowSuggestions(false)
+  }
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -109,6 +196,35 @@ export default function AddressManager() {
       {showForm && (
         <form className="address-form" onSubmit={handleSubmit}>
           <h3>{editingId ? 'Редактировать адрес' : 'Новый адрес'}</h3>
+          
+          {/* Поле поиска с DaData подсказками */}
+          <div className="form-group form-group--full address-search" ref={suggestionsRef}>
+            <label>Поиск адреса</label>
+            <input
+              type="text"
+              value={addressQuery}
+              onChange={handleAddressQueryChange}
+              placeholder="Начните вводить адрес..."
+              className="address-search__input"
+            />
+            {showSuggestions && addressSuggestions.length > 0 && (
+              <div className="address-suggestions">
+                {addressSuggestions.map((suggestion, idx) => (
+                  <div
+                    key={idx}
+                    className="address-suggestion"
+                    onClick={() => handleSelectSuggestion(suggestion)}
+                  >
+                    {suggestion.value}
+                  </div>
+                ))}
+              </div>
+            )}
+            <small className="form-hint">
+              Введите адрес для автозаполнения полей ниже
+            </small>
+          </div>
+
           <div className="address-form__grid">
             <div className="form-group">
               <label>
@@ -118,6 +234,29 @@ export default function AddressManager() {
                 type="text"
                 name="city"
                 value={formData.city}
+                onChange={handleInputChange}
+                placeholder="Москва"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Индекс</label>
+              <input
+                type="text"
+                name="zip"
+                value={formData.zip}
+                onChange={handleInputChange}
+                placeholder="101000"
+              />
+            </div>
+            <div className="form-group form-group--full">
+              <label>
+                Улица <span className="required">*</span>
+              </label>
+              <input
+                type="text"
+                name="street"
+                value={formData.street}
                 onChange={handleInputChange}
                 placeholder="Москва"
                 required
