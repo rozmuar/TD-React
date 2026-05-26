@@ -181,7 +181,9 @@ function OrderDetail({ data, order, statuses }) {
             const qty = Number(item.QUANTITY || item.quantity || 1)
             const img = item.PICTURE_URL || item.DETAIL_PICTURE || item.PREVIEW_PICTURE || ''
             const imgSrc = img && !img.startsWith('http') ? `https://topdisc.ru${img}` : img
-            const productUrl = item.DETAIL_PAGE_URL || ''
+            // Разрешаем только относительные пути и URL с нашего домена
+            const rawUrl = item.DETAIL_PAGE_URL || ''
+            const productUrl = rawUrl && !/^\s*(javascript:|data:)/i.test(rawUrl) ? rawUrl : ''
             const name = item.NAME || item.name || item.PRODUCT_NAME || '—'
 
             return (
@@ -195,7 +197,7 @@ function OrderDetail({ data, order, statuses }) {
                 </div>
                 <div className="order-card__product-info">
                   {productUrl ? (
-                    <a className="order-card__product-name" href={productUrl}>{name}</a>
+                    <a className="order-card__product-name" href={productUrl} rel="noopener noreferrer">{name}</a>
                   ) : (
                     <p className="order-card__product-name">{name}</p>
                   )}

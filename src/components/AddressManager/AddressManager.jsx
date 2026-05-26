@@ -10,7 +10,7 @@ import {
 import './AddressManager.css'
 
 // DaData API для подсказок адресов
-const DADATA_TOKEN = 'b797ba9abf3c4df0a778b1a215514b3a8d9b1382'
+const DADATA_TOKEN = import.meta.env.VITE_DADATA_TOKEN
 const DADATA_URL = 'https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address'
 
 async function suggestAddress(query) {

@@ -171,10 +171,16 @@ function AuthPopup({ isOpen, onClose }) {
     try {
       const result = await dispatch(initTidAuth()).unwrap()
       const url = result.redirectUrl || result.redirect_url
-      if (url && url.startsWith('http')) {
+      // Проверяем, что URL принадлежит домену Т-ID (защита от open redirect)
+      const isTidUrl = typeof url === 'string' && (
+        url.startsWith('https://id.tinkoff.ru') ||
+        url.startsWith('https://id.tbank.ru') ||
+        url.startsWith('https://oauth2.tinkoff.ru')
+      )
+      if (isTidUrl) {
         setTidUrl(url)
         setStep('tid-waiting')
-        window.open(url, '_blank', 'noopener')
+        window.open(url, '_blank', 'noopener,noreferrer')
       } else {
         setError('Не удалось получить ссылку для авторизации')
       }

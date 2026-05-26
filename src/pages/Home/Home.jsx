@@ -139,7 +139,10 @@ function Home() {
                     if (cleanLink.includes('https://topdisc.ruhttps://')) {
                       cleanLink = cleanLink.replace('https://topdisc.ru', '')
                     }
-                    
+                    // Блокируем javascript: и data: URI
+                    if (/^\s*javascript:/i.test(cleanLink) || /^\s*data:/i.test(cleanLink)) {
+                      cleanLink = '#'
+                    }
                     const isExternal = cleanLink.startsWith('http')
                     
                     return (

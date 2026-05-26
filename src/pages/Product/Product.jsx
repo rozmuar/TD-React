@@ -160,7 +160,6 @@ function Product() {
   const hasStock = parseInt(product?.quantity) > 0
   const hasPrice = parseFloat(product?.price) > 0
   const isAvailable = hasPrice && hasStock
-  console.log('[Product] полные данные:', JSON.stringify(product, null, 2))
 
   // Всегда рендерим все характеристики, скрываем через CSS
   const allSpecs = product?.properties || []

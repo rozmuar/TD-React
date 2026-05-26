@@ -307,42 +307,33 @@ export const mergeBasket = (guestFuserId) =>
 
 /** Синхронизировать локальную корзину на сервер */
 export async function syncCartToServer(items) {
-  console.log('🔄 Синхронизация корзины, товаров:', items.length)
-  console.log('📦 Локальные товары:', items.map(i => ({ id: i.id, name: i.name, qty: i.quantity })))
-  
   // Очищаем серверную корзину
   try {
     const basketRes = await getServerBasket()
     const serverItems = basketRes.data?.data || basketRes.data?.result?.data || []
-    console.log('🗑️ Очистка серверной корзины, товаров:', serverItems.length)
     for (const si of serverItems) {
       try {
         await deleteServerBasketItem(si.product_id || si.id)
-      } catch (err) {
-        console.error('❌ Ошибка удаления товара:', si.product_id || si.id, err)
+      } catch {
+        // silent: продолжаем удаление остальных
       }
     }
-  } catch (err) {
-    console.error('❌ Ошибка получения серверной корзины:', err)
+  } catch {
+    // silent: если не удалось получить корзину — пробуем добавить
   }
-  
+
   // Добавляем товары последовательно
   for (const item of items) {
     try {
-      console.log('➕ Добавление товара:', item.id, 'кол-во:', item.quantity)
-      const result = await addToServerBasket(item.id, item.quantity)
-      console.log('✅ Товар добавлен:', result.data)
-    } catch (err) {
-      console.error('❌ Ошибка добавления товара:', item.id, err.response?.data || err.message)
+      await addToServerBasket(item.id, item.quantity)
+    } catch {
+      // silent: продолжаем с остальными товарами
     }
   }
-  
+
   // Проверяем итоговую корзину
   const checkRes = await getServerBasket()
   const finalItems = checkRes.data?.data || checkRes.data?.result?.data || []
-  console.log('✅ Итоговая серверная корзина, товаров:', finalItems.length)
-  console.log('📦 Серверные товары:', finalItems.map(i => ({ id: i.product_id || i.id, name: i.name, qty: i.quantity })))
-  
   if (finalItems.length === 0 && items.length > 0) {
     throw new Error('Серверная корзина пуста после синхронизации')
   }

@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import Layout from './components/Layout/Layout'
+import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute'
 import Home from './pages/Home/Home'
 import Catalog from './pages/Catalog/Catalog'
 import Category from './pages/Category/Category'
@@ -76,12 +77,14 @@ function App() {
           <Route path="politika-konfidentsialnosti/" element={<Privacy />} />
           <Route path="dogovor-oferty/" element={<Oferta />} />
         </Route>
-        <Route path="personal/" element={<Suspense fallback={<div />}><PersonalLayout /></Suspense>}>
-          <Route index element={<Suspense fallback={<div />}><PersonalHome /></Suspense>} />
-          <Route path="info/" element={<Suspense fallback={<div />}><PersonalInfo /></Suspense>} />
-          <Route path="loyalty/" element={<Suspense fallback={<div />}><PersonalLoyalty /></Suspense>} />
-          <Route path="orders/" element={<Suspense fallback={<div />}><PersonalOrders /></Suspense>} />
-          <Route path="addresses/" element={<Suspense fallback={<div />}><PersonalAddresses /></Suspense>} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="personal/" element={<Suspense fallback={<div />}><PersonalLayout /></Suspense>}>
+            <Route index element={<Suspense fallback={<div />}><PersonalHome /></Suspense>} />
+            <Route path="info/" element={<Suspense fallback={<div />}><PersonalInfo /></Suspense>} />
+            <Route path="loyalty/" element={<Suspense fallback={<div />}><PersonalLoyalty /></Suspense>} />
+            <Route path="orders/" element={<Suspense fallback={<div />}><PersonalOrders /></Suspense>} />
+            <Route path="addresses/" element={<Suspense fallback={<div />}><PersonalAddresses /></Suspense>} />
+          </Route>
         </Route>
         <Route path="*" element={<NotFound />} />
       </Route>

@@ -1,5 +1,5 @@
-import { useState, useCallback } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useCallback, useEffect } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { logout } from '../../store/slices/authSlice'
 import AuthPopup from '../AuthPopup/AuthPopup'
@@ -12,9 +12,20 @@ function Header() {
   const favoritesCount = useSelector((state) => state.favorites.items.length)
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
   const dispatch = useDispatch()
+  const location = useLocation()
+  const navigate = useNavigate()
   const [authOpen, setAuthOpen] = useState(false)
   const [catalogOpen, setCatalogOpen] = useState(false)
   const [callbackOpen, setCallbackOpen] = useState(false)
+
+  // Автоматически открываем модалку авторизации при редиректе с защищённой страницы
+  useEffect(() => {
+    if (location.state?.requireAuth && !isAuthenticated) {
+      setAuthOpen(true)
+      // Очищаем state после открытия модалки
+      navigate(location.pathname, { replace: true, state: {} })
+    }
+  }, [location.state, isAuthenticated, location.pathname, navigate])
 
   const openAuth = useCallback(() => setAuthOpen(true), [])
   const closeAuth = useCallback(() => setAuthOpen(false), [])

@@ -20,7 +20,6 @@ function PersonalInfo() {
         const res = await getUserProfile()
         if (cancelled) return
         const data = res.data?.message || res.data
-        console.log('Данные клиента из API:', JSON.stringify(res.data, null, 2))
         setProfile(data)
         setForm({
           name: data?.name || data?.NAME || '',
