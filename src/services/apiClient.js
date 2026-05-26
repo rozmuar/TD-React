@@ -3,6 +3,12 @@ import axios from 'axios'
 // Centralized Bitrix REST API base URL
 const BITRIX_REST_URL = import.meta.env.VITE_BITRIX_REST_URL || 'https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e'
 
+// Inject Redux store для 401-interceptor (вызывается из main.jsx, избегает circular imports)
+let _store = null
+export const injectStore = (store) => {
+  _store = store
+}
+
 // Filter API base URL (separate service)
 // В dev — через Vite proxy, в prod — через nginx reverse proxy
 // Всегда используем относительный путь, чтобы избежать CORS и сохранить сессию
@@ -15,6 +21,19 @@ export const bitrixClient = axios.create({
 export const filterClient = axios.create({
   baseURL: FILTER_API_URL,
 })
+
+// При 401 — токен протух/недействителен → автоматический логаут
+filterClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('auth_token')
+      // dispatch через строковый тип чтобы избежать circular import
+      _store?.dispatch({ type: 'auth/logout' })
+    }
+    return Promise.reject(error)
+  }
+)
 
 // ============================================================
 // Категории
