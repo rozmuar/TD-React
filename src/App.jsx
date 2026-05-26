@@ -40,9 +40,9 @@ const PersonalLoyalty = lazy(() => import('./pages/Personal/PersonalLoyalty'))
 const PersonalOrders = lazy(() => import('./pages/Personal/PersonalOrders'))
 const PersonalAddresses = lazy(() => import('./pages/Personal/PersonalAddresses'))
 
-function App() {
+function App({ helmetContext }) {
   return (
-    <HelmetProvider>
+    <HelmetProvider context={helmetContext}>
       <Routes>
         <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />

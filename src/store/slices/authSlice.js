@@ -21,10 +21,10 @@ function isTokenExpired(token) {
   }
 }
 
-const storedToken = localStorage.getItem(TOKEN_KEY)
+const storedToken = typeof window !== 'undefined' ? localStorage.getItem(TOKEN_KEY) : null
 const tokenValid = storedToken && !isTokenExpired(storedToken)
 // Сразу удаляем просроченный токен из localStorage
-if (storedToken && !tokenValid) {
+if (typeof window !== 'undefined' && storedToken && !tokenValid) {
   localStorage.removeItem(TOKEN_KEY)
 }
 

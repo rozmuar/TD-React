@@ -4,6 +4,7 @@ import { getFavorites, addFavorite, deleteFavorite } from '../../services/apiCli
 const LOCAL_KEY = 'favorite_items'
 
 function getLocal() {
+  if (typeof window === 'undefined') return []
   return JSON.parse(localStorage.getItem(LOCAL_KEY) || '[]')
 }
 

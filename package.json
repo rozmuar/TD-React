@@ -5,15 +5,20 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "build:prerender": "vite build && node prerender.js",
+    "dev:ssr": "node server.js",
+    "build": "vite build && vite build --ssr src/entry-server.jsx",
+    "build:client": "vite build",
+    "build:server": "vite build --ssr src/entry-server.jsx",
+    "build:prerender": "npm run build:client && node prerender.js",
     "prerender": "node prerender.js",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "NODE_ENV=production node server.js"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.2.0",
-    "axios": "^1.6.7",
+    "axios": "^1.16.1",
     "dompurify": "^3.3.3",
+    "express": "^5.2.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-helmet-async": "^2.0.5",

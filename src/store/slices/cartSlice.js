@@ -12,6 +12,7 @@ import {
 const LOCAL_KEY = 'cart_items'
 
 function loadCart() {
+  if (typeof window === 'undefined') return { items: [], totalAmount: 0, totalCount: 0 }
   try {
     const data = JSON.parse(localStorage.getItem(LOCAL_KEY))
     if (data && Array.isArray(data.items)) return data

@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-const saved = JSON.parse(localStorage.getItem('compare_items') || '[]')
+const saved = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('compare_items') || '[]') : []
 
 const compareSlice = createSlice({
   name: 'compare',
