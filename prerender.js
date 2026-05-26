@@ -89,18 +89,18 @@ async function prerenderPage(browser, baseUrl, route) {
       timeout: 30000
     })
 
-    // Ждем загрузку контента
+    // Ждём пока React отрендерит что-то в #root (не пустой div)
     try {
       await page.waitForFunction(
         () => {
           const root = document.getElementById('root')
-          return root && root.dataset.ready === 'true'
+          return root && root.children.length > 0 && root.textContent.trim().length > 50
         },
-        { timeout: 15000 }
+        { timeout: 10000 }
       )
-      console.log('✅ Content loaded')
+      console.log('✅ Content rendered')
     } catch (e) {
-      console.log('⚠️  Saving without data-ready flag...')
+      console.log('⚠️  Saving as-is (wait timeout)...')
     }
 
     const html = await page.content()
