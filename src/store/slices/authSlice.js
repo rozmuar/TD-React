@@ -10,13 +10,31 @@ import {
 
 const TOKEN_KEY = 'auth_token'
 
+// Проверяем exp-поле JWT не обращаясь к серверу
+function isTokenExpired(token) {
+  if (!token) return true
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))
+    return typeof payload.exp === 'number' && payload.exp * 1000 < Date.now()
+  } catch {
+    return true
+  }
+}
+
+const storedToken = localStorage.getItem(TOKEN_KEY)
+const tokenValid = storedToken && !isTokenExpired(storedToken)
+// Сразу удаляем просроченный токен из localStorage
+if (storedToken && !tokenValid) {
+  localStorage.removeItem(TOKEN_KEY)
+}
+
 const initialState = {
-  token: localStorage.getItem(TOKEN_KEY) || null,
-  isAuthenticated: !!localStorage.getItem(TOKEN_KEY),
+  token: tokenValid ? storedToken : null,
+  isAuthenticated: !!tokenValid,
   user: null,
   loading: false,
   error: null,
-  tidSession: null, // Для T-ID авторизации
+  tidSession: null,
 }
 
 // Загрузка профиля пользователя
