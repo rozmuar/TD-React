@@ -28,7 +28,7 @@ async function createServer() {
   }
 
   // Все запросы обрабатываем SSR
-  app.use('/*splat', async (req, res) => {
+  app.use(async (req, res) => {
     const url = req.originalUrl
 
     try {
