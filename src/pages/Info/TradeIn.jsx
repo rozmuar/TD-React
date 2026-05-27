@@ -124,10 +124,10 @@ function TradeIn() {
         <img src={detailPicSrc} alt="Трейд-ин" className="tradein__banner" />
       )}
 
-      {/* 2. preview_text + форма */}
+      {/* 2. Заголовок (preview_text — plain text) + форма */}
       <section className="tradein__form-section">
         {previewText && (
-          <div className="tradein__preview-text" dangerouslySetInnerHTML={{ __html: previewText }} />
+          <h2 className="tradein__section-title">{previewText}</h2>
         )}
         <div className="tradein__form-row">
           <select

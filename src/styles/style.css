@@ -9561,50 +9561,51 @@ a.order-card__product-name:hover {
   display: block;
   width: 100%;
   border-radius: 12px;
-  margin-bottom: 28px;
+  margin-bottom: 32px;
   object-fit: cover;
 }
 
-.tradein__preview-text {
-  margin-bottom: 16px;
-}
-
-.tradein__preview-text h2,
-.tradein__preview-text h3 {
-  font-size: 20px;
+.tradein__section-title {
+  font-size: 22px;
   font-weight: 700;
-  margin: 0 0 12px;
+  color: #242424;
+  margin: 0 0 16px;
 }
 
 .tradein__form-section {
-  margin-bottom: 28px;
+  margin-bottom: 40px;
 }
 
+/* Единый блок формы с внутренними разделителями */
 .tradein__form-row {
   display: flex;
-  gap: 12px;
   align-items: stretch;
-  border: 1px solid #e0e0e0;
-  border-radius: 10px;
-  padding: 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
   background: #fff;
+  overflow: hidden;
 }
 
 .tradein__select {
   flex: 1;
   min-width: 0;
-  padding: 12px 14px;
-  border: 1px solid #d1d1d1;
-  border-radius: 8px;
+  padding: 14px 36px 14px 16px;
+  border: none;
+  border-right: 1px solid #d9d9d9;
+  outline: none;
   font-size: 14px;
-  color: #333;
+  color: #888;
   background: #fff;
   appearance: none;
   -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath fill='%23888' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24'%3E%3Cpath fill='%23aaa' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 10px center;
+  background-position: right 12px center;
   cursor: pointer;
+}
+
+.tradein__select option {
+  color: #333;
 }
 
 .tradein__select--wide {
@@ -9620,32 +9621,29 @@ a.order-card__product-name:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 90px;
-  padding: 12px 16px;
-  border: 1px solid #d1d1d1;
-  border-radius: 8px;
-  font-size: 16px;
+  min-width: 80px;
+  padding: 14px 20px;
+  font-size: 15px;
   font-weight: 600;
   color: #242424;
-  background: #f7f7f7;
   white-space: nowrap;
 }
 
 .tradein__note {
-  margin-top: 10px;
+  margin-top: 12px;
   font-size: 12px;
   color: #888;
   line-height: 1.5;
 }
 
 .tradein__advantages {
-  margin-bottom: 28px;
+  margin-bottom: 32px;
 }
 
 .tradein__advantages-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
-  margin: 0 0 16px;
+  margin: 0 0 20px;
 }
 
 .tradein__advantages-grid {
@@ -9709,9 +9707,18 @@ a.order-card__product-name:hover {
 @media (max-width: 768px) {
   .tradein__form-row {
     flex-direction: column;
+    border-radius: 8px;
+  }
+  .tradein__select {
+    border-right: none;
+    border-bottom: 1px solid #d9d9d9;
   }
   .tradein__select--wide {
     flex: unset;
+  }
+  .tradein__price {
+    justify-content: flex-start;
+    border-top: 1px solid #d9d9d9;
   }
   .tradein__advantages-grid {
     grid-template-columns: repeat(3, 1fr);
