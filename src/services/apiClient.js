@@ -113,6 +113,9 @@ export const getNewsDetail = (params, opts) =>
 export const getInfoPost = (code, opts) =>
   bitrixClient.get('/app_mobile.posts.json', { params: { code }, ...opts })
 
+export const getTradeInData = (opts) =>
+  bitrixClient.get('/app_mobile.tradein.json', { ...opts })
+
 // ============================================================
 // Фильтры
 // ============================================================

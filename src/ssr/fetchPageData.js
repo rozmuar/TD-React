@@ -218,6 +218,29 @@ async function fetchInfo(code) {
     code,
     content: result?.text || result?.detail_text || result?.preview_text || null,
     title: result?.name || null,
+    detail_picture: result?.detail_picture || null,
+    preview_picture: result?.preview_picture || null,
+    preview_text: result?.preview_text || null,
+    detail_text: result?.detail_text || null,
+  }
+}
+
+async function fetchInfoTradein() {
+  const [infoData, tradeData] = await Promise.all([
+    safe(api.get('/app_mobile.posts.json', { params: { code: 'treyd-in' } })),
+    safe(api.get('/app_mobile.tradein.json')),
+  ])
+  const result = infoData?.result
+  return {
+    type: 'info',
+    code: 'treyd-in',
+    content: result?.detail_text || result?.text || null,
+    title: result?.name || null,
+    detail_picture: result?.detail_picture || null,
+    preview_picture: result?.preview_picture || null,
+    preview_text: result?.preview_text || null,
+    detail_text: result?.detail_text || null,
+    tradeData: tradeData?.result || tradeData || null,
   }
 }
 
@@ -258,6 +281,7 @@ export async function fetchPageData(url) {
 
   // Инфо-страницы: /tradein/  /pravila/ и т.д.
   if (INFO_CODES[urlPath]) {
+    if (urlPath === '/tradein/') return fetchInfoTradein()
     return fetchInfo(INFO_CODES[urlPath])
   }
 
