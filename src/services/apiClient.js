@@ -110,6 +110,9 @@ export const getNewsList = (params, opts) =>
 export const getNewsDetail = (params, opts) =>
   bitrixClient.get('/app_mobile.newsDetail.json', { params, ...opts })
 
+export const getInfoPost = (code, opts) =>
+  bitrixClient.get('/app_mobile.posts.json', { params: { code }, ...opts })
+
 // ============================================================
 // Фильтры
 // ============================================================

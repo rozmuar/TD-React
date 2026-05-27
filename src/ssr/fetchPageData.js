@@ -194,6 +194,34 @@ async function fetchNewsDetail(newsCode) {
 }
 
 // ─────────────────────────────────────────────────────────────
+//  Инфо-страницы  /tradein/  /pravila/  /dogovor-oferty/ ...
+// ─────────────────────────────────────────────────────────────
+// Карта: URL-путь → символьный код в Bitrix (app_mobile.posts.json?code=...)
+const INFO_CODES = {
+  '/suppliers/': 'postavshchikam',
+  '/opt/': 'optovikam',
+  '/vacancy/': 'vakansii',
+  '/club-card/': 'klub-karta',
+  '/obmen-i-vozvraty/': 'obmen-i-vozvraty',
+  '/tradein/': 'treyd-in',
+  '/low-price/': 'garantiya-nizkoj-ceny',
+  '/pravila/': 'pravila',
+  '/politika-konfidentsialnosti/': 'politika-konfidentsialnosti',
+  '/dogovor-oferty/': 'dogovor-oferty',
+}
+
+async function fetchInfo(code) {
+  const data = await safe(api.get('/app_mobile.posts.json', { params: { code } }))
+  const result = data?.result
+  return {
+    type: 'info',
+    code,
+    content: result?.text || result?.detail_text || result?.preview_text || null,
+    title: result?.name || null,
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
 //  Главная функция — выбирает нужный fetcher по URL
 // ─────────────────────────────────────────────────────────────
 export async function fetchPageData(url) {
@@ -226,6 +254,11 @@ export async function fetchPageData(url) {
   // Список новостей: /company/news/
   if (urlPath === '/company/news/' || urlPath.startsWith('/company/news/')) {
     return fetchNewsList(searchParams)
+  }
+
+  // Инфо-страницы: /tradein/  /pravila/ и т.д.
+  if (INFO_CODES[urlPath]) {
+    return fetchInfo(INFO_CODES[urlPath])
   }
 
   // Остальные страницы — данных нет, только shell
