@@ -73,8 +73,8 @@ function TradeIn() {
           getInfoPost('treyd-in'),
           getTradeInData(),
         ])
-        setPageInfo(postsRes.data?.result || null)
-        const trade = tradeRes.data?.result || tradeRes.data || null
+        setPageInfo(postsRes.data?.result?.data || null)
+        const trade = tradeRes.data?.result?.data || null
         setTradeData(trade)
         initForm(trade)
       } catch (e) {
@@ -148,7 +148,7 @@ function TradeIn() {
           >
             <option value="">Выберите объем памяти</option>
             {volumeOptions.map((opt) => (
-              <option key={opt.UF_MEMORY} value={opt.UF_MEMORY}>{opt.UF_MEMORY}</option>
+              <option key={opt.UF_MEMORY} value={opt.UF_MEMORY}>{opt.UF_MEMORY} ГБ</option>
             ))}
           </select>
           <div className="tradein__price">

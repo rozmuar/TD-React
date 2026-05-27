@@ -212,7 +212,7 @@ const INFO_CODES = {
 
 async function fetchInfo(code) {
   const data = await safe(api.get('/app_mobile.posts.json', { params: { code } }))
-  const result = data?.result
+  const result = data?.result?.data
   return {
     type: 'info',
     code,
@@ -230,7 +230,7 @@ async function fetchInfoTradein() {
     safe(api.get('/app_mobile.posts.json', { params: { code: 'treyd-in' } })),
     safe(api.get('/app_mobile.tradein.json')),
   ])
-  const result = infoData?.result
+  const result = infoData?.result?.data
   return {
     type: 'info',
     code: 'treyd-in',
@@ -240,7 +240,7 @@ async function fetchInfoTradein() {
     preview_picture: result?.preview_picture || null,
     preview_text: result?.preview_text || null,
     detail_text: result?.detail_text || null,
-    tradeData: tradeData?.result || tradeData || null,
+    tradeData: tradeData?.result?.data || null,
   }
 }
 
