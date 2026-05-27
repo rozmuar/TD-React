@@ -1,17 +1,22 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { getNewsList, getNewsDetail } from '../../services/apiClient'
 import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
 import { sanitizeHtml } from '../../utils/sanitizeHtml'
 import { decodeHtml } from '../../utils/decodeHtml'
+import { useSSRData } from '../../context/SSRDataContext'
 
 function NewsDetail() {
   const { newsCode } = useParams()
   const navigate = useNavigate()
-  
-  const [newsItem, setNewsItem] = useState(null)
-  const [loading, setLoading] = useState(true)
+
+  const ssrData = useSSRData()
+  const ssrMatch = ssrData?.type === 'newsDetail'
+  const ssrUsed = useRef(false)
+
+  const [newsItem, setNewsItem] = useState(ssrMatch ? ssrData.newsItem : null)
+  const [loading, setLoading] = useState(!ssrMatch)
   const [error, setError] = useState(null)
   const [tableOfContents, setTableOfContents] = useState([])
 
@@ -80,6 +85,13 @@ function NewsDetail() {
   }
 
   useEffect(() => {
+    // Если SSR предоставил данные — пропускаем первый запрос
+    if (ssrMatch && !ssrUsed.current) {
+      ssrUsed.current = true
+      return
+    }
+    ssrUsed.current = true
+
     const fetchNewsDetail = async () => {
       try {
         setLoading(true)

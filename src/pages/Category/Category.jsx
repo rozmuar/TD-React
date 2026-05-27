@@ -8,6 +8,7 @@ import ProductCard from '../../components/ProductCard/ProductCard'
 import { useMatchHeight } from '../../hooks/useMatchHeight'
 import { sanitizeHtml } from '../../utils/sanitizeHtml'
 import { decodeHtml } from '../../utils/decodeHtml'
+import { useSSRData } from '../../context/SSRDataContext'
 
 // Кеш категорий для ускорения навигации
 const categoryCache = new Map()
@@ -19,16 +20,24 @@ function Category() {
   const { categoryId } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
   const location = useLocation()
-  const [subcategories, setSubcategories] = useState([])
-  const [products, setProducts] = useState([])
-  const [filters, setFilters] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [mainCategory, setMainCategory] = useState(null)
-  const [categoryDescription, setCategoryDescription] = useState('')
-  const [breadcrumbsPath, setBreadcrumbsPath] = useState([])
-  const [totalPages, setTotalPages] = useState(1)
-  const [isProductListPage, setIsProductListPage] = useState(false)
-  const [childSubcategories, setChildSubcategories] = useState([])
+
+  // SSR данные
+  const ssrData = useSSRData()
+  const ssrMatch = ssrData?.type === 'category' && ssrData?.categoryId === categoryId
+  // Два guard-рефа: один для reset-эффекта, другой для fetch-эффекта
+  const ssrResetGuard = useRef(ssrMatch)
+  const ssrFetchGuard = useRef(ssrMatch)
+
+  const [subcategories, setSubcategories] = useState(ssrMatch ? ssrData.subcategories : [])
+  const [products, setProducts] = useState(ssrMatch ? ssrData.products : [])
+  const [filters, setFilters] = useState(ssrMatch ? ssrData.filters : null)
+  const [loading, setLoading] = useState(!ssrMatch)
+  const [mainCategory, setMainCategory] = useState(ssrMatch ? ssrData.mainCategory : null)
+  const [categoryDescription, setCategoryDescription] = useState(ssrMatch ? ssrData.categoryDescription : '')
+  const [breadcrumbsPath, setBreadcrumbsPath] = useState(ssrMatch ? ssrData.breadcrumbsPath : [])
+  const [totalPages, setTotalPages] = useState(ssrMatch ? ssrData.totalPages : 1)
+  const [isProductListPage, setIsProductListPage] = useState(ssrMatch ? ssrData.isProductListPage : false)
+  const [childSubcategories, setChildSubcategories] = useState(ssrMatch ? ssrData.childSubcategories : [])
   const [activeFilters, setActiveFilters] = useState({})
   const [appliedFilters, setAppliedFilters] = useState({})
   const [sortOrder, setSortOrder] = useState('')
@@ -198,6 +207,11 @@ function Category() {
 
   // Сброс состояния при смене категории
   useEffect(() => {
+    // Если SSR предоставил данные для этого маршрута — пропускаем первый сброс
+    if (ssrResetGuard.current) {
+      ssrResetGuard.current = false
+      return
+    }
     setLoading(true)
     setProducts([])
     setSubcategories([])
@@ -262,6 +276,12 @@ function Category() {
   }
 
   useEffect(() => {
+    // Если SSR предоставил данные для этого маршрута — пропускаем первый запрос
+    if (ssrFetchGuard.current) {
+      ssrFetchGuard.current = false
+      return
+    }
+
     // Отменяем предыдущий запрос если он еще выполняется
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()

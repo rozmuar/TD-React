@@ -50,7 +50,7 @@ async function createServer() {
         render = serverEntry.render
       }
 
-      const { html: appHtml, helmet } = render(url)
+      const { html: appHtml, helmet, ssrData } = await render(url)
 
       // Вставляем отрендеренный HTML
       let finalHtml = template.replace('<!--ssr-outlet-->', appHtml)
@@ -69,6 +69,12 @@ async function createServer() {
             `${metaStr}${linkStr}</head>`
           )
         }
+      }
+
+      // Инжектируем предзагруженные данные для гидратации без мигания
+      if (ssrData) {
+        const dataScript = `<script>window.__SSR_DATA__=${JSON.stringify(ssrData)}</script>`
+        finalHtml = finalHtml.replace('</head>', `${dataScript}</head>`)
       }
 
       res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).end(finalHtml)

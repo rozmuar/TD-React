@@ -3,6 +3,8 @@ import { StaticRouter } from 'react-router'
 import { Provider } from 'react-redux'
 import { configureStore } from '@reduxjs/toolkit'
 import App from './App'
+import { SSRDataContext } from './context/SSRDataContext'
+import { fetchPageData } from './ssr/fetchPageData'
 import categoriesReducer from './store/slices/categoriesSlice'
 import productsReducer from './store/slices/productsSlice'
 import cartReducer from './store/slices/cartSlice'
@@ -28,18 +30,23 @@ function createSSRStore() {
   })
 }
 
-export function render(url) {
+export async function render(url) {
   const helmetContext = {}
   const store = createSSRStore()
 
+  // Предзагружаем данные страницы перед рендером
+  const ssrData = await fetchPageData(url)
+
   const html = renderToString(
-    <Provider store={store}>
-      <StaticRouter location={url}>
-        <App helmetContext={helmetContext} />
-      </StaticRouter>
-    </Provider>
+    <SSRDataContext.Provider value={ssrData}>
+      <Provider store={store}>
+        <StaticRouter location={url}>
+          <App helmetContext={helmetContext} />
+        </StaticRouter>
+      </Provider>
+    </SSRDataContext.Provider>
   )
 
   const { helmet } = helmetContext
-  return { html, helmet }
+  return { html, helmet, ssrData }
 }

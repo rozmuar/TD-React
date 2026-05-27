@@ -1,23 +1,35 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import { Link, useSearchParams, useLocation } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { getNewsList } from '../../services/apiClient'
 import { useMatchHeight } from '../../hooks/useMatchHeight'
 import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
+import { useSSRData } from '../../context/SSRDataContext'
 
 function NewsList() {
   const [searchParams] = useSearchParams()
   const location = useLocation()
   const currentPage = parseInt(searchParams.get('PAGEN_1') || '1', 10)
-  
-  const [news, setNews] = useState([])
-  const [totalPages, setTotalPages] = useState(1)
-  const [loading, setLoading] = useState(true)
+
+  const ssrData = useSSRData()
+  const ssrMatch = ssrData?.type === 'newsList'
+  const ssrUsed = useRef(false)
+
+  const [news, setNews] = useState(ssrMatch ? ssrData.news : [])
+  const [totalPages, setTotalPages] = useState(ssrMatch ? ssrData.totalPages : 1)
+  const [loading, setLoading] = useState(!ssrMatch)
 
   // Выравнивание высоты заголовков новостей
   useMatchHeight('.news-card__title', [news, loading])
 
   useEffect(() => {
+    // Если SSR предоставил данные — пропускаем первый запрос
+    if (ssrMatch && !ssrUsed.current) {
+      ssrUsed.current = true
+      return
+    }
+    ssrUsed.current = true
+
     const fetchNews = async () => {
       try {
         setLoading(true)

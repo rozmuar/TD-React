@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { addToCart } from '../../store/slices/cartSlice'
+import { useSSRData } from '../../context/SSRDataContext'
 import { addToCompare, removeFromCompare } from '../../store/slices/compareSlice'
 import { toggleFavorite } from '../../store/slices/favoritesSlice'
 import { Swiper, SwiperSlide } from 'swiper/react'
@@ -19,14 +20,21 @@ function Product() {
   const { categoryCode, productCode } = useParams()
   const navigate = useNavigate()
   const dispatch = useDispatch()
-  const [product, setProduct] = useState(null)
-  const [category, setCategory] = useState(null)
-  const [loading, setLoading] = useState(true)
+
+  // SSR данные
+  const ssrData = useSSRData()
+  const ssrMatch = ssrData?.type === 'product'
+  const ssrResetGuard = useRef(ssrMatch)
+  const ssrFetchGuard = useRef(ssrMatch)
+
+  const [product, setProduct] = useState(ssrMatch ? ssrData.product : null)
+  const [category, setCategory] = useState(ssrMatch ? ssrData.category : null)
+  const [loading, setLoading] = useState(!ssrMatch)
   const [thumbsSwiper, setThumbsSwiper] = useState(null)
-  const [gallery, setGallery] = useState([])
+  const [gallery, setGallery] = useState(ssrMatch && ssrData.product?.images ? ssrData.product.images : [])
   const [selectedColor, setSelectedColor] = useState(null)
   const [showAllSpecs, setShowAllSpecs] = useState(false)
-  const [sostText, setSostText] = useState([])
+  const [sostText, setSostText] = useState(ssrMatch && ssrData.product?.sost_text ? ssrData.product.sost_text : [])
   const [showPreorder, setShowPreorder] = useState(false)
   const [showFindCheaper, setShowFindCheaper] = useState(false)
   const [showCredit, setShowCredit] = useState(false)
@@ -52,6 +60,10 @@ function Product() {
 
   // Сброс состояния при смене товара
   useEffect(() => {
+    if (ssrResetGuard.current) {
+      ssrResetGuard.current = false
+      return
+    }
     setProduct(null)
     setLoading(true)
     setGallery([])
@@ -59,6 +71,12 @@ function Product() {
   }, [productCode, categoryCode])
 
   useEffect(() => {
+    // Если SSR предоставил данные — пропускаем первый запрос
+    if (ssrFetchGuard.current) {
+      ssrFetchGuard.current = false
+      return
+    }
+
     // Отменяем предыдущий запрос если он еще выполняется
     if (abortControllerRef.current) {
       abortControllerRef.current.abort()

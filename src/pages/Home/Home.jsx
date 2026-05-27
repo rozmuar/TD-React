@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
@@ -10,16 +10,23 @@ import { useMatchHeight } from '../../hooks/useMatchHeight'
 import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
 import { decodeHtml } from '../../utils/decodeHtml'
 import { sanitizeHtml } from '../../utils/sanitizeHtml'
+import { useSSRData } from '../../context/SSRDataContext'
 
 function Home() {
   const dispatch = useDispatch()
-  const [banners, setBanners] = useState([])
-  const [bannersLoading, setBannersLoading] = useState(true)
-  const [forYouProducts, setForYouProducts] = useState([])
-  const [popularCategories, setPopularCategories] = useState([])
-  const [hurryToBuyProducts, setHurryToBuyProducts] = useState([])
-  const [news, setNews] = useState([])
-  const [dataLoading, setDataLoading] = useState(true)
+  const ssrData = useSSRData()
+  const ssrMatch = ssrData?.type === 'home'
+
+  // SSR-guard: пропускаем первый запрос если данные уже пришли с сервера
+  const ssrUsed = useRef(false)
+
+  const [banners, setBanners] = useState(ssrMatch ? ssrData.banners : [])
+  const [bannersLoading, setBannersLoading] = useState(!ssrMatch)
+  const [forYouProducts, setForYouProducts] = useState(ssrMatch ? ssrData.forYouProducts : [])
+  const [popularCategories, setPopularCategories] = useState(ssrMatch ? ssrData.popularCategories : [])
+  const [hurryToBuyProducts, setHurryToBuyProducts] = useState(ssrMatch ? ssrData.hurryToBuyProducts : [])
+  const [news, setNews] = useState(ssrMatch ? ssrData.news : [])
+  const [dataLoading, setDataLoading] = useState(!ssrMatch)
 
   // Выравнивание высоты заголовков товаров
   useMatchHeight('.catalog__main-title', [forYouProducts, hurryToBuyProducts, dataLoading])
@@ -28,6 +35,13 @@ function Home() {
   useMatchHeight('.news-card__title', [news])
 
   useEffect(() => {
+    // Если SSR уже предоставил данные — пропускаем первый запрос
+    if (ssrMatch && !ssrUsed.current) {
+      ssrUsed.current = true
+      return
+    }
+    ssrUsed.current = true
+
     const fetchHomeData = async () => {
       try {
         const [bannersResponse, forYouResponse, categoriesResponse, hurryToBuyResponse, newsResponse] = await Promise.all([

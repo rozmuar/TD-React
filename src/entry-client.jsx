@@ -3,6 +3,7 @@ import { hydrateRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
+import { SSRDataContext } from './context/SSRDataContext'
 import { store } from './store/store'
 import { injectStore } from './services/apiClient'
 import { fetchFavorites } from './store/slices/favoritesSlice'
@@ -22,14 +23,19 @@ if (store.getState().auth.isAuthenticated) {
   store.dispatch(fetchFavorites())
 }
 
+// Читаем данные, инжектированные сервером, для точного совпадения при гидратации
+const ssrData = window.__SSR_DATA__ || null
+
 // hydrateRoot подхватывает SSR-разметку без повторного рендера DOM
 hydrateRoot(
   document.getElementById('root'),
   <React.StrictMode>
-    <Provider store={store}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </Provider>
+    <SSRDataContext.Provider value={ssrData}>
+      <Provider store={store}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </Provider>
+    </SSRDataContext.Provider>
   </React.StrictMode>
 )
