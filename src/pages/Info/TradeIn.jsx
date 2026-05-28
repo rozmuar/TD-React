@@ -39,6 +39,61 @@ function getImgSrc(img) {
   return img.src || img.path || img.url || null
 }
 
+// Кастомный дропдаун
+function CustomSelect({ options, value, onChange, placeholder, disabled }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  const selected = options.find((o) => String(o.value) === String(value))
+
+  return (
+    <div
+      ref={ref}
+      className={`ti-select${open ? ' ti-select--open' : ''}${disabled ? ' ti-select--disabled' : ''}`}
+      onClick={() => !disabled && setOpen((v) => !v)}
+    >
+      <div className="ti-select__trigger">
+        <span className={`ti-select__value${!selected ? ' ti-select__value--placeholder' : ''}`}>
+          {selected ? selected.label : placeholder}
+        </span>
+        <svg className="ti-select__arrow" width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M7 10l5 5 5-5z" fill="currentColor" />
+        </svg>
+      </div>
+      {open && (
+        <ul className="ti-select__dropdown">
+          {options.map((opt) => (
+            <li
+              key={opt.value}
+              className={`ti-select__option${String(opt.value) === String(value) ? ' ti-select__option--selected' : ''}`}
+              onMouseDown={(e) => {
+                e.preventDefault()
+                onChange(opt.value)
+                setOpen(false)
+              }}
+            >
+              {opt.label}
+              {String(opt.value) === String(value) && (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" fill="currentColor" />
+                </svg>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
 function TradeIn() {
   const ssrData = useSSRData()
   const ssrMatch = ssrData?.type === 'info' && ssrData?.code === 'treyd-in'
@@ -86,8 +141,7 @@ function TradeIn() {
     fetchAll()
   }, [])
 
-  const handleModelChange = (e) => {
-    const model = e.target.value
+  const handleModelChange = (model) => {
     setSelectedModel(model)
     setSelectedVolume('')
     setPrice(0)
@@ -98,8 +152,7 @@ function TradeIn() {
     }
   }
 
-  const handleVolumeChange = (e) => {
-    const vol = e.target.value
+  const handleVolumeChange = (vol) => {
     setSelectedVolume(vol)
     if (selectedModel && tradeData?.[selectedModel]) {
       const item = tradeData[selectedModel].find((i) => i.UF_MEMORY === vol)
@@ -131,27 +184,19 @@ function TradeIn() {
           <h2 className="tradein__section-title">{previewText}</h2>
         )}
         <div className="tradein__form-row">
-          <select
-            className="tradein__select tradein__select--wide"
+          <CustomSelect
+            options={models.map((m) => ({ value: m, label: m }))}
             value={selectedModel}
-            onChange={handleModelChange}
-          >
-            <option value="">Сдаваемое устройство</option>
-            {models.map((m) => (
-              <option key={m} value={m}>{m}</option>
-            ))}
-          </select>
-          <select
-            className="tradein__select"
+            onChange={(val) => handleModelChange(val)}
+            placeholder="Сдаваемое устройство"
+          />
+          <CustomSelect
+            options={volumeOptions.map((opt) => ({ value: opt.UF_MEMORY, label: `${opt.UF_MEMORY} ГБ` }))}
             value={selectedVolume}
-            onChange={handleVolumeChange}
+            onChange={(val) => handleVolumeChange(val)}
+            placeholder="Объём памяти"
             disabled={!selectedModel}
-          >
-            <option value="">Выберите объем памяти</option>
-            {volumeOptions.map((opt) => (
-              <option key={opt.UF_MEMORY} value={opt.UF_MEMORY}>{opt.UF_MEMORY} ГБ</option>
-            ))}
-          </select>
+          />
           <div className="tradein__price">
             {price > 0
               ? price.toLocaleString('ru-RU', { style: 'currency', currency: 'RUB', minimumFractionDigits: 0 })
