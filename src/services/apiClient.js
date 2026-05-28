@@ -10,9 +10,12 @@ export const injectStore = (store) => {
 }
 
 // Filter API base URL (separate service)
-// В dev — через Vite proxy, в prod — через nginx reverse proxy
-// Всегда используем относительный путь, чтобы избежать CORS и сохранить сессию
-const FILTER_API_URL = import.meta.env.VITE_FILTER_API_URL || '/api/mobile/v1'
+// SSR (Node.js) — используем абсолютный URL из env
+// Браузер — всегда релятивный /api/mobile/v1 (через nginx proxy), игнорируем VITE_FILTER_API_URL
+const _isSSR = typeof window === 'undefined'
+const FILTER_API_URL = _isSSR
+  ? (import.meta.env.VITE_FILTER_API_URL || 'https://topdisc.ru/mobile/v1')
+  : '/api/mobile/v1'
 
 export const bitrixClient = axios.create({
   baseURL: BITRIX_REST_URL,

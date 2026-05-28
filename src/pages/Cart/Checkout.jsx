@@ -323,10 +323,11 @@ function Checkout() {
         setPaymentMethod(String(selected.id))
       }
     }
-    if (co.person_types?.length && !personTypeId) {
-      setPersonTypeId(co.person_types[0].id)
+    if (co.person_types?.length) {
+      // Берём person_type_id из API, а не хардкодим
+      if (!personTypeId) setPersonTypeId(co.person_types[0].id)
     }
-    if (co.selected?.person_type_id && !personTypeId) {
+    if (co.selected?.person_type_id) {
       setPersonTypeId(co.selected.person_type_id)
     }
     if (co.properties) setCheckoutProperties(co.properties)
@@ -374,7 +375,7 @@ function Checkout() {
         const syncResult = await syncCartToServer(items)
         console.log('[CHECKOUT] syncCartToServer done:', syncResult)
 
-        const params = { person_type_id: 1 }
+        const params = {}
         if (locationCode) params.location = locationCode
         const ctxRes = await getCheckoutContext(params)
         if (cancelled) return
@@ -513,7 +514,7 @@ function Checkout() {
     try {
       // Делаем финальный calculate перед submit (рекомендация API)
       const submitData = {
-        person_type_id: personTypeId || 1,
+        person_type_id: personTypeId,
         delivery_id: Number(deliveryMethod),
         pay_system_id: Number(paymentMethod),
         location: locationCode || undefined,
