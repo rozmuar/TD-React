@@ -9569,32 +9569,29 @@ a.order-card__product-name:hover {
   font-size: 22px;
   font-weight: 700;
   color: #242424;
-  margin: 0 0 16px;
+  margin: 0 0 20px;
 }
 
 .tradein__form-section {
   margin-bottom: 40px;
 }
 
-/* Единый блок формы с внутренними разделителями */
+/* 3 отдельных элемента с gap */
 .tradein__form-row {
   display: flex;
-  align-items: stretch;
-  border: 1px solid #d9d9d9;
-  border-radius: 8px;
-  background: #fff;
-  overflow: hidden;
+  gap: 12px;
+  align-items: center;
 }
 
 .tradein__select {
   flex: 1;
   min-width: 0;
   padding: 14px 36px 14px 16px;
-  border: none;
-  border-right: 1px solid #d9d9d9;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
   outline: none;
   font-size: 14px;
-  color: #888;
+  color: #555;
   background: #fff;
   appearance: none;
   -webkit-appearance: none;
@@ -9621,19 +9618,26 @@ a.order-card__product-name:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 80px;
+  min-width: 100px;
   padding: 14px 20px;
+  border-radius: 8px;
+  background: #e8fae2;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   color: #242424;
   white-space: nowrap;
 }
 
 .tradein__note {
-  margin-top: 12px;
-  font-size: 12px;
+  margin-top: 14px;
+  font-size: 13px;
   color: #888;
   line-height: 1.5;
+}
+
+.tradein__note-star {
+  color: #44BD31;
+  font-weight: 700;
 }
 
 .tradein__advantages {
@@ -9656,6 +9660,9 @@ a.order-card__product-name:hover {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  padding: 20px;
+  background: #f7f7f7;
+  border-radius: 12px;
 }
 
 .tradein__advantage-icon {
@@ -9707,18 +9714,18 @@ a.order-card__product-name:hover {
 @media (max-width: 768px) {
   .tradein__form-row {
     flex-direction: column;
-    border-radius: 8px;
-  }
-  .tradein__select {
-    border-right: none;
-    border-bottom: 1px solid #d9d9d9;
+    gap: 8px;
   }
   .tradein__select--wide {
     flex: unset;
+    width: 100%;
+  }
+  .tradein__select {
+    width: 100%;
   }
   .tradein__price {
+    width: 100%;
     justify-content: flex-start;
-    border-top: 1px solid #d9d9d9;
   }
   .tradein__advantages-grid {
     grid-template-columns: repeat(3, 1fr);
