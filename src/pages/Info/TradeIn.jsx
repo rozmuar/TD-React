@@ -119,7 +119,8 @@ function TradeIn() {
         <meta name="description" content="Обменяйте старый iPhone на новый по программе Трейд-ин в магазине Top Disc" />
       </Helmet>
 
-      {/* 1. detail_picture — верхний баннер */}
+      {/* 1. h1 + detail_picture — верхний баннер */}
+      <h1 className="tradein__title">{pageInfo?.title || pageInfo?.name || 'Трейд-ин'}</h1>
       {detailPicSrc && (
         <img src={detailPicSrc} alt="Трейд-ин" className="tradein__banner" />
       )}

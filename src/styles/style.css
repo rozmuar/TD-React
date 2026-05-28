@@ -9557,6 +9557,13 @@ a.order-card__product-name:hover {
 /* ============================================================
    Trade-in page
    ============================================================ */
+.tradein__title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #242424;
+  margin: 0 0 20px;
+}
+
 .tradein__banner {
   display: block;
   width: 100%;
