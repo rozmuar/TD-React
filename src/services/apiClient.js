@@ -169,9 +169,8 @@ export const tidInit = (phone) => {
 }
 
 export const tidComplete = (code) => {
-  const fd = new FormData()
-  if (code) fd.append('code', code)
-  return filterClient.post('/auth/tid/complete', fd)
+  const params = code ? { code } : {}
+  return filterClient.get('/auth/tid/complete', { params })
 }
 
 // ============================================================
@@ -284,16 +283,21 @@ function isAuthenticated() {
 // ============================================================
 
 /** Получить текущую серверную корзину */
-export const getServerBasket = () => {
-  if (isAuthenticated()) {
-    return filterClient.get('/sale/basket', { headers: authHeaders() })
-  }
+export const getServerBasket = async () => {
+  const auth = isAuthenticated()
   const fuserId = getGuestFuserId()
-  return filterClient.get('/sale/basket', { params: fuserId ? { fuser_id: fuserId } : {} })
+  console.log('[BASKET] getServerBasket →', auth ? 'авторизован' : `гость fuser_id=${fuserId}`)
+  const res = auth
+    ? await filterClient.get('/sale/basket', { headers: authHeaders() })
+    : await filterClient.get('/sale/basket', { params: fuserId ? { fuser_id: fuserId } : {} })
+  const basket = res.data?.basket || res.data?.data || []
+  console.log('[BASKET] getServerBasket ←', { items: basket.length, total_price: res.data?.total_price, raw_keys: Object.keys(res.data || {}) })
+  return res
 }
 
 /** Добавить товар в серверную корзину */
 export const addToServerBasket = async (productId, quantity = 1) => {
+  console.log('[BASKET] addToServerBasket →', { productId, quantity })
   const fd = new FormData()
   fd.append('product_id', productId)
   fd.append('quantity', quantity)
@@ -308,11 +312,13 @@ export const addToServerBasket = async (productId, quantity = 1) => {
   if (returnedFuserId && !isAuthenticated()) {
     saveGuestFuserId(returnedFuserId)
   }
+  console.log('[BASKET] addToServerBasket ←', { success: res.data?.success, fuser_id: returnedFuserId, message: res.data?.message })
   return res
 }
 
 /** Удалить товар из серверной корзины */
-export const deleteServerBasketItem = (productId, mode = 'full') => {
+export const deleteServerBasketItem = async (productId, mode = 'full') => {
+  console.log('[BASKET] deleteServerBasketItem →', { productId, mode })
   const fd = new FormData()
   fd.append('product_id', productId)
   fd.append('mode', mode)
@@ -321,7 +327,9 @@ export const deleteServerBasketItem = (productId, mode = 'full') => {
     if (fuserId) fd.append('fuser_id', fuserId)
   }
   const headers = isAuthenticated() ? authHeaders() : {}
-  return filterClient.post('/sale/basket/delete', fd, { headers })
+  const res = await filterClient.post('/sale/basket/delete', fd, { headers })
+  console.log('[BASKET] deleteServerBasketItem ←', { success: res.data?.success, message: res.data?.message })
+  return res
 }
 
 /** Объединить гостевую корзину с авторизованной */
@@ -332,33 +340,38 @@ export const mergeBasket = (guestFuserId) =>
 
 /** Синхронизировать локальную корзину на сервер */
 export async function syncCartToServer(items) {
+  console.log('[SYNC] syncCartToServer → локальных товаров:', items.length, items.map(i => ({ id: i.id, qty: i.quantity })))
+
   // Очищаем серверную корзину
   try {
     const basketRes = await getServerBasket()
-    const serverItems = basketRes.data?.data || basketRes.data?.result?.data || []
+    // API возвращает { basket: [...], total_price, fuser_id }
+    const serverItems = basketRes.data?.basket || basketRes.data?.data || []
+    console.log('[SYNC] серверная корзина до очистки:', serverItems.length, 'items')
     for (const si of serverItems) {
       try {
         await deleteServerBasketItem(si.product_id || si.id)
-      } catch {
-        // silent: продолжаем удаление остальных
+      } catch (e) {
+        console.warn('[SYNC] ошибка удаления product_id', si.product_id || si.id, e?.message)
       }
     }
-  } catch {
-    // silent: если не удалось получить корзину — пробуем добавить
+  } catch (e) {
+    console.warn('[SYNC] ошибка получения серверной корзины:', e?.message)
   }
 
   // Добавляем товары последовательно
   for (const item of items) {
     try {
       await addToServerBasket(item.id, item.quantity)
-    } catch {
-      // silent: продолжаем с остальными товарами
+    } catch (e) {
+      console.warn('[SYNC] ошибка добавления product_id', item.id, e?.message)
     }
   }
 
   // Проверяем итоговую корзину
   const checkRes = await getServerBasket()
-  const finalItems = checkRes.data?.data || checkRes.data?.result?.data || []
+  const finalItems = checkRes.data?.basket || checkRes.data?.data || []
+  console.log('[SYNC] syncCartToServer ← итог:', finalItems.length, 'товаров на сервере')
   if (finalItems.length === 0 && items.length > 0) {
     throw new Error('Серверная корзина пуста после синхронизации')
   }
@@ -370,20 +383,54 @@ export async function syncCartToServer(items) {
 // ============================================================
 
 /** Получение location code по названию города */
-export const getLocationCode = (city) =>
-  filterClient.get('/sale/location/code', { params: { city }, headers: authHeaders() })
+export const getLocationCode = async (city) => {
+  console.log('[CHECKOUT] getLocationCode →', city)
+  const res = await filterClient.get('/sale/location/code', { params: { city }, headers: authHeaders() })
+  console.log('[CHECKOUT] getLocationCode ←', res.data?.data)
+  return res
+}
 
 /** Стартовый контекст checkout: доставки, оплаты, свойства, суммы */
-export const getCheckoutContext = (params = {}) =>
-  filterClient.get('/sale/checkout/context', { params, headers: authHeaders() })
+export const getCheckoutContext = async (params = {}) => {
+  console.log('[CHECKOUT] getCheckoutContext →', params)
+  const res = await filterClient.get('/sale/checkout/context', { params, headers: authHeaders() })
+  const co = res.data?.checkout || res.data
+  console.log('[CHECKOUT] getCheckoutContext ←', {
+    deliveries: co?.available_deliveries?.length,
+    pay_systems: co?.available_pay_systems?.length,
+    can_submit: res.data?.can_submit,
+    totals: co?.totals,
+    errors: res.data?.errors,
+  })
+  return res
+}
 
 /** Пересчёт checkout при изменениях пользователя */
-export const calculateCheckout = (data) =>
-  filterClient.post('/sale/checkout/calculate', data, { headers: authHeaders() })
+export const calculateCheckout = async (data) => {
+  console.log('[CHECKOUT] calculateCheckout →', data)
+  const res = await filterClient.post('/sale/checkout/calculate', data, { headers: authHeaders() })
+  const co = res.data?.checkout || res.data
+  console.log('[CHECKOUT] calculateCheckout ←', {
+    can_submit: res.data?.can_submit,
+    totals: co?.totals,
+    errors: res.data?.errors,
+    missing: co?.missing_required_properties,
+  })
+  return res
+}
 
 /** Финальное создание заказа */
-export const submitCheckout = (data) =>
-  filterClient.post('/sale/checkout/submit', data, { headers: authHeaders() })
+export const submitCheckout = async (data) => {
+  console.log('[CHECKOUT] submitCheckout →', data)
+  const res = await filterClient.post('/sale/checkout/submit', data, { headers: authHeaders() })
+  console.log('[CHECKOUT] submitCheckout ←', {
+    success: res.data?.success,
+    order: res.data?.order,
+    payment: res.data?.payment,
+    errors: res.data?.errors,
+  })
+  return res
+}
 
 // Магазины самовывоза (Bitrix REST)
 export const getBitrixStoreList = () =>

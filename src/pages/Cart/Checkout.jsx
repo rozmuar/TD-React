@@ -343,7 +343,14 @@ function Checkout() {
     ;(async () => {
       try {
         const locRes = await getLocationCode(cityConfirmed)
-        if (!cancelled) setLocationCode(locRes.data?.data?.location_code || '')
+        if (!cancelled) {
+          const d = locRes.data?.data
+          const code = d?.location_code
+            || (Array.isArray(d?.items) && d.items[0]?.code)
+            || ''
+          console.log('[CHECKOUT] locationCode resolved:', code, '| raw data:', d)
+          setLocationCode(code)
+        }
       } catch {
         if (!cancelled) setLocationCode('')
       }
@@ -365,6 +372,7 @@ function Checkout() {
       try {
         // Синхронизируем локальную корзину на сервер
         const syncResult = await syncCartToServer(items)
+        console.log('[CHECKOUT] syncCartToServer done:', syncResult)
 
         const params = { person_type_id: 1 }
         if (locationCode) params.location = locationCode
@@ -373,6 +381,7 @@ function Checkout() {
         applyCheckoutResponse(ctxRes.data)
       } catch (err) {
         const errMsg = err.response?.data?.errors || err.response?.data?.message || err.message
+        console.error('[CHECKOUT] context/sync error:', err?.response?.data || err?.message)
         setCheckoutErrors(Array.isArray(errMsg) ? errMsg : [String(errMsg)])
       }
       if (!cancelled) setDeliveryLoading(false)
@@ -391,8 +400,8 @@ function Checkout() {
           address: s.address,
           hours: s.schedule || '',
           phone: s.phone || '',
-          lat: Number(s.gpsN || 0),
-          lng: Number(s.gpsS || 0),
+          lat: Number(s.GPS_N || s.gpsN || 0),
+          lng: Number(s.GPS_S || s.gpsS || 0),
         }))
         // Геокодируем адреса без координат через DaData
         const needGeo = mapped.filter((s) => !s.lat && !s.lng)
@@ -432,6 +441,10 @@ function Checkout() {
         }
         if (personTypeId) data.person_type_id = personTypeId
         if (paymentMethod) data.pay_system_id = Number(paymentMethod)
+        // Для самовывозных доставок передаём pickup_point_id
+        const activeD = deliveryMethods.find((d) => String(d.id) === String(deliveryMethod))
+        const pickupPointId = selectedStore?.id || activeD?.selected_pickup_point_id || null
+        if (pickupPointId) data.pickup_point_id = pickupPointId
         const res = await calculateCheckout(data)
         if (!cancelled) applyCheckoutResponse(res.data)
       } catch {}
@@ -505,14 +518,22 @@ function Checkout() {
         pay_system_id: Number(paymentMethod),
         location: locationCode || undefined,
         properties: {
-          PHONE: phone.replace(/\D/g, ''),
-          EMAIL: email || undefined,
-          FIO: [lastName, firstName].filter(Boolean).join(' ') || undefined,
           LOCATION: locationCode || undefined,
+          PHONE: phone.replace(/\D/g, ''),
+          NAME: firstName || undefined,
+          SURNAME: lastName || undefined,
+          EMAIL: email || undefined,
+          ADDRESS: cityConfirmed || undefined,
         },
         comment: comment || undefined,
       }
+      // pickup_point_id для самовывоза
+      if (selectedStore?.id) submitData.pickup_point_id = selectedStore.id
+      else if (activeDelivery?.selected_pickup_point_id) {
+        submitData.pickup_point_id = activeDelivery.selected_pickup_point_id
+      }
 
+      console.log('[CHECKOUT] submitCheckout → submitData:', submitData)
       const result = await submitCheckout(submitData)
       const data = result.data
 
@@ -547,6 +568,7 @@ function Checkout() {
       })
     } catch (err) {
       const msg = err.response?.data?.errors?.join(', ') || err.message || 'Попробуйте позже'
+      console.error('[CHECKOUT] doCreateOrder error:', err?.response?.data || err?.message)
       alert('Ошибка при создании заказа: ' + msg)
     }
     setSubmitting(false)

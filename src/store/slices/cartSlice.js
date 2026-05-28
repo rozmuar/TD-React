@@ -36,8 +36,10 @@ export const fetchServerCart = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await getServerBasket()
-      const data = res.data?.data || res.data?.basket || []
+      console.log('[CART] fetchServerCart raw response:', res.data)
+      const data = res.data?.basket || res.data?.data || []
       const items = Array.isArray(data) ? data : []
+      console.log('[CART] fetchServerCart items count:', items.length)
       return items.map(item => ({
         id: Number(item.product_id || item.ID || item.id),
         name: item.name || item.NAME || '',
@@ -47,6 +49,7 @@ export const fetchServerCart = createAsyncThunk(
         selected: true,
       }))
     } catch (error) {
+      console.error('[CART] fetchServerCart error:', error?.response?.data || error?.message)
       return rejectWithValue(error.response?.data?.message || 'Ошибка загрузки корзины')
     }
   }
@@ -97,12 +100,13 @@ export const mergeGuestCart = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const guestFuserId = getGuestFuserId()
+      console.log('[CART] mergeGuestCart → guestFuserId:', guestFuserId)
       if (!guestFuserId) {
         throw new Error('Guest fuser_id not found')
       }
       const res = await mergeBasket(guestFuserId)
       clearGuestFuserId()
-      
+      console.log('[CART] mergeGuestCart raw response:', res.data)
       const data = res.data?.basket || res.data?.data?.basket || []
       const items = Array.isArray(data) ? data : []
       return items.map(item => ({
@@ -114,6 +118,7 @@ export const mergeGuestCart = createAsyncThunk(
         selected: true,
       }))
     } catch (error) {
+      console.error('[CART] mergeGuestCart error:', error?.response?.data || error?.message)
       return rejectWithValue(error.response?.data?.message || 'Ошибка слияния корзин')
     }
   }
