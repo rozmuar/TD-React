@@ -9,6 +9,7 @@ import {
   decrementQuantity,
   toggleItemSelected,
   selectAll,
+  clearSkipped,
 } from '../../store/slices/cartSlice'
 import { toggleFavorite } from '../../store/slices/favoritesSlice'
 import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
@@ -21,7 +22,7 @@ import { useState, useEffect } from 'react'
 function Cart() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { items } = useSelector((s) => s.cart)
+  const { items, skippedProductIds } = useSelector((s) => s.cart)
   const favoriteItems = useSelector((s) => s.favorites.items)
   const [recommended, setRecommended] = useState([])
 
@@ -112,6 +113,23 @@ function Cart() {
       <div className="category-page">
         <div className="container">
           <h1 className="catalog__title">Корзина</h1>
+
+          {skippedProductIds && skippedProductIds.length > 0 && (
+            <div className="cart__notice" style={{ marginBottom: 16, padding: 12, background: '#fff4e5', border: '1px solid #ffb74d', borderRadius: 6 }}>
+              <strong>Часть товаров не была перенесена в корзину</strong>
+              <div style={{ fontSize: 13, marginTop: 4 }}>
+                Не удалось добавить товары: {skippedProductIds.join(', ')}.
+                Возможно, их нет в наличии.
+                <button
+                  type="button"
+                  onClick={() => dispatch(clearSkipped())}
+                  style={{ marginLeft: 8, background: 'none', border: 'none', textDecoration: 'underline', cursor: 'pointer', color: '#666' }}
+                >
+                  Скрыть
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="cart__layout">
             {/* LEFT: Cart items */}

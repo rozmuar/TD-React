@@ -6,6 +6,8 @@ import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallb
 import { sanitizeHtml } from '../../utils/sanitizeHtml'
 import { decodeHtml } from '../../utils/decodeHtml'
 import { useSSRData } from '../../context/SSRDataContext'
+import JsonLd from '../../components/JsonLd/JsonLd'
+import { breadcrumbSchema, newsArticleSchema } from '../../utils/jsonLd'
 
 function NewsDetail() {
   const { newsCode } = useParams()
@@ -163,6 +165,17 @@ function NewsDetail() {
         <title>{newsItem.name} - TopDisk</title>
         <meta name="description" content={newsItem.preview_text || newsItem.name} />
       </Helmet>
+      <JsonLd data={[
+        newsArticleSchema(
+          { ...newsItem, name: decodeHtml(newsItem.name), code: newsCode },
+          { path: `/company/news/${newsCode}/` }
+        ),
+        breadcrumbSchema([
+          { name: 'Главная', url: '/' },
+          { name: 'Новости', url: '/company/news/' },
+          { name: decodeHtml(newsItem.name) },
+        ]),
+      ]} />
 
       <div className="breadcrumbs">
         <div className="container">

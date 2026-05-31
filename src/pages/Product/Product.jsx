@@ -15,6 +15,8 @@ import { sanitizeHtml } from '../../utils/sanitizeHtml'
 import PreorderModal from '../../components/PreorderModal/PreorderModal'
 import FindCheaperModal from '../../components/FindCheaperModal/FindCheaperModal'
 import CreditModal from '../../components/CreditModal/CreditModal'
+import JsonLd from '../../components/JsonLd/JsonLd'
+import { productSchema, breadcrumbSchema } from '../../utils/jsonLd'
 
 function Product() {
   const { categoryCode, productCode } = useParams()
@@ -160,8 +162,11 @@ function Product() {
       dispatch(addToCart({
         id: product.id,
         name: product.name,
+        code: product.code,
+        section_code: categoryCode,
         price: parseFloat(product.price),
-        image: product.image
+        oldPrice: product.oldPrice,
+        image: product.image,
       }))
     }
   }
@@ -196,6 +201,18 @@ function Product() {
         <title>{decodeHtml(product.name)} - TopDisk</title>
         <meta name="description" content={`Купить ${decodeHtml(product.name)} в интернет-магазине TopDisk`} />
       </Helmet>
+      <JsonLd data={[
+        productSchema(
+          { ...product, name: decodeHtml(product.name), images: gallery },
+          { path: `/catalog/${categoryCode}/${productCode}/` }
+        ),
+        breadcrumbSchema([
+          { name: 'Главная', url: '/' },
+          { name: 'Каталог', url: '/catalog/' },
+          ...(category ? [{ name: decodeHtml(category.name), url: `/category/${category.code}/` }] : []),
+          { name: decodeHtml(product.name) },
+        ]),
+      ]} />
 
       {/* ХЛЕБНЫЕ КРОШКИ */}
       <div className="breadcrumbs">

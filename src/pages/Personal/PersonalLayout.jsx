@@ -3,7 +3,8 @@ import { Outlet, NavLink, Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { logout } from '../../store/slices/authSlice'
 import { clearFavorites } from '../../store/slices/favoritesSlice'
-import { userLogout, deleteFavorite } from '../../services/apiClient'
+import { clearCart } from '../../store/slices/cartSlice'
+import { userLogout, deleteFavorite, clearGuestFuserId } from '../../services/apiClient'
 
 function PersonalLayout() {
   const { isAuthenticated } = useSelector((s) => s.auth)
@@ -22,6 +23,8 @@ function PersonalLayout() {
       favItems.map((item) => deleteFavorite(item.id).catch(() => {}))
     )
     dispatch(clearFavorites())
+    dispatch(clearCart())
+    clearGuestFuserId()
     dispatch(logout())
     navigate('/')
   }

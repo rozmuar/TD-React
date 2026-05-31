@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { setToken, initTidAuth, completeTidAuth } from '../../store/slices/authSlice'
 import { fetchFavorites } from '../../store/slices/favoritesSlice'
-import { mergeGuestCart } from '../../store/slices/cartSlice'
+import { mergeGuestCart, fetchServerCart } from '../../store/slices/cartSlice'
 import { sendSmsCode, verifySmsCode, getGuestFuserId } from '../../services/apiClient'
 
 // Маска телефона (на основе phoneinput.js — github.com/Shaadanio/phoneinput)
@@ -66,17 +66,22 @@ function AuthPopup({ isOpen, onClose }) {
   // Обработка успешной авторизации
   const handleAuthSuccess = useCallback(async (token) => {
     dispatch(setToken(token))
-    
-    // Объединяем гостевую корзину с авторизованной
+
+    // Если есть гостевая корзина — сливаем с серверной, иначе просто
+    // подтягиваем серверную корзину для этого аккаунта.
     const guestFuserId = getGuestFuserId()
     if (guestFuserId) {
       try {
         await dispatch(mergeGuestCart()).unwrap()
       } catch (err) {
         console.warn('Failed to merge guest cart:', err)
+        // Фолбэк: всё равно загружаем серверную корзину аккаунта.
+        dispatch(fetchServerCart())
       }
+    } else {
+      dispatch(fetchServerCart())
     }
-    
+
     // Загружаем избранное
     dispatch(fetchFavorites())
     onClose()

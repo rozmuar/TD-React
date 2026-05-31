@@ -4,7 +4,6 @@ import {
   addToServerBasket,
   deleteServerBasketItem,
   mergeBasket,
-  syncCartToServer,
   getGuestFuserId,
   clearGuestFuserId,
 } from '../../services/apiClient'
@@ -12,117 +11,164 @@ import {
 const LOCAL_KEY = 'cart_items'
 
 function loadCart() {
-  if (typeof window === 'undefined') return { items: [], totalAmount: 0, totalCount: 0 }
+  if (typeof window === 'undefined') return { items: [], totalAmount: 0, totalCount: 0, serverTotalPrice: null }
   try {
     const data = JSON.parse(localStorage.getItem(LOCAL_KEY))
-    if (data && Array.isArray(data.items)) return data
+    if (data && Array.isArray(data.items)) {
+      return {
+        items: data.items,
+        totalAmount: data.totalAmount || 0,
+        totalCount: data.totalCount || 0,
+        serverTotalPrice: data.serverTotalPrice ?? null,
+      }
+    }
   } catch {}
-  return { items: [], totalAmount: 0, totalCount: 0 }
+  return { items: [], totalAmount: 0, totalCount: 0, serverTotalPrice: null }
 }
 
 function saveCart(state) {
+  if (typeof window === 'undefined') return
   localStorage.setItem(LOCAL_KEY, JSON.stringify({
     items: state.items,
     totalAmount: state.totalAmount,
     totalCount: state.totalCount,
+    serverTotalPrice: state.serverTotalPrice,
   }))
+}
+
+function recalcTotals(state) {
+  state.totalAmount = state.items.reduce((sum, i) => sum + Number(i.price) * i.quantity, 0)
+  state.totalCount = state.items.reduce((sum, i) => sum + i.quantity, 0)
+}
+
+function mapServerItem(item) {
+  return {
+    id: Number(item.product_id || item.ID || item.id),
+    name: item.name || item.NAME || '',
+    code: item.code || item.CODE || item.product_code || '',
+    section_code: item.section_code || item.SECTION_CODE || item.category_code || '',
+    price: Number(item.price || item.PRICE || 0),
+    oldPrice: item.old_price ?? item.oldPrice ?? item.OLD_PRICE ?? null,
+    quantity: Number(item.quantity || item.QUANTITY || 1),
+    image: item.image || item.PREVIEW_PICTURE || '',
+    selected: true,
+  }
 }
 
 const saved = loadCart()
 
-// Загрузка корзины с сервера
+// ============================================================
+// Thunks
+// ============================================================
+
 export const fetchServerCart = createAsyncThunk(
   'cart/fetchServerCart',
   async (_, { rejectWithValue }) => {
     try {
       const res = await getServerBasket()
-      console.log('[CART] fetchServerCart raw response:', res.data)
       const data = res.data?.basket || res.data?.data || []
       const items = Array.isArray(data) ? data : []
-      console.log('[CART] fetchServerCart items count:', items.length)
-      return items.map(item => ({
-        id: Number(item.product_id || item.ID || item.id),
-        name: item.name || item.NAME || '',
-        price: Number(item.price || item.PRICE || 0),
-        quantity: Number(item.quantity || item.QUANTITY || 1),
-        image: item.image || item.PREVIEW_PICTURE || '',
-        selected: true,
-      }))
+      return {
+        items: items.map(mapServerItem),
+        serverTotalPrice: res.data?.total_price ?? null,
+      }
     } catch (error) {
-      console.error('[CART] fetchServerCart error:', error?.response?.data || error?.message)
       return rejectWithValue(error.response?.data?.message || 'Ошибка загрузки корзины')
     }
   }
 )
 
-// Добавление товара в серверную корзину
-export const addToServerCart = createAsyncThunk(
-  'cart/addToServerCart',
-  async ({ product, quantity = 1 }, { rejectWithValue }) => {
-    try {
-      await addToServerBasket(product.id, quantity)
-      return { product, quantity }
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Ошибка добавления товара')
-    }
-  }
-)
-
-// Удаление товара из серверной корзины
-export const removeFromServerCart = createAsyncThunk(
-  'cart/removeFromServerCart',
-  async (productId, { rejectWithValue }) => {
-    try {
-      await deleteServerBasketItem(productId, 'full')
-      return productId
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Ошибка удаления товара')
-    }
-  }
-)
-
-// Синхронизация локальной корзины на сервер
-export const syncLocalCartToServer = createAsyncThunk(
-  'cart/syncLocalCartToServer',
-  async (items, { rejectWithValue }) => {
-    try {
-      await syncCartToServer(items)
-      return true
-    } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Ошибка синхронизации')
-    }
-  }
-)
-
-// Слияние гостевой корзины с авторизованной
 export const mergeGuestCart = createAsyncThunk(
   'cart/mergeGuestCart',
   async (_, { rejectWithValue }) => {
     try {
       const guestFuserId = getGuestFuserId()
-      console.log('[CART] mergeGuestCart → guestFuserId:', guestFuserId)
       if (!guestFuserId) {
-        throw new Error('Guest fuser_id not found')
+        return rejectWithValue('Guest fuser_id not found')
       }
       const res = await mergeBasket(guestFuserId)
       clearGuestFuserId()
-      console.log('[CART] mergeGuestCart raw response:', res.data)
       const data = res.data?.basket || res.data?.data?.basket || []
       const items = Array.isArray(data) ? data : []
-      return items.map(item => ({
-        id: Number(item.product_id || item.ID || item.id),
-        name: item.name || item.NAME || '',
-        price: Number(item.price || item.PRICE || 0),
-        quantity: Number(item.quantity || item.QUANTITY || 1),
-        image: item.image || item.PREVIEW_PICTURE || '',
-        selected: true,
-      }))
+      return {
+        items: items.map(mapServerItem),
+        serverTotalPrice: res.data?.total_price ?? null,
+        skippedProductIds: Array.isArray(res.data?.skipped_product_ids) ? res.data.skipped_product_ids : [],
+      }
     } catch (error) {
-      console.error('[CART] mergeGuestCart error:', error?.response?.data || error?.message)
       return rejectWithValue(error.response?.data?.message || 'Ошибка слияния корзин')
     }
   }
 )
+
+// Public thunks: оптимистичное обновление + серверный вызов.
+// На ошибку — откатываемся через fetchServerCart.
+export const addToCart = (product, quantity = 1) => async (dispatch) => {
+  if (!product || !product.id) return
+  const qty = Math.max(1, Math.floor(Number(quantity) || 1))
+  dispatch(cartSlice.actions._addItemLocal({ product, quantity: qty }))
+  try {
+    await addToServerBasket(product.id, qty)
+  } catch (e) {
+    console.warn('[CART] addToCart server error:', e?.message)
+    dispatch(fetchServerCart())
+  }
+}
+
+export const removeFromCart = (productId) => async (dispatch) => {
+  if (!productId) return
+  dispatch(cartSlice.actions._removeItemLocal(productId))
+  try {
+    await deleteServerBasketItem(productId, 'full')
+  } catch (e) {
+    console.warn('[CART] removeFromCart server error:', e?.message)
+    dispatch(fetchServerCart())
+  }
+}
+
+export const incrementQuantity = (productId) => async (dispatch) => {
+  if (!productId) return
+  dispatch(cartSlice.actions._incQtyLocal(productId))
+  try {
+    await addToServerBasket(productId, 1)
+  } catch (e) {
+    console.warn('[CART] incrementQuantity server error:', e?.message)
+    dispatch(fetchServerCart())
+  }
+}
+
+export const decrementQuantity = (productId) => async (dispatch, getState) => {
+  if (!productId) return
+  const item = getState().cart.items.find((i) => i.id === productId)
+  if (!item || item.quantity <= 1) return
+  dispatch(cartSlice.actions._decQtyLocal(productId))
+  try {
+    await deleteServerBasketItem(productId, 'decrement')
+  } catch (e) {
+    console.warn('[CART] decrementQuantity server error:', e?.message)
+    dispatch(fetchServerCart())
+  }
+}
+
+export const removeSelected = () => async (dispatch, getState) => {
+  const selected = getState().cart.items.filter((i) => i.selected !== false)
+  if (!selected.length) return
+  dispatch(cartSlice.actions._removeSelectedLocal())
+  let hadError = false
+  for (const item of selected) {
+    try {
+      await deleteServerBasketItem(item.id, 'full')
+    } catch (e) {
+      hadError = true
+      console.warn('[CART] removeSelected server error for', item.id, e?.message)
+    }
+  }
+  if (hadError) dispatch(fetchServerCart())
+}
+
+// ============================================================
+// Slice
+// ============================================================
 
 const cartSlice = createSlice({
   name: 'cart',
@@ -130,170 +176,120 @@ const cartSlice = createSlice({
     items: saved.items,
     totalAmount: saved.totalAmount,
     totalCount: saved.totalCount,
+    serverTotalPrice: saved.serverTotalPrice,
     loading: false,
     error: null,
+    skippedProductIds: [],
   },
   reducers: {
-    addToCart: (state, action) => {
-      const existingItem = state.items.find(item => item.id === action.payload.id)
-      if (existingItem) {
-        existingItem.quantity += 1
+    _addItemLocal: (state, action) => {
+      const { product, quantity } = action.payload
+      const existing = state.items.find((i) => i.id === product.id)
+      if (existing) {
+        existing.quantity += quantity
       } else {
-        state.items.push({ ...action.payload, quantity: 1, selected: true })
+        state.items.push({
+          id: product.id,
+          name: product.name || '',
+          code: product.code || '',
+          section_code: product.section_code || '',
+          price: Number(product.price) || 0,
+          oldPrice: product.oldPrice ?? null,
+          image: product.image || '',
+          quantity,
+          selected: true,
+        })
       }
-      state.totalCount += 1
-      state.totalAmount += Number(action.payload.price)
+      recalcTotals(state)
       saveCart(state)
     },
-    removeFromCart: (state, action) => {
-      const itemIndex = state.items.findIndex(item => item.id === action.payload)
-      if (itemIndex !== -1) {
-        const item = state.items[itemIndex]
-        state.totalAmount -= Number(item.price) * item.quantity
-        state.totalCount -= item.quantity
-        state.items.splice(itemIndex, 1)
-      }
+    _removeItemLocal: (state, action) => {
+      state.items = state.items.filter((i) => i.id !== action.payload)
+      recalcTotals(state)
       saveCart(state)
     },
-    removeSelected: (state) => {
-      const remaining = []
-      for (const item of state.items) {
-        if (item.selected) {
-          state.totalAmount -= Number(item.price) * item.quantity
-          state.totalCount -= item.quantity
-        } else {
-          remaining.push(item)
-        }
-      }
-      state.items = remaining
+    _removeSelectedLocal: (state) => {
+      state.items = state.items.filter((i) => i.selected === false)
+      recalcTotals(state)
       saveCart(state)
     },
-    incrementQuantity: (state, action) => {
-      const item = state.items.find(item => item.id === action.payload)
+    _incQtyLocal: (state, action) => {
+      const item = state.items.find((i) => i.id === action.payload)
       if (item) {
         item.quantity += 1
-        state.totalCount += 1
-        state.totalAmount += Number(item.price)
+        recalcTotals(state)
+        saveCart(state)
       }
-      saveCart(state)
     },
-    decrementQuantity: (state, action) => {
-      const item = state.items.find(item => item.id === action.payload)
+    _decQtyLocal: (state, action) => {
+      const item = state.items.find((i) => i.id === action.payload)
       if (item && item.quantity > 1) {
         item.quantity -= 1
-        state.totalCount -= 1
-        state.totalAmount -= Number(item.price)
+        recalcTotals(state)
+        saveCart(state)
       }
-      saveCart(state)
     },
     toggleItemSelected: (state, action) => {
-      const item = state.items.find(item => item.id === action.payload)
+      const item = state.items.find((i) => i.id === action.payload)
       if (item) item.selected = !item.selected
       saveCart(state)
     },
     selectAll: (state, action) => {
-      state.items.forEach(item => { item.selected = action.payload })
+      state.items.forEach((i) => { i.selected = action.payload })
       saveCart(state)
     },
     clearCart: (state) => {
       state.items = []
       state.totalAmount = 0
       state.totalCount = 0
+      state.serverTotalPrice = null
+      state.skippedProductIds = []
       state.error = null
-      localStorage.removeItem(LOCAL_KEY)
+      if (typeof window !== 'undefined') localStorage.removeItem(LOCAL_KEY)
     },
     setCartItems: (state, action) => {
       state.items = action.payload
-      state.totalAmount = action.payload.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0)
-      state.totalCount = action.payload.reduce((sum, item) => sum + item.quantity, 0)
+      recalcTotals(state)
       saveCart(state)
     },
     clearError: (state) => {
       state.error = null
     },
+    clearSkipped: (state) => {
+      state.skippedProductIds = []
+    },
   },
   extraReducers: (builder) => {
     builder
-      // Загрузка корзины с сервера
       .addCase(fetchServerCart.pending, (state) => {
         state.loading = true
         state.error = null
       })
       .addCase(fetchServerCart.fulfilled, (state, action) => {
         state.loading = false
-        state.items = action.payload
-        state.totalAmount = action.payload.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0)
-        state.totalCount = action.payload.reduce((sum, item) => sum + item.quantity, 0)
+        const prevSelected = new Map(state.items.map((i) => [i.id, i.selected]))
+        state.items = action.payload.items.map((i) => ({
+          ...i,
+          selected: prevSelected.has(i.id) ? prevSelected.get(i.id) : true,
+        }))
+        state.serverTotalPrice = action.payload.serverTotalPrice
+        recalcTotals(state)
         saveCart(state)
       })
       .addCase(fetchServerCart.rejected, (state, action) => {
         state.loading = false
         state.error = action.payload
       })
-      // Добавление в серверную корзину
-      .addCase(addToServerCart.pending, (state) => {
-        state.loading = true
-        state.error = null
-      })
-      .addCase(addToServerCart.fulfilled, (state, action) => {
-        state.loading = false
-        const { product, quantity } = action.payload
-        const existingItem = state.items.find(item => item.id === product.id)
-        if (existingItem) {
-          existingItem.quantity += quantity
-        } else {
-          state.items.push({ ...product, quantity, selected: true })
-        }
-        state.totalCount += quantity
-        state.totalAmount += Number(product.price) * quantity
-        saveCart(state)
-      })
-      .addCase(addToServerCart.rejected, (state, action) => {
-        state.loading = false
-        state.error = action.payload
-      })
-      // Удаление из серверной корзины
-      .addCase(removeFromServerCart.pending, (state) => {
-        state.loading = true
-        state.error = null
-      })
-      .addCase(removeFromServerCart.fulfilled, (state, action) => {
-        state.loading = false
-        const itemIndex = state.items.findIndex(item => item.id === action.payload)
-        if (itemIndex !== -1) {
-          const item = state.items[itemIndex]
-          state.totalAmount -= Number(item.price) * item.quantity
-          state.totalCount -= item.quantity
-          state.items.splice(itemIndex, 1)
-        }
-        saveCart(state)
-      })
-      .addCase(removeFromServerCart.rejected, (state, action) => {
-        state.loading = false
-        state.error = action.payload
-      })
-      // Синхронизация на сервер
-      .addCase(syncLocalCartToServer.pending, (state) => {
-        state.loading = true
-        state.error = null
-      })
-      .addCase(syncLocalCartToServer.fulfilled, (state) => {
-        state.loading = false
-      })
-      .addCase(syncLocalCartToServer.rejected, (state, action) => {
-        state.loading = false
-        state.error = action.payload
-      })
-      // Слияние корзин
       .addCase(mergeGuestCart.pending, (state) => {
         state.loading = true
         state.error = null
       })
       .addCase(mergeGuestCart.fulfilled, (state, action) => {
         state.loading = false
-        state.items = action.payload
-        state.totalAmount = action.payload.reduce((sum, item) => sum + Number(item.price) * item.quantity, 0)
-        state.totalCount = action.payload.reduce((sum, item) => sum + item.quantity, 0)
+        state.items = action.payload.items
+        state.serverTotalPrice = action.payload.serverTotalPrice
+        state.skippedProductIds = action.payload.skippedProductIds || []
+        recalcTotals(state)
         saveCart(state)
       })
       .addCase(mergeGuestCart.rejected, (state, action) => {
@@ -303,16 +299,12 @@ const cartSlice = createSlice({
   },
 })
 
-export const { 
-  addToCart, 
-  removeFromCart,
-  removeSelected,
-  incrementQuantity, 
-  decrementQuantity, 
+export const {
   toggleItemSelected,
   selectAll,
   clearCart,
   setCartItems,
   clearError,
+  clearSkipped,
 } = cartSlice.actions
 export default cartSlice.reducer

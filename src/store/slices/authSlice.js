@@ -6,7 +6,9 @@ import {
   userLogout,
   tidInit,
   tidComplete,
+  clearGuestFuserId,
 } from '../../services/apiClient'
+import { clearCart } from './cartSlice'
 
 const TOKEN_KEY = 'auth_token'
 
@@ -119,12 +121,16 @@ export const completeTidAuth = createAsyncThunk(
 // Логаут
 export const performLogout = createAsyncThunk(
   'auth/performLogout',
-  async (_, { rejectWithValue }) => {
+  async (_, { dispatch, rejectWithValue }) => {
     try {
       await userLogout()
     } catch (error) {
       console.warn('Logout API error:', error)
     }
+    // Чистим корзину и гостевой fuser_id, чтобы не утекли между сессиями
+    // на общем устройстве.
+    dispatch(clearCart())
+    clearGuestFuserId()
     return null
   }
 )

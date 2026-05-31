@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { getCategoryFirst } from '../../services/apiClient'
 import { sanitizeHtml } from '../../utils/sanitizeHtml'
+import JsonLd from '../../components/JsonLd/JsonLd'
+import { breadcrumbSchema, collectionPageSchema } from '../../utils/jsonLd'
 
 function Catalog() {
   const [categories, setCategories] = useState([])
@@ -38,6 +40,21 @@ function Catalog() {
         <meta name="description" content="Каталог товаров интернет-магазина TopDisk. Смартфоны, бытовая техника, электроника, компьютеры и многое другое." />
         <meta property="og:title" content="Каталог товаров - TopDisk" />
       </Helmet>
+      <JsonLd data={[
+        collectionPageSchema({
+          name: 'Каталог товаров',
+          description: 'Каталог товаров интернет-магазина TopDisk',
+          path: '/catalog/',
+          breadcrumbs: breadcrumbSchema([
+            { name: 'Главная', url: '/' },
+            { name: 'Каталог' },
+          ]),
+        }),
+        breadcrumbSchema([
+          { name: 'Главная', url: '/' },
+          { name: 'Каталог' },
+        ]),
+      ]} />
       {/* ХЛЕБНЫЕ КРОШКИ */}
       <div className="breadcrumbs">
         <div className="container">

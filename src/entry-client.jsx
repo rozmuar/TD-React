@@ -7,6 +7,8 @@ import { SSRDataContext } from './context/SSRDataContext'
 import { store } from './store/store'
 import { injectStore } from './services/apiClient'
 import { fetchFavorites } from './store/slices/favoritesSlice'
+import { fetchServerCart } from './store/slices/cartSlice'
+import { getGuestFuserId } from './services/apiClient'
 import './styles/normalize.css'
 import './styles/bootstrap-grid.css'
 import 'swiper/css'
@@ -18,9 +20,13 @@ import './styles/style.css'
 // Передаём store в apiClient для обработки 401
 injectStore(store)
 
-// Если пользователь авторизован — загружаем избранное из API
+// Если пользователь авторизован — загружаем избранное и серверную корзину.
+// Для гостей с сохранённым fuser_id тоже подтягиваем корзину с сервера.
 if (store.getState().auth.isAuthenticated) {
   store.dispatch(fetchFavorites())
+  store.dispatch(fetchServerCart())
+} else if (getGuestFuserId()) {
+  store.dispatch(fetchServerCart())
 }
 
 // Читаем данные, инжектированные сервером, для точного совпадения при гидратации

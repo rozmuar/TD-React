@@ -31,8 +31,11 @@ filterClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('auth_token')
+      localStorage.removeItem('cart_items')
+      localStorage.removeItem('guest_fuser_id')
       // dispatch через строковый тип чтобы избежать circular import
       _store?.dispatch({ type: 'auth/logout' })
+      _store?.dispatch({ type: 'cart/clearCart' })
     }
     return Promise.reject(error)
   }
@@ -340,46 +343,6 @@ export const mergeBasket = (guestFuserId) =>
   filterClient.post('/sale/basket/merge', { guest_fuser_id: guestFuserId }, {
     headers: { ...authHeaders(), 'Content-Type': 'application/json' },
   })
-
-/** Синхронизировать локальную корзину на сервер */
-export async function syncCartToServer(items) {
-  console.log('[SYNC] syncCartToServer → локальных товаров:', items.length, items.map(i => ({ id: i.id, qty: i.quantity })))
-
-  // Очищаем серверную корзину
-  try {
-    const basketRes = await getServerBasket()
-    // API возвращает { basket: [...], total_price, fuser_id }
-    const serverItems = basketRes.data?.basket || basketRes.data?.data || []
-    console.log('[SYNC] серверная корзина до очистки:', serverItems.length, 'items')
-    for (const si of serverItems) {
-      try {
-        await deleteServerBasketItem(si.product_id || si.id)
-      } catch (e) {
-        console.warn('[SYNC] ошибка удаления product_id', si.product_id || si.id, e?.message)
-      }
-    }
-  } catch (e) {
-    console.warn('[SYNC] ошибка получения серверной корзины:', e?.message)
-  }
-
-  // Добавляем товары последовательно
-  for (const item of items) {
-    try {
-      await addToServerBasket(item.id, item.quantity)
-    } catch (e) {
-      console.warn('[SYNC] ошибка добавления product_id', item.id, e?.message)
-    }
-  }
-
-  // Проверяем итоговую корзину
-  const checkRes = await getServerBasket()
-  const finalItems = checkRes.data?.basket || checkRes.data?.data || []
-  console.log('[SYNC] syncCartToServer ← итог:', finalItems.length, 'товаров на сервере')
-  if (finalItems.length === 0 && items.length > 0) {
-    throw new Error('Серверная корзина пуста после синхронизации')
-  }
-  return checkRes.data
-}
 
 // ============================================================
 // Checkout API (new)

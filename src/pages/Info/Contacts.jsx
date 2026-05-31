@@ -1,5 +1,7 @@
 import { Helmet } from 'react-helmet-async'
 import { useEffect, useRef } from 'react'
+import JsonLd from '../../components/JsonLd/JsonLd'
+import { breadcrumbSchema, storeSchema } from '../../utils/jsonLd'
 
 function Contacts() {
   const mapRef = useRef(null)
@@ -38,6 +40,13 @@ function Contacts() {
         <title>Контакты — Top Disc</title>
         <meta name="description" content="Контакты магазина Top Disc: телефон, адрес, режим работы." />
       </Helmet>
+      <JsonLd data={[
+        storeSchema(),
+        breadcrumbSchema([
+          { name: 'Главная', url: '/' },
+          { name: 'Контакты' },
+        ]),
+      ]} />
 
       <section className="contacts">
         <h1 className="contacts__title">Контакты</h1>

@@ -2,15 +2,14 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import { clearCart } from '../../store/slices/cartSlice'
+import { clearCart, fetchServerCart, mergeGuestCart } from '../../store/slices/cartSlice'
 import { fetchUserAddresses } from '../../store/slices/userSlice'
 import {
   getLocationCode, getCheckoutContext, calculateCheckout, submitCheckout,
-  syncCartToServer,
   sendSmsCode, verifySmsCode,
   getBitrixStoreList,
   getUserProfile,
-  mergeBasket, getGuestFuserId, clearGuestFuserId,
+  getGuestFuserId,
 } from '../../services/apiClient'
 import { setToken } from '../../store/slices/authSlice'
 import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
@@ -371,9 +370,9 @@ function Checkout() {
 
     ;(async () => {
       try {
-        // Синхронизируем локальную корзину на сервер
-        const syncResult = await syncCartToServer(items)
-        console.log('[CHECKOUT] syncCartToServer done:', syncResult)
+        // Подтягиваем актуальную серверную корзину перед расчётом.
+        // Все add/remove/qty уже синхронизированы в момент действия пользователя.
+        await dispatch(fetchServerCart()).unwrap().catch(() => {})
 
         const params = {}
         if (locationCode) params.location = locationCode
@@ -585,11 +584,17 @@ function Checkout() {
       const token = res.data?.message?.Authorization
       if (token) {
         dispatch(setToken(token))
-        // Объединяем гостевую корзину
+        // Объединяем гостевую корзину с корзиной аккаунта (или просто
+        // подтягиваем серверную, если гостевой fuser_id не было).
         const guestFuserId = getGuestFuserId()
         if (guestFuserId) {
-          try { await mergeBasket(guestFuserId) } catch {}
-          clearGuestFuserId()
+          try {
+            await dispatch(mergeGuestCart()).unwrap()
+          } catch {
+            dispatch(fetchServerCart())
+          }
+        } else {
+          dispatch(fetchServerCart())
         }
         setSmsModalOpen(false)
         setSmsCode(['', '', '', '', '', ''])

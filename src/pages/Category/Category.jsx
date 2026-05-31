@@ -9,6 +9,8 @@ import { useMatchHeight } from '../../hooks/useMatchHeight'
 import { sanitizeHtml } from '../../utils/sanitizeHtml'
 import { decodeHtml } from '../../utils/decodeHtml'
 import { useSSRData } from '../../context/SSRDataContext'
+import JsonLd from '../../components/JsonLd/JsonLd'
+import { breadcrumbSchema, collectionPageSchema, itemListSchema } from '../../utils/jsonLd'
 
 // Кеш категорий для ускорения навигации
 const categoryCache = new Map()
@@ -633,6 +635,27 @@ function Category() {
         <title>{mainCategory.name} - TopDisk</title>
         <meta name="description" content={`Купить ${mainCategory.name} в интернет-магазине TopDisk`} />
       </Helmet>
+      {(() => {
+        const path = `/category/${mainCategory.code}/`
+        const crumbs = [
+          { name: 'Главная', url: '/' },
+          { name: 'Каталог', url: '/catalog/' },
+          ...breadcrumbsPath.map((c) => ({ name: decodeHtml(c.name), url: `/category/${c.code}/` })),
+          { name: decodeHtml(mainCategory.name) },
+        ]
+        const breadcrumbs = breadcrumbSchema(crumbs)
+        const itemList = isProductListPage ? itemListSchema(products, {
+          name: decodeHtml(mainCategory.name),
+        }) : null
+        const collection = collectionPageSchema({
+          name: decodeHtml(mainCategory.name),
+          description: `Купить ${decodeHtml(mainCategory.name)} в интернет-магазине TopDisk`,
+          path,
+          breadcrumbs,
+          itemList,
+        })
+        return <JsonLd data={[collection, breadcrumbs, itemList]} />
+      })()}
 
       {/* ХЛЕБНЫЕ КРОШКИ */}
       <div className="breadcrumbs">
