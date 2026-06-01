@@ -219,7 +219,9 @@ function Checkout() {
   const [deliveryMethods, setDeliveryMethods] = useState([])
   const [deliveryLoading, setDeliveryLoading] = useState(false)
   const [deliveryMethod, setDeliveryMethod] = useState(null)
-  const [stores, setStores] = useState(DEFAULT_STORES)
+  const [stores, setStores] = useState(DEFAULT_STORES)        // магазины самовывоза
+  const [cdekPoints, setCdekPoints] = useState([])            // ПВЗ СДЭК
+  const [cdekLoading, setCdekLoading] = useState(false)
   const [selectedStore, setSelectedStore] = useState(null)
   const [storePickerOpen, setStorePickerOpen] = useState(false)
   const [storeSearch, setStoreSearch] = useState('')
@@ -338,6 +340,23 @@ function Checkout() {
     if (typeof data.can_submit !== 'undefined') setCanSubmit(data.can_submit)
     if (data.errors?.length) setCheckoutErrors(data.errors)
     else setCheckoutErrors([])
+
+    // Пункты самовывоза СДЭК — из ответа calculate/context
+    const cdek = co.selected_delivery?.pickup_points
+      || co.available_deliveries?.find((d) => d.selected)?.pickup_points
+      || []
+    if (cdek.length) {
+      const mapped = cdek.map((p) => ({
+        id: p.id || p.code,
+        name: p.name || p.city_name || 'Пункт СДЭК',
+        address: p.address || p.full_address || '',
+        hours: p.work_time || p.schedule || '',
+        phone: p.phones?.[0]?.number || '',
+        lat: Number(p.latitude || p.lat || 0),
+        lng: Number(p.longitude || p.lng || 0),
+      }))
+      setCdekPoints(mapped)
+    }
   }
 
   // ── Получаем location code при подтверждении города ─────
@@ -493,7 +512,43 @@ function Checkout() {
   // Сброс выбранного магазина при смене способа доставки
   useEffect(() => {
     setSelectedStore(null)
+    setStoreSearch('')
   }, [deliveryMethod])
+
+  // ── Загрузка ПВЗ СДЭК при выборе СДЭК-самовывоза ────────
+  // Если API не вернул pickup_points — запрашиваем через СДЭК API напрямую
+  useEffect(() => {
+    if (!isPickupCdek || !cityConfirmed) return
+    if (cdekPoints.length > 0) return   // уже загружены из calculate ответа
+    let cancelled = false
+    setCdekLoading(true)
+    ;(async () => {
+      try {
+        // СДЭК публичный API: список ПВЗ по городу
+        const city = encodeURIComponent(cityConfirmed)
+        const res = await fetch(
+          `https://api.cdek.ru/v2/deliverypoints?city_code=270&type=PVZ&have_cash=false&is_handout=true&size=100`,
+          { headers: { Accept: 'application/json' } }
+        )
+        // Если CORS блокирует — используем данные из calculate
+        if (!res.ok) return
+        const json = await res.json()
+        if (cancelled) return
+        const points = (json || []).map((p) => ({
+          id: p.code,
+          name: p.name || 'ПВЗ СДЭК',
+          address: p.location?.address || '',
+          hours: p.work_time || '',
+          phone: p.phones?.[0]?.number || '',
+          lat: Number(p.location?.latitude || 0),
+          lng: Number(p.location?.longitude || 0),
+        })).filter((p) => p.address)
+        if (!cancelled && points.length) setCdekPoints(points)
+      } catch {}
+      if (!cancelled) setCdekLoading(false)
+    })()
+    return () => { cancelled = true }
+  }, [isPickupCdek, cityConfirmed])
 
   // ── SMS авторизация для неавторизованных ───────────────
   const handleSendSms = async () => {
@@ -638,6 +693,12 @@ function Checkout() {
     const name = activeDelivery?.name?.toLowerCase() || ''
     return deliveryMethod === 'pickup' || name.includes('самовывоз')
   })()
+
+  // Самовывоз из магазина (не СДЭК)
+  const isPickupStore = isPickup && !activeDelivery?.name?.toLowerCase().includes('сдэк')
+
+  // Самовывоз из ПВЗ СДЭК
+  const isPickupCdek = isPickup && activeDelivery?.name?.toLowerCase().includes('сдэк')
 
   // Курьерская доставка по Пензе (не СДЭК)
   const isCourierPenza = (() => {
@@ -934,10 +995,10 @@ function Checkout() {
                       </div>
                     )}
 
-                    {/* Самовывоз → выбор / отображение магазина */}
-                    {isPickup && (
+                    {/* Самовывоз из магазина (не СДЭК) */}
+                    {isPickupStore && (
                       <div className="checkout__block">
-                        <h3 className="checkout__block-title">Адрес самовывоза</h3>
+                        <h3 className="checkout__block-title">Выберите магазин</h3>
 
                         {/* Выбранный магазин */}
                         {selectedStore && (
@@ -957,7 +1018,6 @@ function Checkout() {
                           </div>
                         )}
 
-                        {/* Список магазинов (всегда виден если не выбран, или по кнопке «Изменить») */}
                         {(!selectedStore || storePickerOpen) && (
                           <div className="checkout__store-inline">
                             <div className="checkout__store-search">
@@ -992,6 +1052,76 @@ function Checkout() {
                                 />
                               </div>
                             </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Самовывоз из ПВЗ СДЭК */}
+                    {isPickupCdek && (
+                      <div className="checkout__block">
+                        <h3 className="checkout__block-title">Выберите пункт выдачи СДЭК</h3>
+
+                        {cdekLoading && <div className="checkout__loading">Загрузка пунктов выдачи…</div>}
+
+                        {/* Выбранный ПВЗ */}
+                        {selectedStore && (
+                          <div className="checkout__pickup-info">
+                            <div className="checkout__pickup-details">
+                              <strong>{selectedStore.name}</strong>
+                              <p>{selectedStore.address}</p>
+                              {selectedStore.hours && <p className="checkout__pickup-hours">{selectedStore.hours}</p>}
+                              {selectedStore.phone && <p className="checkout__pickup-phone">{selectedStore.phone}</p>}
+                              <button className="checkout__change-btn" onClick={() => setStorePickerOpen((v) => !v)}>Изменить</button>
+                            </div>
+                            {selectedStore.lat > 0 && (
+                              <div className="checkout__pickup-map">
+                                <YandexMap lat={selectedStore.lat} lng={selectedStore.lng} height={250} />
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {(!selectedStore || storePickerOpen) && cdekPoints.length > 0 && (
+                          <div className="checkout__store-inline">
+                            <div className="checkout__store-search">
+                              <input type="text" placeholder="Поиск по адресу" value={storeSearch} onChange={(e) => setStoreSearch(e.target.value)} />
+                            </div>
+                            <div className="checkout__store-layout">
+                              <div className="checkout__store-list">
+                                {cdekPoints
+                                  .filter((s) => !storeSearch || s.name.toLowerCase().includes(storeSearch.toLowerCase()) || s.address.toLowerCase().includes(storeSearch.toLowerCase()))
+                                  .map((point) => (
+                                    <div className="checkout__store-item" key={point.id}>
+                                      <strong>{point.name}</strong>
+                                      <p>{point.address}</p>
+                                      {point.hours && <p className="checkout__store-hours">{point.hours}</p>}
+                                      <button
+                                        className={`checkout__store-select${selectedStore?.id === point.id ? ' is-active' : ''}`}
+                                        onClick={() => { setSelectedStore(point); setStorePickerOpen(false) }}
+                                      >
+                                        {selectedStore?.id === point.id ? 'Выбрано' : 'Выбрать'}
+                                      </button>
+                                    </div>
+                                  ))}
+                              </div>
+                              <div className="checkout__store-map">
+                                <YandexMap
+                                  lat={selectedStore ? selectedStore.lat : (cdekPoints[0]?.lat || 53.1867)}
+                                  lng={selectedStore ? selectedStore.lng : (cdekPoints[0]?.lng || 45.0052)}
+                                  zoom={13}
+                                  points={cdekPoints.filter((s) => s.lat && s.lng)}
+                                  height={400}
+                                  onSelect={(point) => { setSelectedStore(point); setStorePickerOpen(false) }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {!cdekLoading && cdekPoints.length === 0 && (
+                          <div className="checkout__disabled-hint">
+                            Пункты выдачи СДЭК для выбранного города не найдены
                           </div>
                         )}
                       </div>
