@@ -515,41 +515,6 @@ function Checkout() {
     setStoreSearch('')
   }, [deliveryMethod])
 
-  // ── Загрузка ПВЗ СДЭК при выборе СДЭК-самовывоза ────────
-  // Если API не вернул pickup_points — запрашиваем через СДЭК API напрямую
-  useEffect(() => {
-    if (!isPickupCdek || !cityConfirmed) return
-    if (cdekPoints.length > 0) return   // уже загружены из calculate ответа
-    let cancelled = false
-    setCdekLoading(true)
-    ;(async () => {
-      try {
-        // СДЭК публичный API: список ПВЗ по городу
-        const city = encodeURIComponent(cityConfirmed)
-        const res = await fetch(
-          `https://api.cdek.ru/v2/deliverypoints?city_code=270&type=PVZ&have_cash=false&is_handout=true&size=100`,
-          { headers: { Accept: 'application/json' } }
-        )
-        // Если CORS блокирует — используем данные из calculate
-        if (!res.ok) return
-        const json = await res.json()
-        if (cancelled) return
-        const points = (json || []).map((p) => ({
-          id: p.code,
-          name: p.name || 'ПВЗ СДЭК',
-          address: p.location?.address || '',
-          hours: p.work_time || '',
-          phone: p.phones?.[0]?.number || '',
-          lat: Number(p.location?.latitude || 0),
-          lng: Number(p.location?.longitude || 0),
-        })).filter((p) => p.address)
-        if (!cancelled && points.length) setCdekPoints(points)
-      } catch {}
-      if (!cancelled) setCdekLoading(false)
-    })()
-    return () => { cancelled = true }
-  }, [isPickupCdek, cityConfirmed])
-
   // ── SMS авторизация для неавторизованных ───────────────
   const handleSendSms = async () => {
     if (!phone.trim() || phone.replace(/\D/g, '').length < 11) {
@@ -764,6 +729,39 @@ function Checkout() {
       if (!deliveryTime) setDeliveryTime(TIME_SLOTS[0].value)
     }
   }, [deliveryDate])
+
+  // ── Загрузка ПВЗ СДЭК при выборе СДЭК-самовывоза ────────
+  // Объявлен ПОСЛЕ isPickupCdek чтобы избежать TDZ в dependency array
+  useEffect(() => {
+    if (!isPickupCdek || !cityConfirmed) return
+    if (cdekPoints.length > 0) return   // уже загружены из calculate ответа
+    let cancelled = false
+    setCdekLoading(true)
+    ;(async () => {
+      try {
+        const res = await fetch(
+          `https://api.cdek.ru/v2/deliverypoints?city_code=270&type=PVZ&have_cash=false&is_handout=true&size=100`,
+          { headers: { Accept: 'application/json' } }
+        )
+        // Если CORS блокирует — используем данные из calculate ответа
+        if (!res.ok) return
+        const json = await res.json()
+        if (cancelled) return
+        const points = (json || []).map((p) => ({
+          id: p.code,
+          name: p.name || 'ПВЗ СДЭК',
+          address: p.location?.address || '',
+          hours: p.work_time || '',
+          phone: p.phones?.[0]?.number || '',
+          lat: Number(p.location?.latitude || 0),
+          lng: Number(p.location?.longitude || 0),
+        })).filter((p) => p.address)
+        if (!cancelled && points.length) setCdekPoints(points)
+      } catch {}
+      if (!cancelled) setCdekLoading(false)
+    })()
+    return () => { cancelled = true }
+  }, [isPickupCdek, cityConfirmed])
 
   // ═══════════════════════════ RENDER ═════════════════════
   return (
