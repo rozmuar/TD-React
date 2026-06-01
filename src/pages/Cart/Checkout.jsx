@@ -238,6 +238,7 @@ function Checkout() {
   const [totals, setTotals] = useState(null)
   const [canSubmit, setCanSubmit] = useState(false)
   const [checkoutErrors, setCheckoutErrors] = useState([])
+  const [deliveryAddress, setDeliveryAddress] = useState('')
 
   // ── SMS / Submit ────────────────────────────────────────
   const [smsModalOpen, setSmsModalOpen] = useState(false)
@@ -441,6 +442,7 @@ function Checkout() {
             LOCATION: locationCode || undefined,
             PHONE: phone.replace(/\D/g, '') || undefined,
             EMAIL: email || undefined,
+            ADDRESS: deliveryAddress ? `${cityConfirmed}, ${deliveryAddress}` : (cityConfirmed || undefined),
           },
         }
         if (personTypeId) data.person_type_id = personTypeId
@@ -475,6 +477,7 @@ function Checkout() {
             LOCATION: locationCode || undefined,
             PHONE: phone.replace(/\D/g, '') || undefined,
             EMAIL: email || undefined,
+            ADDRESS: deliveryAddress ? `${cityConfirmed}, ${deliveryAddress}` : (cityConfirmed || undefined),
           },
         }
         if (personTypeId) data.person_type_id = personTypeId
@@ -532,7 +535,7 @@ function Checkout() {
           NAME: firstName || undefined,
           SURNAME: lastName || undefined,
           EMAIL: email || undefined,
-          ADDRESS: cityConfirmed || undefined,
+          ADDRESS: deliveryAddress ? `${cityConfirmed}, ${deliveryAddress}` : (cityConfirmed || undefined),
         },
         comment: comment || undefined,
       }
@@ -787,6 +790,17 @@ function Checkout() {
                       <label>Фамилия</label>
                       <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
                     </div>
+                    {!isPickup && deliveryMethod && (
+                      <div className="checkout__field checkout__field--wide">
+                        <label>Адрес доставки <span className="checkout__field-hint">(улица, дом, квартира)</span></label>
+                        <input
+                          type="text"
+                          value={deliveryAddress}
+                          onChange={(e) => setDeliveryAddress(e.target.value)}
+                          placeholder="Например: ул. Ленина, д. 10, кв. 5"
+                        />
+                      </div>
+                    )}
                     <div className="checkout__field checkout__field--wide">
                       <label>Комментарий к заказу</label>
                       <textarea value={comment} onChange={(e) => setComment(e.target.value)} rows="3" />

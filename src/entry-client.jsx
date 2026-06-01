@@ -1,5 +1,5 @@
 import React from 'react'
-import { hydrateRoot } from 'react-dom/client'
+import { hydrateRoot, createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App'
@@ -32,9 +32,10 @@ if (store.getState().auth.isAuthenticated) {
 // Читаем данные, инжектированные сервером, для точного совпадения при гидратации
 const ssrData = window.__SSR_DATA__ || null
 
-// hydrateRoot подхватывает SSR-разметку без повторного рендера DOM
-hydrateRoot(
-  document.getElementById('root'),
+// hydrateRoot подхватывает SSR-разметку без повторного рендера DOM.
+// Если сервер не рендерил эту страницу (client-only), используем createRoot.
+const rootEl = document.getElementById('root')
+const app = (
   <React.StrictMode>
     <SSRDataContext.Provider value={ssrData}>
       <Provider store={store}>
@@ -45,3 +46,9 @@ hydrateRoot(
     </SSRDataContext.Provider>
   </React.StrictMode>
 )
+
+if (rootEl.hasChildNodes()) {
+  hydrateRoot(rootEl, app)
+} else {
+  createRoot(rootEl).render(app)
+}

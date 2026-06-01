@@ -27,9 +27,14 @@ async function createServer() {
     )
   }
 
+  // Страницы, которые зависят от авторизации — SSR не делаем,
+  // отдаём чистый HTML-шелл, клиент рендерит сам (нет hydration mismatch)
+  const CLIENT_ONLY_RE = /^\/(?:cart|personal|compare|favorites)\//
+
   // Все запросы обрабатываем SSR
   app.use(async (req, res) => {
     const url = req.originalUrl
+    const urlPath = url.split('?')[0]
 
     try {
       let template, render
@@ -37,12 +42,20 @@ async function createServer() {
       if (!isProduction) {
         template = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf-8')
         template = await vite.transformIndexHtml(url, template)
+        // Для авторизованных страниц — отдаём шелл без SSR
+        if (CLIENT_ONLY_RE.test(urlPath)) {
+          return res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).end(template)
+        }
         render = (await vite.ssrLoadModule('/src/entry-server.jsx')).render
       } else {
         template = fs.readFileSync(
           path.join(__dirname, 'dist/client/index.html'),
           'utf-8'
         )
+        // Для авторизованных страниц — отдаём шелл без SSR
+        if (CLIENT_ONLY_RE.test(urlPath)) {
+          return res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).end(template)
+        }
         // Динамический импорт собранного SSR-бандла
         const serverEntry = await import(
           path.join(__dirname, 'dist/server/entry-server.js')
