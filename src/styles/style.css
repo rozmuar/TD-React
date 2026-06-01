@@ -8539,6 +8539,25 @@ a.order-card__product-name:hover {
   border-color: #04B31B;
 }
 
+.checkout__delivery-btn.is-unavailable {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: #f8f8f8;
+}
+
+.checkout__delivery-unavailable {
+  font-size: 11px;
+  color: #999;
+  font-weight: 400;
+  text-align: center;
+}
+
+.checkout__delivery-price {
+  font-size: 13px;
+  font-weight: 600;
+  color: #04B31B;
+}
+
 .checkout__delivery-label {
   font-size: 14px;
   font-weight: 600;

@@ -303,9 +303,12 @@ function Checkout() {
   const applyCheckoutResponse = (data) => {
     const co = data.checkout || data
     if (co.available_deliveries) {
-      const deliveries = co.available_deliveries.filter((d) => d.available !== false)
+      const deliveries = co.available_deliveries
       setDeliveryMethods(deliveries)
-      const selected = deliveries.find((d) => d.selected) || deliveries[0]
+      // Автовыбор: сначала уже выбранный, потом первый доступный, потом просто первый
+      const selected = deliveries.find((d) => d.selected)
+        || deliveries.find((d) => d.available !== false)
+        || deliveries[0]
       if (selected && String(selected.id) !== String(deliveryMethod)) {
         setDeliveryMethod(String(selected.id))
       } else if (!deliveryMethod && selected) {
@@ -435,6 +438,7 @@ function Checkout() {
           delivery_id: Number(deliveryMethod),
           location: locationCode || undefined,
           properties: {
+            LOCATION: locationCode || undefined,
             PHONE: phone.replace(/\D/g, '') || undefined,
             EMAIL: email || undefined,
           },
@@ -447,7 +451,9 @@ function Checkout() {
         if (pickupPointId) data.pickup_point_id = pickupPointId
         const res = await calculateCheckout(data)
         if (!cancelled) applyCheckoutResponse(res.data)
-      } catch {}
+      } catch (calcErr) {
+        console.error('[CHECKOUT] calculateCheckout error:', calcErr?.response?.data || calcErr?.message)
+      }
       if (!cancelled) setPaymentLoading(false)
     })()
 
@@ -466,6 +472,7 @@ function Checkout() {
           pay_system_id: Number(paymentMethod),
           location: locationCode || undefined,
           properties: {
+            LOCATION: locationCode || undefined,
             PHONE: phone.replace(/\D/g, '') || undefined,
             EMAIL: email || undefined,
           },
@@ -473,7 +480,9 @@ function Checkout() {
         if (personTypeId) data.person_type_id = personTypeId
         const res = await calculateCheckout(data)
         applyCheckoutResponse(res.data)
-      } catch {}
+      } catch (calcErr) {
+        console.error('[CHECKOUT] payment calculateCheckout error:', calcErr?.response?.data || calcErr?.message)
+      }
     }, 300)
     return () => clearTimeout(paymentCalculateTimer.current)
   }, [paymentMethod])
@@ -847,22 +856,32 @@ function Checkout() {
                   <>
                     <div className="checkout__block">
                       <div className="checkout__delivery-methods">
-                        {deliveryMethods.map((d) => (
-                          <button
-                            key={d.id}
-                            className={`checkout__delivery-btn${String(deliveryMethod) === String(d.id) ? ' is-active' : ''}`}
-                            onClick={() => setDeliveryMethod(String(d.id))}
-                          >
-                            {d.logotip && <img src={d.logotip} alt="" className="checkout__delivery-logo" />}
-                            <span className="checkout__delivery-label">{d.name}</span>
-                            {d.price_formatted && (
-                              <span className="checkout__delivery-price">{d.price_formatted}</span>
-                            )}
-                            {d.period_text && (
-                              <span className="checkout__delivery-desc">{d.period_text}</span>
-                            )}
-                          </button>
-                        ))}
+                        {deliveryMethods.map((d) => {
+                          const isUnavailable = d.available === false
+                          const priceText = d.price_formatted
+                            || (d.price != null ? (d.price > 0 ? `${fmt(d.price)} ₽` : 'Бесплатно') : null)
+                          return (
+                            <button
+                              key={d.id}
+                              className={`checkout__delivery-btn${String(deliveryMethod) === String(d.id) ? ' is-active' : ''}${isUnavailable ? ' is-unavailable' : ''}`}
+                              onClick={() => !isUnavailable && setDeliveryMethod(String(d.id))}
+                              disabled={isUnavailable}
+                              title={isUnavailable ? 'Недоступно для выбранного города' : undefined}
+                            >
+                              {d.logotip && <img src={d.logotip} alt="" className="checkout__delivery-logo" />}
+                              <span className="checkout__delivery-label">{d.name}</span>
+                              {priceText && (
+                                <span className="checkout__delivery-price">{priceText}</span>
+                              )}
+                              {d.period_text && (
+                                <span className="checkout__delivery-desc">{d.period_text}</span>
+                              )}
+                              {isUnavailable && (
+                                <span className="checkout__delivery-unavailable">Недоступно</span>
+                              )}
+                            </button>
+                          )
+                        })}
                       </div>
                     </div>
 
