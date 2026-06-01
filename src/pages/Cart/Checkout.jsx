@@ -790,17 +790,6 @@ function Checkout() {
                       <label>Фамилия</label>
                       <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
                     </div>
-                    {!isPickup && deliveryMethod && (
-                      <div className="checkout__field checkout__field--wide">
-                        <label>Адрес доставки <span className="checkout__field-hint">(улица, дом, квартира)</span></label>
-                        <input
-                          type="text"
-                          value={deliveryAddress}
-                          onChange={(e) => setDeliveryAddress(e.target.value)}
-                          placeholder="Например: ул. Ленина, д. 10, кв. 5"
-                        />
-                      </div>
-                    )}
                     <div className="checkout__field checkout__field--wide">
                       <label>Комментарий к заказу</label>
                       <textarea value={comment} onChange={(e) => setComment(e.target.value)} rows="3" />
@@ -898,6 +887,20 @@ function Checkout() {
                         })}
                       </div>
                     </div>
+
+                    {/* Адрес доставки — только для курьерских способов */}
+                    {!isPickup && deliveryMethod && (
+                      <div className="checkout__block">
+                        <h3 className="checkout__block-title">Адрес доставки</h3>
+                        <input
+                          type="text"
+                          className="checkout__input"
+                          value={deliveryAddress}
+                          onChange={(e) => setDeliveryAddress(e.target.value)}
+                          placeholder="Улица, дом, квартира"
+                        />
+                      </div>
+                    )}
 
                     {/* Курьерская по Пензе → дата и время доставки */}
                     {isCourierPenza && (
