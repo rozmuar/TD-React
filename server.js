@@ -44,7 +44,8 @@ async function createServer() {
         template = await vite.transformIndexHtml(url, template)
         // Для авторизованных страниц — отдаём шелл без SSR
         if (CLIENT_ONLY_RE.test(urlPath)) {
-          return res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).end(template)
+          const shell = template.replace('<!--ssr-outlet-->', '')
+          return res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).end(shell)
         }
         render = (await vite.ssrLoadModule('/src/entry-server.jsx')).render
       } else {
@@ -54,7 +55,8 @@ async function createServer() {
         )
         // Для авторизованных страниц — отдаём шелл без SSR
         if (CLIENT_ONLY_RE.test(urlPath)) {
-          return res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).end(template)
+          const shell = template.replace('<!--ssr-outlet-->', '')
+          return res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).end(shell)
         }
         // Динамический импорт собранного SSR-бандла
         const serverEntry = await import(
