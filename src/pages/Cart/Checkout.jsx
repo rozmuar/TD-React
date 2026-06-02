@@ -472,7 +472,7 @@ function Checkout() {
         const res = await calculateCheckout(data)
         if (!cancelled) applyCheckoutResponse(res.data, { autoSelectDelivery: false })
       } catch (calcErr) {
-        console.error('[CHECKOUT] calculateCheckout error:'}, calcErr?.response?.data || calcErr?.message)
+        console.error('[CHECKOUT] calculateCheckout error:', calcErr?.response?.data || calcErr?.message)
       }
       if (!cancelled) setPaymentLoading(false)
     })()
@@ -502,7 +502,7 @@ function Checkout() {
         const res = await calculateCheckout(data)
         applyCheckoutResponse(res.data, { autoSelectDelivery: false })
       } catch (calcErr) {
-        console.error('[CHECKOUT] payment calculateCheckout error:'}, calcErr?.response?.data || calcErr?.message)
+        console.error('[CHECKOUT] payment calculateCheckout error:', calcErr?.response?.data || calcErr?.message)
       }
     }, 300)
     return () => clearTimeout(paymentCalculateTimer.current)
