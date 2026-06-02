@@ -734,36 +734,13 @@ function Checkout() {
   }, [deliveryDate])
 
   // ── Загрузка ПВЗ СДЭК при выборе СДЭК-самовывоза ────────
-  // Объявлен ПОСЛЕ isPickupCdek чтобы избежать TDZ в dependency array
+  // ПВЗ приходят из поля pickup_points в ответе calculateCheckout / getCheckoutContext
+  // Прямой вызов api.cdek.ru невозможен из браузера (CORS + OAuth2)
   useEffect(() => {
-    if (!isPickupCdek || !cityConfirmed) return
-    if (cdekPoints.length > 0) return   // уже загружены из calculate ответа
-    let cancelled = false
-    setCdekLoading(true)
-    ;(async () => {
-      try {
-        const res = await fetch(
-          `https://api.cdek.ru/v2/deliverypoints?city_code=270&type=PVZ&have_cash=false&is_handout=true&size=100`,
-          { headers: { Accept: 'application/json' } }
-        )
-        // Если CORS блокирует — используем данные из calculate ответа
-        if (!res.ok) return
-        const json = await res.json()
-        if (cancelled) return
-        const points = (json || []).map((p) => ({
-          id: p.code,
-          name: p.name || 'ПВЗ СДЭК',
-          address: p.location?.address || '',
-          hours: p.work_time || '',
-          phone: p.phones?.[0]?.number || '',
-          lat: Number(p.location?.latitude || 0),
-          lng: Number(p.location?.longitude || 0),
-        })).filter((p) => p.address)
-        if (!cancelled && points.length) setCdekPoints(points)
-      } catch {}
-      if (!cancelled) setCdekLoading(false)
-    })()
-    return () => { cancelled = true }
+    if (!isPickupCdek) return
+    // Сброс при смене доставки на СДЭК (новый город)
+    setCdekPoints([])
+    setCdekLoading(false)
   }, [isPickupCdek, cityConfirmed])
 
   // ═══════════════════════════ RENDER ═════════════════════
@@ -1124,7 +1101,8 @@ function Checkout() {
 
                         {!cdekLoading && cdekPoints.length === 0 && (
                           <div className="checkout__disabled-hint">
-                            Пункты выдачи СДЭК для выбранного города не найдены
+                            Пункты выдачи СДЭК будут доступны после расчёта стоимости доставки.
+                            Если список не появился — уточните пункты самовывоза на сайте <a href="https://cdek.ru/ru/offices" target="_blank" rel="noopener noreferrer">cdek.ru</a>
                           </div>
                         )}
                       </div>
