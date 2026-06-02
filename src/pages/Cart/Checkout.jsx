@@ -303,22 +303,21 @@ function Checkout() {
   }, [])
 
   // ── Утилита применения checkout ответа ───────────────────
-  const applyCheckoutResponse = (data) => {
+  // autoSelectDelivery=true только при первоначальном getCheckoutContext
+  // В calculate-ответах НЕ меняем deliveryMethod — иначе infinite loop
+  const applyCheckoutResponse = (data, { autoSelectDelivery = false, autoSelectPayment = true } = {}) => {
     const co = data.checkout || data
     if (co.available_deliveries) {
       const deliveries = co.available_deliveries
       setDeliveryMethods(deliveries)
-      // Автовыбор: сначала уже выбранный, потом первый доступный, потом просто первый
-      const selected = deliveries.find((d) => d.selected)
-        || deliveries.find((d) => d.available !== false)
-        || deliveries[0]
-      if (selected && String(selected.id) !== String(deliveryMethod)) {
-        setDeliveryMethod(String(selected.id))
-      } else if (!deliveryMethod && selected) {
-        setDeliveryMethod(String(selected.id))
+      if (autoSelectDelivery) {
+        const selected = deliveries.find((d) => d.selected)
+          || deliveries.find((d) => d.available !== false)
+          || deliveries[0]
+        if (selected) setDeliveryMethod(String(selected.id))
       }
     }
-    if (co.available_pay_systems) {
+    if (autoSelectPayment && co.available_pay_systems) {
       const payments = co.available_pay_systems.filter((p) => p.available !== false)
       setPaymentMethods(payments)
       const selected = payments.find((p) => p.selected) || payments[0]
@@ -401,7 +400,7 @@ function Checkout() {
         if (locationCode) params.location = locationCode
         const ctxRes = await getCheckoutContext(params)
         if (cancelled) return
-        applyCheckoutResponse(ctxRes.data)
+        applyCheckoutResponse(ctxRes.data, { autoSelectDelivery: true })
       } catch (err) {
         const errMsg = err.response?.data?.errors || err.response?.data?.message || err.message
         console.error('[CHECKOUT] context/sync error:', err?.response?.data || err?.message)
@@ -471,9 +470,9 @@ function Checkout() {
         const pickupPointId = selectedStore?.id || activeD?.selected_pickup_point_id || null
         if (pickupPointId) data.pickup_point_id = pickupPointId
         const res = await calculateCheckout(data)
-        if (!cancelled) applyCheckoutResponse(res.data)
+        if (!cancelled) applyCheckoutResponse(res.data, { autoSelectDelivery: false })
       } catch (calcErr) {
-        console.error('[CHECKOUT] calculateCheckout error:', calcErr?.response?.data || calcErr?.message)
+        console.error('[CHECKOUT] calculateCheckout error:'}, calcErr?.response?.data || calcErr?.message)
       }
       if (!cancelled) setPaymentLoading(false)
     })()
@@ -501,9 +500,9 @@ function Checkout() {
         }
         if (personTypeId) data.person_type_id = personTypeId
         const res = await calculateCheckout(data)
-        applyCheckoutResponse(res.data)
+        applyCheckoutResponse(res.data, { autoSelectDelivery: false })
       } catch (calcErr) {
-        console.error('[CHECKOUT] payment calculateCheckout error:', calcErr?.response?.data || calcErr?.message)
+        console.error('[CHECKOUT] payment calculateCheckout error:'}, calcErr?.response?.data || calcErr?.message)
       }
     }, 300)
     return () => clearTimeout(paymentCalculateTimer.current)
@@ -659,11 +658,15 @@ function Checkout() {
     return deliveryMethod === 'pickup' || name.includes('самовывоз')
   })()
 
-  // Самовывоз из магазина (не СДЭК)
-  const isPickupStore = isPickup && !activeDelivery?.name?.toLowerCase().includes('сдэк')
+  // Bitrix магазины самовывоза есть только в Пензе
+  // Для любого другого города самовывоз = СДЭК ПВЗ
+  const isPenzaCity = !!cityConfirmed?.toLowerCase().includes('пенз')
 
-  // Самовывоз из ПВЗ СДЭК
-  const isPickupCdek = isPickup && activeDelivery?.name?.toLowerCase().includes('сдэк')
+  // Самовывоз из магазина — только Пенза
+  const isPickupStore = isPickup && isPenzaCity
+
+  // Самовывоз из ПВЗ СДЭК — любой другой город
+  const isPickupCdek = isPickup && !isPenzaCity
 
   // Курьерская доставка по Пензе (не СДЭК)
   const isCourierPenza = (() => {
@@ -920,8 +923,10 @@ function Checkout() {
                       <div className="checkout__delivery-methods">
                         {deliveryMethods.map((d) => {
                           const isUnavailable = d.available === false
-                          const priceText = d.price_formatted
-                            || (d.price != null ? (d.price > 0 ? `${fmt(d.price)} ₽` : 'Бесплатно') : null)
+                          // price_formatted из Bitrix содержит HTML-теги → считаем сами
+                          const priceText = d.price != null
+                            ? (d.price > 0 ? `${fmt(d.price)} ₽` : 'Бесплатно')
+                            : null
                           return (
                             <button
                               key={d.id}
