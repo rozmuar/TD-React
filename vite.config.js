@@ -61,6 +61,11 @@ export default defineConfig(({ isSsrBuild }) => ({
     },
   },
   ssr: {
-    noExternal: ['react-helmet-async', 'react-router-dom'],
+    noExternal: [
+      'react-helmet-async',
+      'react-router-dom',
+      'react-router',
+      '@remix-run/router',
+    ],
   },
 }))
