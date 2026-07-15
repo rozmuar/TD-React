@@ -48,6 +48,9 @@ export default defineConfig(({ isSsrBuild }) => ({
       },
     },
   },
+  optimizeDeps: {
+    include: ['react-router-dom'],
+  },
   server: {
     proxy: {
       '/api/mobile': {
@@ -58,6 +61,6 @@ export default defineConfig(({ isSsrBuild }) => ({
     },
   },
   ssr: {
-    noExternal: ['react-helmet-async'],
+    noExternal: ['react-helmet-async', 'react-router-dom'],
   },
 }))
