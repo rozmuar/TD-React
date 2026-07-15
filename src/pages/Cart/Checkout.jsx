@@ -185,16 +185,29 @@ function Checkout() {
     }
   }, [isAuthenticated, dispatch])
 
-  // Обработчик выбора сохранённого адреса
+  // Обработчик выбора сохранённого адреса — заполняет город и адрес
+  // доставки целиком, чтобы ускорить оформление для вернувшегося покупателя
   const handleSelectAddress = (address) => {
     setSelectedAddressId(address.id)
-    // Автозаполнение полей из выбранного адреса
-    if (address.city && !cityConfirmed) {
+    if (address.city) {
       setCityInput(address.city)
       setCityConfirmed(address.city)
     }
-    // Можно добавить дополнительные поля если они есть в форме
+    const addrLine = [
+      address.street,
+      address.house && `д. ${address.house}`,
+      address.apartment && `кв. ${address.apartment}`,
+    ].filter(Boolean).join(', ')
+    setDeliveryAddress(addrLine)
   }
+
+  // Автовыбор первого сохранённого адреса сразу после загрузки —
+  // не заставляем повторно выбирать город, если он уже есть в профиле
+  useEffect(() => {
+    if (!isAuthenticated || !userAddresses.length) return
+    if (selectedAddressId || cityConfirmed) return
+    handleSelectAddress(userAddresses[0])
+  }, [isAuthenticated, userAddresses])
 
   // ── Автозаполнение из профиля авторизованного пользователя ──
   useEffect(() => {
@@ -768,75 +781,8 @@ function Checkout() {
               <div className="checkout__step">
                 <div className="checkout__step-badge">Шаг 1</div>
 
-                <div className="checkout__block">
-                  <h3 className="checkout__block-title">Укажите город</h3>
-                  <div className="checkout__city-wrapper" ref={wrapperRef}>
-                    <input
-                      type="text"
-                      className="checkout__input"
-                      value={cityInput}
-                      onChange={(e) => handleCityInput(e.target.value)}
-                      onFocus={() => suggestions.length && setShowSuggestions(true)}
-                      placeholder="Начните вводить город..."
-                      autoComplete="off"
-                    />
-                    {cityConfirmed && (
-                      <span className="checkout__city-check" title="Город подтверждён">✓</span>
-                    )}
-                    {showSuggestions && (
-                      <ul className="checkout__suggest-list">
-                        {suggestions.map((s, i) => (
-                          <li key={i} className="checkout__suggest-item" onMouseDown={() => pickCity(s)}>
-                            <span className="checkout__suggest-city">{s.value}</span>
-                            {s.region && <span className="checkout__suggest-region">{s.region}</span>}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
-
-                <div className="checkout__block">
-                  <h3 className="checkout__block-title">Покупатель</h3>
-                  <div className="checkout__form-grid">
-                    <div className="checkout__field">
-                      <label>Телефон</label>
-                      <div className="checkout__phone-row">
-                        <input type="tel" value={phone} onChange={(e) => setPhone(formatPhoneInput(e.target.value))} placeholder="+7" />
-                        {!isAuthenticated && cityConfirmed && (
-                          <button
-                            className="checkout__sms-send-btn"
-                            onClick={handleSendSms}
-                            disabled={smsSending || !phone.trim()}
-                          >
-                            {smsSending ? '...' : 'Подтвердить'}
-                          </button>
-                        )}
-                      </div>
-                      {!isAuthenticated && cityConfirmed && smsError && (
-                        <p className="checkout__sms-error" style={{marginTop:4}}>{smsError}</p>
-                      )}
-                    </div>
-                    <div className="checkout__field">
-                      <label>E-mail</label>
-                      <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                    </div>
-                    <div className="checkout__field">
-                      <label>Имя</label>
-                      <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
-                    </div>
-                    <div className="checkout__field">
-                      <label>Фамилия</label>
-                      <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
-                    </div>
-                    <div className="checkout__field checkout__field--wide">
-                      <label>Комментарий к заказу</label>
-                      <textarea value={comment} onChange={(e) => setComment(e.target.value)} rows="3" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Сохранённые адреса для авторизованных пользователей */}
+                {/* Сохранённые адреса — быстрый путь: выбор сразу
+                    заполняет город и адрес доставки (см. handleSelectAddress) */}
                 {isAuthenticated && userAddresses.length > 0 && (
                   <div className="checkout__block">
                     <div className="checkout__saved-addresses-header">
@@ -877,6 +823,80 @@ function Checkout() {
                     </div>
                   </div>
                 )}
+
+                <div className="checkout__block">
+                  <h3 className="checkout__block-title">Укажите город</h3>
+                  <div className="checkout__city-wrapper" ref={wrapperRef}>
+                    <input
+                      type="text"
+                      className="checkout__input"
+                      value={cityInput}
+                      onChange={(e) => handleCityInput(e.target.value)}
+                      onFocus={() => suggestions.length && setShowSuggestions(true)}
+                      placeholder="Начните вводить город..."
+                      autoComplete="off"
+                    />
+                    {cityConfirmed && (
+                      <span className="checkout__city-check" title="Город подтверждён">✓</span>
+                    )}
+                    {showSuggestions && (
+                      <ul className="checkout__suggest-list">
+                        {suggestions.map((s, i) => (
+                          <li key={i} className="checkout__suggest-item" onMouseDown={() => pickCity(s)}>
+                            <span className="checkout__suggest-city">{s.value}</span>
+                            {s.region && <span className="checkout__suggest-region">{s.region}</span>}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </div>
+
+                {/* Данные покупателя — доступны только после выбора города
+                    (либо сразу, если город пришёл из сохранённого адреса) */}
+                <div className={`checkout__block${!cityConfirmed ? ' is-disabled' : ''}`}>
+                  <h3 className="checkout__block-title">Покупатель</h3>
+                  {!cityConfirmed ? (
+                    <div className="checkout__disabled-hint">Сначала укажите город доставки</div>
+                  ) : (
+                    <div className="checkout__form-grid">
+                      <div className="checkout__field">
+                        <label>Телефон</label>
+                        <div className="checkout__phone-row">
+                          <input type="tel" value={phone} onChange={(e) => setPhone(formatPhoneInput(e.target.value))} placeholder="+7" />
+                          {!isAuthenticated && (
+                            <button
+                              className="checkout__sms-send-btn"
+                              onClick={handleSendSms}
+                              disabled={smsSending || !phone.trim()}
+                            >
+                              {smsSending ? '...' : 'Подтвердить'}
+                            </button>
+                          )}
+                        </div>
+                        {!isAuthenticated && smsError && (
+                          <p className="checkout__sms-error" style={{marginTop:4}}>{smsError}</p>
+                        )}
+                      </div>
+                      <div className="checkout__field">
+                        <label>E-mail</label>
+                        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                      </div>
+                      <div className="checkout__field">
+                        <label>Имя</label>
+                        <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+                      </div>
+                      <div className="checkout__field">
+                        <label>Фамилия</label>
+                        <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} />
+                      </div>
+                      <div className="checkout__field checkout__field--wide">
+                        <label>Комментарий к заказу</label>
+                        <textarea value={comment} onChange={(e) => setComment(e.target.value)} rows="3" />
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* ▸▸▸ ШАГ 2: Доставка ▸▸▸ */}

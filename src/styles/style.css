@@ -8418,6 +8418,12 @@ a.order-card__product-name:hover {
   background: #bbb;
 }
 
+.checkout__block.is-disabled {
+  opacity: .45;
+  pointer-events: none;
+  user-select: none;
+}
+
 .checkout__disabled-hint {
   font-size: 14px;
   color: #999;
