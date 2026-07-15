@@ -94,7 +94,13 @@ async function createServer() {
 
       res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).end(finalHtml)
     } catch (e) {
-      if (!isProduction && vite) vite.ssrFixStacktrace(e)
+      if (!isProduction && vite) {
+        try {
+          vite.ssrFixStacktrace(e)
+        } catch (stackErr) {
+          // Игнорируем ошибки в обработке stack trace
+        }
+      }
       console.error(e.stack)
       res.status(500).end(e.message)
     }
