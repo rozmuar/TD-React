@@ -458,7 +458,29 @@ function Checkout() {
     return () => { cancelled = true }
   }, [cityConfirmed, isAuthenticated, locationCode])
 
-  // ── Пересчёт при смене доставки ─────────────────────────
+  // ── Пересчёт checkout/calculate ──────────────────────────
+  // По документации API вызывается после ЛЮБОГО изменения данных
+  // checkout: город/адрес, плательщик, доставка, оплата, пункт самовывоза
+  const buildCalculatePayload = () => {
+    const activeD = deliveryMethods.find((d) => String(d.id) === String(deliveryMethod))
+    const pickupPointId = selectedStore?.id || activeD?.selected_pickup_point_id || null
+    const data = {
+      delivery_id: Number(deliveryMethod),
+      location: locationCode || undefined,
+      properties: {
+        LOCATION: locationCode || undefined,
+        PHONE: phone.replace(/\D/g, '') || undefined,
+        EMAIL: email || undefined,
+        ADDRESS: deliveryAddress ? `${cityConfirmed}, ${deliveryAddress}` : (cityConfirmed || undefined),
+      },
+    }
+    if (personTypeId) data.person_type_id = personTypeId
+    if (paymentMethod) data.pay_system_id = Number(paymentMethod)
+    if (pickupPointId) data.pickup_point_id = pickupPointId
+    return data
+  }
+
+  // ── Пересчёт при смене доставки (сразу) ─────────────────
   useEffect(() => {
     if (!deliveryMethod || !cityConfirmed) return
     let cancelled = false
@@ -466,23 +488,7 @@ function Checkout() {
 
     ;(async () => {
       try {
-        const data = {
-          delivery_id: Number(deliveryMethod),
-          location: locationCode || undefined,
-          properties: {
-            LOCATION: locationCode || undefined,
-            PHONE: phone.replace(/\D/g, '') || undefined,
-            EMAIL: email || undefined,
-            ADDRESS: deliveryAddress ? `${cityConfirmed}, ${deliveryAddress}` : (cityConfirmed || undefined),
-          },
-        }
-        if (personTypeId) data.person_type_id = personTypeId
-        if (paymentMethod) data.pay_system_id = Number(paymentMethod)
-        // Для самовывозных доставок передаём pickup_point_id
-        const activeD = deliveryMethods.find((d) => String(d.id) === String(deliveryMethod))
-        const pickupPointId = selectedStore?.id || activeD?.selected_pickup_point_id || null
-        if (pickupPointId) data.pickup_point_id = pickupPointId
-        const res = await calculateCheckout(data)
+        const res = await calculateCheckout(buildCalculatePayload())
         if (!cancelled) applyCheckoutResponse(res.data, { autoSelectDelivery: false })
       } catch (calcErr) {
         console.error('[CHECKOUT] calculateCheckout error:', calcErr?.response?.data || calcErr?.message)
@@ -493,26 +499,14 @@ function Checkout() {
     return () => { cancelled = true }
   }, [deliveryMethod])
 
-  // ── Пересчёт при смене оплаты ──────────────────────────
+  // ── Пересчёт при смене оплаты (debounce) ────────────────
   const paymentCalculateTimer = useRef(null)
   useEffect(() => {
     if (!paymentMethod || !deliveryMethod || !cityConfirmed) return
     clearTimeout(paymentCalculateTimer.current)
     paymentCalculateTimer.current = setTimeout(async () => {
       try {
-        const data = {
-          delivery_id: Number(deliveryMethod),
-          pay_system_id: Number(paymentMethod),
-          location: locationCode || undefined,
-          properties: {
-            LOCATION: locationCode || undefined,
-            PHONE: phone.replace(/\D/g, '') || undefined,
-            EMAIL: email || undefined,
-            ADDRESS: deliveryAddress ? `${cityConfirmed}, ${deliveryAddress}` : (cityConfirmed || undefined),
-          },
-        }
-        if (personTypeId) data.person_type_id = personTypeId
-        const res = await calculateCheckout(data)
+        const res = await calculateCheckout(buildCalculatePayload())
         applyCheckoutResponse(res.data, { autoSelectDelivery: false })
       } catch (calcErr) {
         console.error('[CHECKOUT] payment calculateCheckout error:', calcErr?.response?.data || calcErr?.message)
@@ -520,6 +514,25 @@ function Checkout() {
     }, 300)
     return () => clearTimeout(paymentCalculateTimer.current)
   }, [paymentMethod])
+
+  // ── Пересчёт при смене адреса или пункта самовывоза (debounce) ──
+  // Раньше ADDRESS/pickup_point_id попадали на backend только при смене
+  // способа доставки — калькуляция не знала о введённом адресе или
+  // выбранном ПВЗ до самого submit
+  const addressCalculateTimer = useRef(null)
+  useEffect(() => {
+    if (!deliveryMethod || !cityConfirmed) return
+    clearTimeout(addressCalculateTimer.current)
+    addressCalculateTimer.current = setTimeout(async () => {
+      try {
+        const res = await calculateCheckout(buildCalculatePayload())
+        applyCheckoutResponse(res.data, { autoSelectDelivery: false })
+      } catch (calcErr) {
+        console.error('[CHECKOUT] address/pickup calculateCheckout error:', calcErr?.response?.data || calcErr?.message)
+      }
+    }, 500)
+    return () => clearTimeout(addressCalculateTimer.current)
+  }, [deliveryAddress, selectedStore])
 
   // Сброс выбранного магазина при смене способа доставки
   useEffect(() => {
