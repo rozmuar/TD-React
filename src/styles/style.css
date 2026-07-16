@@ -7735,6 +7735,27 @@ p.region-delivery__note {
   justify-content: center;
   padding: 0 4px;
 }
+
+.header__action--cart.is-bumped img {
+  animation: cartIconBump 0.5s ease;
+}
+
+.header__action--cart.is-bumped .cart-count {
+  animation: cartCountBump 0.5s ease;
+}
+
+@keyframes cartIconBump {
+  0% { transform: scale(1) rotate(0); }
+  30% { transform: scale(1.25) rotate(-8deg); }
+  55% { transform: scale(0.95) rotate(4deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+@keyframes cartCountBump {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.4); }
+  100% { transform: scale(1); }
+}
 .header__action--cart {
   position: relative;
 }

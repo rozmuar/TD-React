@@ -3,10 +3,10 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { removeFromCompare, clearCompare } from '../../store/slices/compareSlice'
-import { addToCart } from '../../store/slices/cartSlice'
 import { getProductById } from '../../services/apiClient'
 import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
 import { decodeHtml } from '../../utils/decodeHtml'
+import AddToCartButton from '../../components/AddToCartButton/AddToCartButton'
 
 function Compare() {
   const dispatch = useDispatch()
@@ -71,7 +71,6 @@ function Compare() {
 
   const handleRemove = (id) => dispatch(removeFromCompare(id))
   const handleClear = () => dispatch(clearCompare())
-  const handleAddToCart = (product) => dispatch(addToCart(product))
 
   const formatPrice = (val) => {
     const n = Number(val)
@@ -129,7 +128,7 @@ function Compare() {
                         <span className="compare__product-old">{formatPrice(p.oldPrice)} ₽</span>
                       )}
                     </div>
-                    <button className="compare__product-cart" onClick={() => handleAddToCart(p)}>В корзину</button>
+                    <AddToCartButton product={p} className="compare__product-cart" />
                   </div>
                 ))}
 

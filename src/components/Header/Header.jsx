@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { logout } from '../../store/slices/authSlice'
@@ -17,6 +17,24 @@ function Header() {
   const [authOpen, setAuthOpen] = useState(false)
   const [catalogOpen, setCatalogOpen] = useState(false)
   const [callbackOpen, setCallbackOpen] = useState(false)
+  const [cartBump, setCartBump] = useState(false)
+  const prevCartCount = useRef(cartCount)
+  const cartBumpTimer = useRef(null)
+
+  // Короткая анимация иконки корзины при добавлении товара.
+  // Таймер держим в ref, а не в cleanup эффекта — иначе повторное
+  // изменение cartCount внутри окна анимации (например, откат корзины
+  // при неудачном добавлении) отменяет таймер и bump зависает навсегда
+  useEffect(() => {
+    if (cartCount > prevCartCount.current) {
+      setCartBump(true)
+      clearTimeout(cartBumpTimer.current)
+      cartBumpTimer.current = setTimeout(() => setCartBump(false), 500)
+    }
+    prevCartCount.current = cartCount
+  }, [cartCount])
+
+  useEffect(() => () => clearTimeout(cartBumpTimer.current), [])
 
   // Автоматически открываем модалку авторизации при редиректе с защищённой страницы
   useEffect(() => {
@@ -115,7 +133,7 @@ function Header() {
                   {favoritesCount > 0 && <span className="favorites-count">{favoritesCount}</span>}
                 </Link>
               </li>
-              <li className="header__action header__action--cart">
+              <li className={`header__action header__action--cart${cartBump ? ' is-bumped' : ''}`}>
                 <Link to="/cart/" aria-label="Корзина">
                   <img src="/img/footer/cart.svg" alt="Корзина" />
                   <span>Корзина</span>

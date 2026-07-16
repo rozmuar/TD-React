@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { addToCart } from '../../store/slices/cartSlice'
 import { useSSRData } from '../../context/SSRDataContext'
 import { addToCompare, removeFromCompare } from '../../store/slices/compareSlice'
 import { toggleFavorite } from '../../store/slices/favoritesSlice'
@@ -16,6 +15,7 @@ import PreorderModal from '../../components/PreorderModal/PreorderModal'
 import FindCheaperModal from '../../components/FindCheaperModal/FindCheaperModal'
 import CreditModal from '../../components/CreditModal/CreditModal'
 import JsonLd from '../../components/JsonLd/JsonLd'
+import AddToCartButton from '../../components/AddToCartButton/AddToCartButton'
 import { productSchema, breadcrumbSchema } from '../../utils/jsonLd'
 
 function Product() {
@@ -157,18 +157,14 @@ function Product() {
     }
   }, [productCode, categoryCode])
 
-  const handleAddToCart = () => {
-    if (product) {
-      dispatch(addToCart({
-        id: product.id,
-        name: product.name,
-        code: product.code,
-        section_code: categoryCode,
-        price: parseFloat(product.price),
-        oldPrice: product.oldPrice,
-        image: product.image,
-      }))
-    }
+  const cartProduct = product && {
+    id: product.id,
+    name: product.name,
+    code: product.code,
+    section_code: categoryCode,
+    price: parseFloat(product.price),
+    oldPrice: product.oldPrice,
+    image: product.image,
   }
 
   const handleColorChange = (colorCode) => {
@@ -394,9 +390,9 @@ function Product() {
             <div className="product__actions mobile-hidden">
               {isAvailable ? (
                 <>
-                  <button className="product__btn product__btn--primary" onClick={handleAddToCart}>
+                  <AddToCartButton product={cartProduct} className="product__btn product__btn--primary">
                     Добавить в корзину
-                  </button>
+                  </AddToCartButton>
                   <button className="product__btn product__btn--outline">Купить в 1 клик</button>
                 </>
               ) : (
@@ -518,9 +514,9 @@ function Product() {
         zIndex: 100
       }}>
         {isAvailable ? (
-          <button className="product__btn product__btn--primary" onClick={handleAddToCart} style={{width: '100%'}}>
+          <AddToCartButton product={cartProduct} className="product__btn product__btn--primary" style={{width: '100%'}}>
             Добавить в корзину
-          </button>
+          </AddToCartButton>
         ) : (
           <button className="product__btn product__btn--preorder" onClick={() => setShowPreorder(true)} style={{width: '100%'}}>
             Хочу под заказ

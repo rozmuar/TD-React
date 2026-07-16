@@ -2,7 +2,6 @@ import { useEffect, useState, useRef } from 'react'
 import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import { addToCart } from '../../store/slices/cartSlice'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Pagination } from 'swiper/modules'
 import { getBigBanners, getForYou, getPopularCategories, getHurryToBuy, getNewsForHome } from '../../services/apiClient'
@@ -11,6 +10,7 @@ import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallb
 import { decodeHtml } from '../../utils/decodeHtml'
 import { sanitizeHtml } from '../../utils/sanitizeHtml'
 import { useSSRData } from '../../context/SSRDataContext'
+import AddToCartButton from '../../components/AddToCartButton/AddToCartButton'
 
 function Home() {
   const dispatch = useDispatch()
@@ -94,10 +94,6 @@ function Home() {
       if (root) root.dataset.ready = 'true'
     }
   }, [bannersLoading, dataLoading])
-
-  const handleAddToCart = (product) => {
-    dispatch(addToCart(product))
-  }
 
   // Маппинг кодов категорий на CSS классы
   const categoryClassMap = {
@@ -266,7 +262,7 @@ function Home() {
                           <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
                         </div>
                       </div>
-                      <button className="catalog__main-button" onClick={() => handleAddToCart(product)}>В корзину</button>
+                      <AddToCartButton product={product} className="catalog__main-button" />
                     </div>
                   </SwiperSlide>
                 )
@@ -376,7 +372,7 @@ function Home() {
                       <div className="catalog__main-price">{parseFloat(product.price).toLocaleString()} ₽</div>
                     </div>
                     <Link to={`/catalog/${product.section_code || product.category_code}/${product.code}/`} className="catalog__main-title">{decodeHtml(product.name)}</Link>
-                    <button className="catalog__main-button" onClick={() => handleAddToCart(product)}>В корзину</button>
+                    <AddToCartButton product={product} className="catalog__main-button" />
                   </div>
                 </SwiperSlide>
               ))}

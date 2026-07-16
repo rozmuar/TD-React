@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { memo, useMemo, useState } from 'react'
-import { addToCart } from '../../store/slices/cartSlice'
 import { addToCompare, removeFromCompare } from '../../store/slices/compareSlice'
 import { toggleFavorite } from '../../store/slices/favoritesSlice'
 import ImageWithFallback from '../ImageWithFallback/ImageWithFallback'
 import { decodeHtml } from '../../utils/decodeHtml'
 import PreorderModal from '../PreorderModal/PreorderModal'
+import AddToCartButton from '../AddToCartButton/AddToCartButton'
 
 function ProductCard({ product }) {
   const dispatch = useDispatch()
@@ -15,10 +15,6 @@ function ProductCard({ product }) {
   const favoriteItems = useSelector((s) => s.favorites.items)
   const isInFavorites = favoriteItems.some((i) => i.id === product.id)
   const [showPreorder, setShowPreorder] = useState(false)
-
-  const handleAddToCart = () => {
-    dispatch(addToCart(product))
-  }
 
   const handleToggleCompare = () => {
     if (isInCompare) {
@@ -80,7 +76,7 @@ function ProductCard({ product }) {
               <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
             </div>
           </div>
-          <button className="catalog__main-button" onClick={handleAddToCart}>В корзину</button>
+          <AddToCartButton product={product} className="catalog__main-button" />
         </>
       ) : (
         <>
