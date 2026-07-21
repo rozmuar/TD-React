@@ -28,9 +28,11 @@ function PersonalOrders() {
 
         if (ordersRes.status === 'fulfilled') {
           const raw = ordersRes.value.data
-          const msg = raw?.message
+          const msg = raw?.message ?? raw
           let list = []
-          const source = msg?.data && typeof msg.data === 'object' && !Array.isArray(msg.data) ? msg.data : msg
+          // msg.data — самый частый формат обёртки (массив или объект),
+          // раньше массив тут явно исключался и парсинг падал на "нет заказов"
+          const source = msg?.data ?? msg
           if (Array.isArray(source)) {
             list = source
           } else if (source && typeof source === 'object') {
@@ -38,7 +40,9 @@ function PersonalOrders() {
             else if (Array.isArray(source.list)) list = source.list
             else {
               const entries = Object.entries(source)
-              if (entries.length > 0 && typeof entries[0][1] === 'object' && entries[0][1] !== null) {
+              const looksLikeOrderMap = entries.length > 0
+                && entries.every(([, val]) => val && typeof val === 'object' && !Array.isArray(val))
+              if (looksLikeOrderMap) {
                 list = entries.map(([key, val]) => ({ ...val, ID: val.ID || val.id || key }))
               }
             }
