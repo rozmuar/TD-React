@@ -9,6 +9,12 @@ import {
 } from '../../services/apiClient'
 
 const LOCAL_KEY = 'cart_items'
+const SITE_ORIGIN = 'https://topdisc.ru'
+
+function resolveImage(url) {
+  if (!url) return ''
+  return url.startsWith('http') ? url : SITE_ORIGIN + url
+}
 
 function loadCart() {
   if (typeof window === 'undefined') return { items: [], totalAmount: 0, totalCount: 0, serverTotalPrice: null }
@@ -50,7 +56,7 @@ function mapServerItem(item) {
     price: Number(item.price || item.PRICE || 0),
     oldPrice: item.old_price ?? item.oldPrice ?? item.OLD_PRICE ?? null,
     quantity: Number(item.quantity || item.QUANTITY || 1),
-    image: item.image || item.PREVIEW_PICTURE || '',
+    image: resolveImage(item.imageUrl || item.image || item.PREVIEW_PICTURE || ''),
     selected: true,
   }
 }
