@@ -7,12 +7,18 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const isProduction = process.env.NODE_ENV === 'production'
 const PORT = process.env.PORT || 3000
 
+console.log('🚀 Starting server...')
+console.log('📦 NODE_ENV:', process.env.NODE_ENV)
+console.log('🏭 isProduction:', isProduction)
+console.log('📁 __dirname:', __dirname)
+
 async function createServer() {
   const app = express()
 
   let vite
 
   if (!isProduction) {
+    console.log('🔧 Starting in DEVELOPMENT mode with Vite')
     // Dev: Vite как middleware — hot reload, трансформации
     const { createServer: createViteServer } = await import('vite')
     vite = await createViteServer({
@@ -21,9 +27,16 @@ async function createServer() {
     })
     app.use(vite.middlewares)
   } else {
+    console.log('⚡ Starting in PRODUCTION mode with built files')
+    const distServerPath = path.join(__dirname, 'dist/server')
+    const distClientPath = path.join(__dirname, 'dist/client')
+    console.log('📂 Server dist path:', distServerPath)
+    console.log('📂 Client dist path:', distClientPath)
+    console.log('📄 Server entry exists:', fs.existsSync(path.join(distServerPath, 'entry-server.js')))
+    console.log('📄 Client index exists:', fs.existsSync(path.join(distClientPath, 'index.html')))
     // Prod: статика из dist/client (CSS, JS, картинки и т.д.)
     app.use(
-      express.static(path.join(__dirname, 'dist/client'), { index: false })
+      express.static(distClientPath, { index: false })
     )
   }
 
@@ -40,6 +53,7 @@ async function createServer() {
       let template, render
 
       if (!isProduction) {
+        console.log('🔧 DEV: Loading entry-server via vite.ssrLoadModule')
         template = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf-8')
         template = await vite.transformIndexHtml(url, template)
         // Для авторизованных страниц — отдаём шелл без SSR
@@ -49,6 +63,9 @@ async function createServer() {
         }
         render = (await vite.ssrLoadModule('/src/entry-server.jsx')).render
       } else {
+        console.log('⚡ PROD: Loading entry-server from dist/server')
+        const serverEntryPath = path.join(__dirname, 'dist/server/entry-server.js')
+        console.log('📄 Importing from:', serverEntryPath)
         template = fs.readFileSync(
           path.join(__dirname, 'dist/client/index.html'),
           'utf-8'
@@ -59,9 +76,7 @@ async function createServer() {
           return res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).end(shell)
         }
         // Динамический импорт собранного SSR-бандла
-        const serverEntry = await import(
-          path.join(__dirname, 'dist/server/entry-server.js')
-        )
+        const serverEntry = await import(serverEntryPath)
         render = serverEntry.render
       }
 
