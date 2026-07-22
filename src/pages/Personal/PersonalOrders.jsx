@@ -23,7 +23,8 @@ function PersonalOrders() {
         if (cancelled) return
 
         if (statusesRes.status === 'fulfilled') {
-          setStatuses(statusesRes.value.data?.message || {})
+          const statusesRaw = statusesRes.value.data
+          setStatuses((statusesRaw?.message ?? statusesRaw) || {})
         }
 
         if (ordersRes.status === 'fulfilled') {
@@ -72,11 +73,12 @@ function PersonalOrders() {
     setDetailLoading(orderId)
     try {
       const res = await getOrderById(orderId)
-      const msg = res.data?.message
-      const data = msg?.data && typeof msg.data === 'object' ? msg.data : msg
+      const raw = res.data
+      const msg = raw?.message ?? raw
+      const data = msg?.data ?? msg
       setDetails((prev) => ({ ...prev, [orderId]: data || {} }))
     } catch (err) {
-
+      console.error('[ORDERS] getOrderById error:', err?.response?.data || err?.message)
     }
     setDetailLoading(null)
   }
@@ -99,13 +101,14 @@ function PersonalOrders() {
             const id = order.ID || order.id
             const isOpen = expandedId === id
             const detail = details[id]
-            const statusName = getStatusName(order.STATUS_ID)
+            const statusId = order.STATUS_ID || order.status_id
+            const statusName = getStatusName(statusId)
 
             return (
               <div className={'order-card' + (isOpen ? ' order-card--open' : '')} key={id}>
                 <button className="order-card__header" onClick={() => toggleOrder(id)}>
                   <span className="order-card__number">Заказ №{order.ACCOUNT_NUMBER || id}</span>
-                  <span className={'order-card__badge order-card__badge--' + (order.STATUS_ID || 'default')}>
+                  <span className={'order-card__badge order-card__badge--' + (statusId || 'default')}>
                     {statusName}
                   </span>
                   <span className="order-card__price">{formatPrice(order.PRICE || order.price)} ₽</span>
@@ -161,7 +164,7 @@ function findProp(properties, ...codes) {
 function OrderDetail({ data, order, statuses }) {
   if (!data || typeof data !== 'object') return null
 
-  const basket = extractArray(data, 'basket', 'BASKET', 'items', 'ITEMS', 'basketItems')
+  const basket = extractArray(data, 'basket_items', 'basket', 'BASKET', 'items', 'ITEMS', 'basketItems')
   const shipments = extractArray(data, 'shipment', 'SHIPMENT', 'shipments', 'delivery')
   const payments = extractArray(data, 'payment', 'PAYMENT', 'payments')
   const properties = extractArray(data, 'properties', 'PROPERTIES', 'props', 'orderProperties')
@@ -180,18 +183,18 @@ function OrderDetail({ data, order, statuses }) {
       {basket.length > 0 && (
         <div className="order-card__products">
           {basket.map((item, i) => {
-            const price = Number(item.PRICE || item.price || 0)
-            const basePrice = Number(item.BASE_PRICE || 0)
-            const qty = Number(item.QUANTITY || item.quantity || 1)
-            const img = item.PICTURE_URL || item.DETAIL_PICTURE || item.PREVIEW_PICTURE || ''
+            const price = Number(item.price || item.PRICE || 0)
+            const basePrice = Number(item.base_price || item.BASE_PRICE || 0)
+            const qty = Number(item.quantity || item.QUANTITY || 1)
+            const img = item.picture_url || item.PICTURE_URL || item.DETAIL_PICTURE || item.PREVIEW_PICTURE || ''
             const imgSrc = img && !img.startsWith('http') ? `https://topdisc.ru${img}` : img
             // Разрешаем только относительные пути и URL с нашего домена
-            const rawUrl = item.DETAIL_PAGE_URL || ''
+            const rawUrl = item.detail_page_url || item.DETAIL_PAGE_URL || ''
             const productUrl = rawUrl && !/^\s*(javascript:|data:)/i.test(rawUrl) ? rawUrl : ''
-            const name = item.NAME || item.name || item.PRODUCT_NAME || '—'
+            const name = item.name || item.NAME || item.PRODUCT_NAME || '—'
 
             return (
-              <div className="order-card__product" key={item.ID || item.id || i}>
+              <div className="order-card__product" key={item.id || item.ID || i}>
                 <div className="order-card__product-img">
                   {imgSrc ? (
                     <ImageWithFallback src={imgSrc} alt={name} />
