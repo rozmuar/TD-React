@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getOrders, getOrderById, getSaleStatuses } from '../../services/apiClient'
+import { getOrders, getOrderById, getSaleStatuses, getProductById } from '../../services/apiClient'
 import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
 
 function PersonalOrders() {
@@ -76,6 +76,25 @@ function PersonalOrders() {
       const raw = res.data
       const msg = raw?.message ?? raw
       const data = msg?.data ?? msg
+
+      // API заказа не отдаёт картинки товаров — подтягиваем их
+      // отдельно из каталога по product_id (это и есть item.id)
+      if (Array.isArray(data?.basket_items) && data.basket_items.length) {
+        data.basket_items = await Promise.all(
+          data.basket_items.map(async (item) => {
+            const productId = item.id || item.ID
+            if (!productId) return item
+            try {
+              const productRes = await getProductById(productId)
+              const image = productRes.data?.result?.image
+              return image ? { ...item, image } : item
+            } catch {
+              return item
+            }
+          })
+        )
+      }
+
       setDetails((prev) => ({ ...prev, [orderId]: data || {} }))
     } catch (err) {
       console.error('[ORDERS] getOrderById error:', err?.response?.data || err?.message)
@@ -186,7 +205,7 @@ function OrderDetail({ data, order, statuses }) {
             const price = Number(item.price || item.PRICE || 0)
             const basePrice = Number(item.base_price || item.BASE_PRICE || 0)
             const qty = Number(item.quantity || item.QUANTITY || 1)
-            const img = item.picture_url || item.PICTURE_URL || item.DETAIL_PICTURE || item.PREVIEW_PICTURE || ''
+            const img = item.image || item.picture_url || item.PICTURE_URL || item.DETAIL_PICTURE || item.PREVIEW_PICTURE || ''
             const imgSrc = img && !img.startsWith('http') ? `https://topdisc.ru${img}` : img
             // Разрешаем только относительные пути и URL с нашего домена
             const rawUrl = item.detail_page_url || item.DETAIL_PAGE_URL || ''
