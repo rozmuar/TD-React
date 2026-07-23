@@ -29,6 +29,39 @@ function getPropValue(properties, ...codes) {
   return prop?.value || ''
 }
 
+// Лучшая попытка разложить сохранённую строку адреса обратно по полям формы.
+// Надёжно это сделать нельзя (адрес хранится одной строкой без разметки),
+// но для адресов, собранных этой же формой ("Город, Улица, д. X, кв. Y"),
+// разбор получается точным
+function parseAddressLine(addressLine) {
+  const empty = { city: '', street: '', house: '', apartment: '' }
+  if (!addressLine) return empty
+
+  const parts = addressLine.split(',').map((s) => s.trim()).filter(Boolean)
+  let house = ''
+  let apartment = ''
+  const rest = []
+
+  parts.forEach((part) => {
+    const houseMatch = !house && part.match(/^д(?:ом)?\.?\s*(.+)/i)
+    const aptMatch = !apartment && part.match(/^(?:кв(?:артира)?|апарт(?:амент)?)\.?\s*(.+)/i)
+    if (houseMatch) {
+      house = houseMatch[1].trim()
+    } else if (aptMatch) {
+      apartment = aptMatch[1].trim()
+    } else {
+      rest.push(part)
+    }
+  })
+
+  return {
+    city: rest.shift() || '',
+    street: rest.join(', '),
+    house,
+    apartment,
+  }
+}
+
 async function suggestAddress(query) {
   if (!query || query.length < 3) return []
   try {
@@ -184,6 +217,9 @@ export default function AddressManager() {
     dispatch(action)
       .unwrap()
       .then(() => {
+        // Ответ add/update содержит только {id, message} без properties —
+        // локально мержить нечего, перезапрашиваем список целиком с сервера
+        dispatch(fetchUserAddresses())
         resetForm()
       })
       .catch(() => {})
@@ -191,15 +227,14 @@ export default function AddressManager() {
   }
 
   const handleEdit = (address) => {
-    // ADDRESS хранится одной строкой (не city/street/house по отдельности) —
-    // надёжно разложить обратно нельзя, показываем как есть в поле "улица"
     const addressLine = getPropValue(address.properties, 'ADDRESS')
+    const parsed = parseAddressLine(addressLine)
     setEditingId(address.id)
     setFormData({
-      city: '',
-      street: addressLine,
-      house: '',
-      apartment: '',
+      city: parsed.city,
+      street: parsed.street,
+      house: parsed.house,
+      apartment: parsed.apartment,
       zip: '',
     })
     setShowForm(true)
