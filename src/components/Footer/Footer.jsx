@@ -63,7 +63,6 @@ function Footer() {
                         <li><Link to="/brands/">Бренды</Link></li>
                         <li><Link to="/suppliers/">Поставщикам</Link></li>
                         <li><Link to="/opt/">Оптовикам</Link></li>
-                        <li><Link to="/vacancy/">Вакансии</Link></li>
                         <li><Link to="/contacts/">Контакты</Link></li>
                       </ul>
                     </nav>
@@ -73,12 +72,13 @@ function Footer() {
                     <nav>
                       <ul>
                         <li><Link to="/company/news/">Статьи</Link></li>
-                        <li><Link to="/club-card/">Клубная карта</Link></li>
+                        <li><Link to="/bonus/">Бонусная программа</Link></li>
                         <li><Link to="/dostavka/">Доставка</Link></li>
                         <li><Link to="/payment/">Оплата</Link></li>
                         <li><Link to="/obmen-i-vozvraty/">Обмен и возврат</Link></li>
                         <li><Link to="/tradein/">Трейд-ин</Link></li>
-                        <li><Link to="/low-price/">Гарантия низкой цены</Link></li>
+                        <li><Link to="/garantiya-nizkoy-tseny/">Гарантия низкой цены</Link></li>
+                        <li><Link to="/platnyy-remont/">Платный ремонт</Link></li>
                       </ul>
                     </nav>
                   </div>

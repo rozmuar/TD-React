@@ -199,13 +199,11 @@ async function fetchNewsDetail(newsCode) {
 // Карта: URL-путь → символьный код в Bitrix (app_mobile.posts.json?code=...)
 const INFO_CODES = {
   '/suppliers/': 'postavshchikam',
-  '/opt/': 'optovikam',
-  '/vacancy/': 'vakansii',
-  '/club-card/': 'klub-karta',
-  '/obmen-i-vozvraty/': 'obmen-i-vozvraty',
+  '/opt/': 'opt',
+  '/obmen-i-vozvraty/': 'vozvrat-i-obmen',
   '/tradein/': 'treyd-in',
-  '/low-price/': 'garantiya-nizkoj-ceny',
-  '/pravila/': 'pravila',
+  '/garantiya-nizkoy-tseny/': 'garantiya-nizkoy-tseny',
+  '/pravila/': 'pravila-prodazhi',
   '/politika-konfidentsialnosti/': 'politika-konfidentsialnosti',
   '/dogovor-oferty/': 'dogovor-oferty',
 }

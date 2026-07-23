@@ -1,7 +1,7 @@
 import InfoPage from './InfoPage'
 
 function Rules() {
-  return <InfoPage title="Правила продажи" bitrixCode="pravila" />
+  return <InfoPage title="Правила продажи" bitrixCode="pravila-prodazhi" />
 }
 
 export default Rules

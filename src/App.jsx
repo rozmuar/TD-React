@@ -24,11 +24,11 @@ import Delivery from './pages/Info/Delivery'
 import Payment from './pages/Info/Payment'
 import Suppliers from './pages/Info/Suppliers'
 import Wholesale from './pages/Info/Wholesale'
-import Vacancy from './pages/Info/Vacancy'
-import ClubCard from './pages/Info/ClubCard'
+import Bonus from './pages/Info/Bonus'
 import Exchange from './pages/Info/Exchange'
 import TradeIn from './pages/Info/TradeIn'
 import LowPrice from './pages/Info/LowPrice'
+import PlatnyyRemont from './pages/Info/PlatnyyRemont'
 import Rules from './pages/Info/Rules'
 import Privacy from './pages/Info/Privacy'
 import Oferta from './pages/Info/Oferta'
@@ -66,13 +66,13 @@ function App({ helmetContext }) {
           <Route path="contacts/" element={<Contacts />} />
           <Route path="suppliers/" element={<Suppliers />} />
           <Route path="opt/" element={<Wholesale />} />
-          <Route path="vacancy/" element={<Vacancy />} />
           <Route path="dostavka/" element={<Delivery />} />
           <Route path="payment/" element={<Payment />} />
-          <Route path="club-card/" element={<ClubCard />} />
+          <Route path="bonus/" element={<Bonus />} />
           <Route path="obmen-i-vozvraty/" element={<Exchange />} />
           <Route path="tradein/" element={<TradeIn />} />
-          <Route path="low-price/" element={<LowPrice />} />
+          <Route path="garantiya-nizkoy-tseny/" element={<LowPrice />} />
+          <Route path="platnyy-remont/" element={<PlatnyyRemont />} />
           <Route path="pravila/" element={<Rules />} />
           <Route path="politika-konfidentsialnosti/" element={<Privacy />} />
           <Route path="dogovor-oferty/" element={<Oferta />} />
