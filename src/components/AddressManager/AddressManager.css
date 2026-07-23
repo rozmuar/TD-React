@@ -12,7 +12,7 @@
 }
 
 .address-manager__header h2 {
-  font-size: 28px;
+  font-size: 20px;
   font-weight: 600;
   margin: 0;
 }
@@ -54,7 +54,7 @@
 /* Форма добавления/редактирования */
 .address-form {
   background: #f8f9fa;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 24px;
   margin-bottom: 30px;
 }
@@ -89,20 +89,21 @@
 }
 
 .form-group .required {
-  color: #e74c3c;
+  color: #e53935;
 }
 
 .form-group input {
-  padding: 10px 12px;
+  padding: 10px 14px;
   border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: inherit;
   transition: border-color 0.2s;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: var(--accent);
 }
 
 .address-form__actions {
@@ -129,7 +130,7 @@
   align-items: center;
   padding: 20px;
   border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  border-radius: 12px;
   background: #fff;
   transition: box-shadow 0.2s;
 }
@@ -167,13 +168,14 @@
 
 /* Кнопки */
 .btn {
-  padding: 10px 20px;
+  padding: 12px 24px;
   border: none;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 500;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background 0.2s, color 0.2s;
 }
 
 .btn:disabled {
@@ -182,45 +184,45 @@
 }
 
 .btn-primary {
-  background: #007bff;
+  background: var(--accent);
   color: #fff;
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: #0056b3;
+  background: var(--accent-hover);
 }
 
 .btn-secondary {
-  background: #6c757d;
-  color: #fff;
+  background: #f0f0f0;
+  color: #333;
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #545b62;
+  background: #e4e4e4;
 }
 
 .btn-outline {
   background: #fff;
-  color: #007bff;
-  border: 1px solid #007bff;
+  color: var(--accent);
+  border: 1px solid var(--accent);
 }
 
 .btn-outline:hover:not(:disabled) {
-  background: #007bff;
+  background: var(--accent);
   color: #fff;
 }
 
 .btn-danger {
-  background: #dc3545;
+  background: #e53935;
   color: #fff;
 }
 
 .btn-danger:hover:not(:disabled) {
-  background: #c82333;
+  background: #c62828;
 }
 
 .btn-sm {
-  padding: 6px 12px;
+  padding: 8px 16px;
   font-size: 13px;
 }
 
@@ -263,17 +265,17 @@
 
 .address-search__input {
   width: 100%;
-  padding: 10px 12px;
+  padding: 10px 14px;
   border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: inherit;
   transition: border-color 0.2s;
 }
 
 .address-search__input:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+  border-color: var(--accent);
 }
 
 .address-suggestions {
@@ -284,7 +286,7 @@
   background: white;
   border: 1px solid #ddd;
   border-top: none;
-  border-radius: 0 0 6px 6px;
+  border-radius: 0 0 8px 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   max-height: 300px;
   overflow-y: auto;
@@ -293,7 +295,7 @@
 }
 
 .address-suggestion {
-  padding: 10px 12px;
+  padding: 10px 14px;
   cursor: pointer;
   font-size: 14px;
   border-bottom: 1px solid #f0f0f0;
@@ -312,5 +314,5 @@
   display: block;
   margin-top: 6px;
   font-size: 12px;
-  color: #6c757d;
+  color: #999;
 }
