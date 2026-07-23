@@ -7,8 +7,13 @@ import {
   removeAddress,
   clearError,
 } from '../../store/slices/userSlice'
+import { getLocationCode } from '../../services/apiClient'
 import ConfirmDialog from '../ConfirmDialog/ConfirmDialog'
 import './AddressManager.css'
+
+// person_type_id=5 — «Физическое лицо», единственный тип плательщика,
+// который реально используется на этом сайте (см. checkout)
+const PERSON_TYPE_ID = 5
 
 // DaData API для подсказок адресов
 const DADATA_TOKEN = import.meta.env.VITE_DADATA_TOKEN
@@ -55,6 +60,7 @@ export default function AddressManager() {
   const [editingId, setEditingId] = useState(null)
   const [formError, setFormError] = useState('')
   const [deleteTargetId, setDeleteTargetId] = useState(null)
+  const [submitting, setSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     city: '',
     street: '',
@@ -132,39 +138,69 @@ export default function AddressManager() {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setFormError('')
-    if (!formData.city || !formData.street || !formData.house) {
-      setFormError('Заполните обязательные поля: город, улица, дом')
+
+    const addressLine = [
+      formData.city,
+      formData.street,
+      formData.house && `д. ${formData.house}`,
+      formData.apartment && `кв. ${formData.apartment}`,
+    ].filter(Boolean).join(', ')
+
+    // Бэкенд хранит адрес одной строкой (ADDRESS), поэтому при редактировании
+    // старой записи разложить обратно на city/street/house гарантированно
+    // нельзя — проверяем только итоговую строку, а не каждое поле по отдельности
+    if (!addressLine.trim()) {
+      setFormError('Укажите адрес')
       return
     }
 
-    if (editingId) {
-      dispatch(editAddress({ id: editingId, data: formData }))
-        .unwrap()
-        .then(() => {
-          resetForm()
-        })
-        .catch(() => {})
-    } else {
-      dispatch(createAddress(formData))
-        .unwrap()
-        .then(() => {
-          resetForm()
-        })
-        .catch(() => {})
+    setSubmitting(true)
+
+    // Бэкенд (/user/addresses) хранит адрес как профиль свойств заказа
+    // Bitrix — не плоские city/street/house, а {name, person_type_id,
+    // properties: {ADDRESS, LOCATION}}. LOCATION — код города, как в чекауте
+    let locationCode = ''
+    try {
+      const locRes = await getLocationCode(formData.city || formData.street)
+      locationCode = locRes.data?.data?.location_code || ''
+    } catch {}
+
+    const payload = {
+      name: addressLine || 'Адрес',
+      person_type_id: PERSON_TYPE_ID,
+      properties: {
+        ADDRESS: addressLine,
+        ...(locationCode ? { LOCATION: locationCode } : {}),
+      },
     }
+
+    const action = editingId
+      ? editAddress({ id: editingId, data: payload })
+      : createAddress(payload)
+
+    dispatch(action)
+      .unwrap()
+      .then(() => {
+        resetForm()
+      })
+      .catch(() => {})
+      .finally(() => setSubmitting(false))
   }
 
   const handleEdit = (address) => {
+    // ADDRESS хранится одной строкой (не city/street/house по отдельности) —
+    // надёжно разложить обратно нельзя, показываем как есть в поле "улица"
+    const addressLine = getPropValue(address.properties, 'ADDRESS')
     setEditingId(address.id)
     setFormData({
-      city: address.city || '',
-      street: address.street || '',
-      house: address.house || '',
-      apartment: address.apartment || '',
-      zip: address.zip || '',
+      city: '',
+      street: addressLine,
+      house: '',
+      apartment: '',
+      zip: '',
     })
     setShowForm(true)
   }
@@ -255,30 +291,6 @@ export default function AddressManager() {
                 value={formData.city}
                 onChange={handleInputChange}
                 placeholder="Москва"
-                required
-              />
-            </div>
-            <div className="form-group">
-              <label>Индекс</label>
-              <input
-                type="text"
-                name="zip"
-                value={formData.zip}
-                onChange={handleInputChange}
-                placeholder="101000"
-              />
-            </div>
-            <div className="form-group form-group--full">
-              <label>
-                Улица <span className="required">*</span>
-              </label>
-              <input
-                type="text"
-                name="street"
-                value={formData.street}
-                onChange={handleInputChange}
-                placeholder="Москва"
-                required
               />
             </div>
             <div className="form-group">
@@ -301,7 +313,6 @@ export default function AddressManager() {
                 value={formData.street}
                 onChange={handleInputChange}
                 placeholder="ул. Пример"
-                required
               />
             </div>
             <div className="form-group">
@@ -314,7 +325,6 @@ export default function AddressManager() {
                 value={formData.house}
                 onChange={handleInputChange}
                 placeholder="1"
-                required
               />
             </div>
             <div className="form-group">
@@ -330,14 +340,14 @@ export default function AddressManager() {
           </div>
           {formError && <p className="address-form__error">{formError}</p>}
           <div className="address-form__actions">
-            <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? 'Сохранение...' : 'Сохранить'}
+            <button type="submit" className="btn btn-primary" disabled={loading || submitting}>
+              {loading || submitting ? 'Сохранение...' : 'Сохранить'}
             </button>
             <button
               type="button"
               className="btn btn-secondary"
               onClick={resetForm}
-              disabled={loading}
+              disabled={loading || submitting}
             >
               Отмена
             </button>
