@@ -190,12 +190,16 @@ function Checkout() {
   // Обработчик выбора сохранённого адреса — заполняет город и адрес
   // доставки целиком, чтобы ускорить оформление для вернувшегося покупателя.
   // Адрес хранится одной строкой в properties (ADDRESS) — город это первый
-  // сегмент до запятой, остальное — адрес доставки
+  // сегмент до запятой, остальное — адрес доставки. В отличие от DaData
+  // (которая отдаёт чистое "Пенза"), в сохранённом адресе первый сегмент
+  // может содержать префикс "г./с./пос." — /sale/location/code с таким
+  // префиксом код города вообще не находит, поэтому его нужно срезать
   const handleSelectAddress = (address) => {
     setSelectedAddressId(address.id)
     const addressLine = getPropValue(address.properties, 'ADDRESS')
     if (addressLine) {
-      const [city, ...rest] = addressLine.split(',').map((s) => s.trim())
+      const [rawCity, ...rest] = addressLine.split(',').map((s) => s.trim())
+      const city = rawCity?.replace(/^(г|гор|город|с|село|пос|посёлок|поселок|д|дер|деревня)\.?\s+/i, '').trim()
       if (city) {
         setCityInput(city)
         setCityConfirmed(city)
@@ -822,7 +826,11 @@ function Checkout() {
                       {userAddresses.map((addr) => {
                         const addrLine = getPropValue(addr.properties, 'ADDRESS')
                         const isDefault = String(getDefaultAddressId()) === String(addr.id)
-                        const label = [addr.name, addrLine].filter(Boolean).join(' — ')
+                        // name профиля часто совпадает с адресом (так создаётся
+                        // через форму) — не дублируем в одной строке
+                        const label = addrLine && addrLine !== addr.name
+                          ? `${addr.name} — ${addrLine}`
+                          : (addr.name || addrLine)
                         return (
                           <option key={addr.id} value={addr.id}>
                             {label}{isDefault ? ' (по умолчанию)' : ''}
