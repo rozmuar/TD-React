@@ -810,35 +810,26 @@ function Checkout() {
                         Управление адресами
                       </Link>
                     </div>
-                    <div className="checkout__saved-addresses">
+                    <select
+                      className="checkout__saved-address-select"
+                      value={selectedAddressId ?? ''}
+                      onChange={(e) => {
+                        const addr = userAddresses.find((a) => String(a.id) === e.target.value)
+                        if (addr) handleSelectAddress(addr)
+                      }}
+                    >
+                      <option value="" disabled>Выберите адрес</option>
                       {userAddresses.map((addr) => {
                         const addrLine = getPropValue(addr.properties, 'ADDRESS')
                         const isDefault = String(getDefaultAddressId()) === String(addr.id)
+                        const label = [addr.name, addrLine].filter(Boolean).join(' — ')
                         return (
-                        <div
-                          key={addr.id}
-                          className={`checkout__saved-address${selectedAddressId === addr.id ? ' is-selected' : ''}`}
-                          onClick={() => handleSelectAddress(addr)}
-                        >
-                          <div className="checkout__saved-address-radio">
-                            <input
-                              type="radio"
-                              name="saved_address"
-                              checked={selectedAddressId === addr.id}
-                              onChange={() => handleSelectAddress(addr)}
-                            />
-                          </div>
-                          <div className="checkout__saved-address-content">
-                            <div className="checkout__saved-address-city">
-                              {addr.name}
-                              {isDefault && <span className="checkout__saved-address-badge">По умолчанию</span>}
-                            </div>
-                            <div className="checkout__saved-address-details">{addrLine || '—'}</div>
-                          </div>
-                        </div>
+                          <option key={addr.id} value={addr.id}>
+                            {label}{isDefault ? ' (по умолчанию)' : ''}
+                          </option>
                         )
                       })}
-                    </div>
+                    </select>
                   </div>
                 )}
 

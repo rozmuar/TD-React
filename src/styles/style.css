@@ -9142,76 +9142,27 @@ a.order-card__product-name:hover {
   opacity: 0.8;
 }
 
-.checkout__saved-addresses {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.checkout__saved-address {
-  display: flex;
-  gap: 12px;
-  padding: 16px;
-  border: 2px solid #e8e8e8;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.checkout__saved-address:hover {
-  border-color: #04B31B;
-  background-color: #f8fff9;
-}
-
-.checkout__saved-address.is-selected {
-  border-color: #04B31B;
-  background-color: #f0fff1;
-}
-
-.checkout__saved-address-radio {
-  display: flex;
-  align-items: flex-start;
-  padding-top: 2px;
-}
-
-.checkout__saved-address-radio input[type="radio"] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-}
-
-.checkout__saved-address-content {
-  flex: 1;
-}
-
-.checkout__saved-address-city {
-  font-size: 15px;
-  font-weight: 600;
-  color: #222;
-  margin-bottom: 4px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.checkout__saved-address-badge {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--accent);
-  background: rgba(68, 189, 49, 0.1);
-  border-radius: 6px;
-  padding: 2px 8px;
-}
-
-.checkout__saved-address-details {
+.checkout__saved-address-select {
+  width: 100%;
+  padding: 12px 36px 12px 14px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
   font-size: 14px;
-  color: #555;
-  margin-bottom: 2px;
+  font-family: inherit;
+  background-color: #fff;
+  color: #333;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' fill='none' stroke='%23999' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  cursor: pointer;
+  transition: border-color 0.2s;
 }
 
-.checkout__saved-address-zip {
-  font-size: 13px;
-  color: #999;
+.checkout__saved-address-select:focus {
+  outline: none;
+  border-color: var(--accent);
 }
 
 /* ===================== ORDER SUCCESS PAGE ===================== */
