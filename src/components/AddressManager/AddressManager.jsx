@@ -13,6 +13,16 @@ import './AddressManager.css'
 const DADATA_TOKEN = import.meta.env.VITE_DADATA_TOKEN
 const DADATA_URL = 'https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address'
 
+// Профиль адреса приходит с бэкенда как properties: [{id, code, name, value}]
+// (свойства заказа Bitrix, привязанные к person_type_id), а не плоские
+// city/street/house — достаём значение по коду свойства
+function getPropValue(properties, ...codes) {
+  if (!Array.isArray(properties)) return ''
+  const upperCodes = codes.map((c) => c.toUpperCase())
+  const prop = properties.find((p) => upperCodes.includes((p.code || '').toUpperCase()))
+  return prop?.value || ''
+}
+
 async function suggestAddress(query) {
   if (!query || query.length < 3) return []
   try {
@@ -334,16 +344,16 @@ export default function AddressManager() {
               У вас пока нет сохранённых адресов
             </div>
           ) : (
-            addresses.map((address) => (
+            addresses.map((address) => {
+              const addressLine = getPropValue(address.properties, 'ADDRESS')
+              const phone = getPropValue(address.properties, 'PHONE', 'Phone')
+              return (
               <div key={address.id} className="address-card">
                 <div className="address-card__content">
-                  <div className="address-card__city">{address.city}</div>
-                  <div className="address-card__details">
-                    {address.street}, д. {address.house}
-                    {address.apartment && `, кв. ${address.apartment}`}
-                  </div>
-                  {address.zip && (
-                    <div className="address-card__zip">Индекс: {address.zip}</div>
+                  <div className="address-card__city">{address.name}</div>
+                  <div className="address-card__details">{addressLine || '—'}</div>
+                  {phone && (
+                    <div className="address-card__zip">Телефон: {phone}</div>
                   )}
                 </div>
                 <div className="address-card__actions">
@@ -363,7 +373,8 @@ export default function AddressManager() {
                   </button>
                 </div>
               </div>
-            ))
+              )
+            })
           )}
         </div>
       )}
