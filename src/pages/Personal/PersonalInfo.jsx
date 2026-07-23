@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getUserProfile, updateUserProfile } from '../../services/apiClient'
+import AddressManager from '../../components/AddressManager/AddressManager'
 
 function PersonalInfo() {
   const [profile, setProfile] = useState(null)
@@ -91,7 +92,9 @@ function PersonalInfo() {
         </button>
       </form>
 
+      <hr className="personal-info__divider" />
 
+      <AddressManager />
     </div>
   )
 }
