@@ -23,6 +23,34 @@
   color: #666;
 }
 
+.address-manager__error {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  background: #fdecea;
+  color: #c62828;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+.address-manager__error button {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.address-form__error {
+  color: #c62828;
+  font-size: 13px;
+  margin: -8px 0 16px;
+}
+
 /* Форма добавления/редактирования */
 .address-form {
   background: #f8f9fa;

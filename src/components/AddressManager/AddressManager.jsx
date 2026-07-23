@@ -7,6 +7,7 @@ import {
   removeAddress,
   clearError,
 } from '../../store/slices/userSlice'
+import ConfirmDialog from '../ConfirmDialog/ConfirmDialog'
 import './AddressManager.css'
 
 // DaData API для подсказок адресов
@@ -52,6 +53,8 @@ export default function AddressManager() {
   const { addresses, loading, error } = useSelector((state) => state.user)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState(null)
+  const [formError, setFormError] = useState('')
+  const [deleteTargetId, setDeleteTargetId] = useState(null)
   const [formData, setFormData] = useState({
     city: '',
     street: '',
@@ -71,12 +74,6 @@ export default function AddressManager() {
     dispatch(fetchUserAddresses())
   }, [dispatch])
 
-  useEffect(() => {
-    if (error) {
-      alert(error)
-      dispatch(clearError())
-    }
-  }, [error, dispatch])
 
   // Закрытие подсказок при клике вне
   useEffect(() => {
@@ -137,8 +134,9 @@ export default function AddressManager() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
+    setFormError('')
     if (!formData.city || !formData.street || !formData.house) {
-      alert('Заполните обязательные поля: город, улица, дом')
+      setFormError('Заполните обязательные поля: город, улица, дом')
       return
     }
 
@@ -172,9 +170,12 @@ export default function AddressManager() {
   }
 
   const handleDelete = (id) => {
-    if (confirm('Удалить этот адрес?')) {
-      dispatch(removeAddress(id))
-    }
+    setDeleteTargetId(id)
+  }
+
+  const confirmDelete = () => {
+    dispatch(removeAddress(deleteTargetId))
+    setDeleteTargetId(null)
   }
 
   const resetForm = () => {
@@ -186,6 +187,7 @@ export default function AddressManager() {
       zip: '',
     })
     setEditingId(null)
+    setFormError('')
     setShowForm(false)
   }
 
@@ -202,6 +204,13 @@ export default function AddressManager() {
           </button>
         )}
       </div>
+
+      {error && (
+        <div className="address-manager__error">
+          <span>{error}</span>
+          <button type="button" onClick={() => dispatch(clearError())} aria-label="Закрыть">&times;</button>
+        </div>
+      )}
 
       {showForm && (
         <form className="address-form" onSubmit={handleSubmit}>
@@ -319,6 +328,7 @@ export default function AddressManager() {
               />
             </div>
           </div>
+          {formError && <p className="address-form__error">{formError}</p>}
           <div className="address-form__actions">
             <button type="submit" className="btn btn-primary" disabled={loading}>
               {loading ? 'Сохранение...' : 'Сохранить'}
@@ -377,6 +387,17 @@ export default function AddressManager() {
             })
           )}
         </div>
+      )}
+
+      {deleteTargetId !== null && (
+        <ConfirmDialog
+          title="Удалить адрес?"
+          message="Это действие нельзя отменить."
+          confirmLabel="Удалить"
+          danger
+          onConfirm={confirmDelete}
+          onCancel={() => setDeleteTargetId(null)}
+        />
       )}
     </div>
   )
