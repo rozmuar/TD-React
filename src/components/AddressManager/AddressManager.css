@@ -1,7 +1,7 @@
 .address-manager {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 20px 0;
 }
 
 .address-manager__header {
@@ -139,15 +139,46 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.address-card--default {
+  border-color: var(--accent);
+}
+
 .address-card__content {
   flex: 1;
 }
 
 .address-card__city {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 18px;
   font-weight: 600;
   color: #333;
   margin-bottom: 6px;
+}
+
+.address-card__default-badge {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  background: rgba(68, 189, 49, 0.1);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+
+.address-card__default-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--accent);
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.address-card__default-btn:hover {
+  color: var(--accent-hover);
 }
 
 .address-card__details {

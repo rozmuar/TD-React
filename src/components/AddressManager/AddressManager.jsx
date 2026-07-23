@@ -8,6 +8,8 @@ import {
   clearError,
 } from '../../store/slices/userSlice'
 import { getLocationCode } from '../../services/apiClient'
+import { getPropValue } from '../../utils/addressProperties'
+import { getDefaultAddressId, setDefaultAddressId } from '../../utils/defaultAddress'
 import ConfirmDialog from '../ConfirmDialog/ConfirmDialog'
 import './AddressManager.css'
 
@@ -18,16 +20,6 @@ const PERSON_TYPE_ID = 5
 // DaData API для подсказок адресов
 const DADATA_TOKEN = import.meta.env.VITE_DADATA_TOKEN
 const DADATA_URL = 'https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address'
-
-// Профиль адреса приходит с бэкенда как properties: [{id, code, name, value}]
-// (свойства заказа Bitrix, привязанные к person_type_id), а не плоские
-// city/street/house — достаём значение по коду свойства
-function getPropValue(properties, ...codes) {
-  if (!Array.isArray(properties)) return ''
-  const upperCodes = codes.map((c) => c.toUpperCase())
-  const prop = properties.find((p) => upperCodes.includes((p.code || '').toUpperCase()))
-  return prop?.value || ''
-}
 
 // Лучшая попытка разложить сохранённую строку адреса обратно по полям формы.
 // Надёжно это сделать нельзя (адрес хранится одной строкой без разметки),
@@ -94,6 +86,7 @@ export default function AddressManager() {
   const [formError, setFormError] = useState('')
   const [deleteTargetId, setDeleteTargetId] = useState(null)
   const [submitting, setSubmitting] = useState(false)
+  const [defaultId, setDefaultId] = useState(() => getDefaultAddressId())
   const [formData, setFormData] = useState({
     city: '',
     street: '',
@@ -246,7 +239,16 @@ export default function AddressManager() {
 
   const confirmDelete = () => {
     dispatch(removeAddress(deleteTargetId))
+    if (String(defaultId) === String(deleteTargetId)) {
+      setDefaultAddressId(null)
+      setDefaultId(null)
+    }
     setDeleteTargetId(null)
+  }
+
+  const handleSetDefault = (id) => {
+    setDefaultAddressId(id)
+    setDefaultId(id)
   }
 
   const resetForm = () => {
@@ -402,13 +404,26 @@ export default function AddressManager() {
             addresses.map((address) => {
               const addressLine = getPropValue(address.properties, 'ADDRESS')
               const phone = getPropValue(address.properties, 'PHONE', 'Phone')
+              const isDefault = defaultId !== null && String(defaultId) === String(address.id)
               return (
-              <div key={address.id} className="address-card">
+              <div key={address.id} className={`address-card${isDefault ? ' address-card--default' : ''}`}>
                 <div className="address-card__content">
-                  <div className="address-card__city">{address.name}</div>
+                  <div className="address-card__city">
+                    {address.name}
+                    {isDefault && <span className="address-card__default-badge">По умолчанию</span>}
+                  </div>
                   <div className="address-card__details">{addressLine || '—'}</div>
                   {phone && (
                     <div className="address-card__zip">Телефон: {phone}</div>
+                  )}
+                  {!isDefault && (
+                    <button
+                      type="button"
+                      className="address-card__default-btn"
+                      onClick={() => handleSetDefault(address.id)}
+                    >
+                      Сделать основным
+                    </button>
                   )}
                 </div>
                 <div className="address-card__actions">

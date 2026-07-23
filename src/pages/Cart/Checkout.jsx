@@ -14,6 +14,8 @@ import {
 import { setToken } from '../../store/slices/authSlice'
 import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
 import { decodeHtml } from '../../utils/decodeHtml'
+import { getPropValue } from '../../utils/addressProperties'
+import { getDefaultAddressId } from '../../utils/defaultAddress'
 
 // ── DaData подсказки городов ──────────────────────────────
 const DADATA_TOKEN = import.meta.env.VITE_DADATA_TOKEN
@@ -186,27 +188,31 @@ function Checkout() {
   }, [isAuthenticated, dispatch])
 
   // Обработчик выбора сохранённого адреса — заполняет город и адрес
-  // доставки целиком, чтобы ускорить оформление для вернувшегося покупателя
+  // доставки целиком, чтобы ускорить оформление для вернувшегося покупателя.
+  // Адрес хранится одной строкой в properties (ADDRESS) — город это первый
+  // сегмент до запятой, остальное — адрес доставки
   const handleSelectAddress = (address) => {
     setSelectedAddressId(address.id)
-    if (address.city) {
-      setCityInput(address.city)
-      setCityConfirmed(address.city)
+    const addressLine = getPropValue(address.properties, 'ADDRESS')
+    if (addressLine) {
+      const [city, ...rest] = addressLine.split(',').map((s) => s.trim())
+      if (city) {
+        setCityInput(city)
+        setCityConfirmed(city)
+      }
+      setDeliveryAddress(rest.join(', '))
     }
-    const addrLine = [
-      address.street,
-      address.house && `д. ${address.house}`,
-      address.apartment && `кв. ${address.apartment}`,
-    ].filter(Boolean).join(', ')
-    setDeliveryAddress(addrLine)
   }
 
-  // Автовыбор первого сохранённого адреса сразу после загрузки —
-  // не заставляем повторно выбирать город, если он уже есть в профиле
+  // Автовыбор сохранённого адреса сразу после загрузки — приоритет у адреса
+  // "по умолчанию" (фронтенд-only, бэкенд его не хранит), иначе первый из списка.
+  // Не заставляем повторно выбирать город, если он уже есть в профиле
   useEffect(() => {
     if (!isAuthenticated || !userAddresses.length) return
     if (selectedAddressId || cityConfirmed) return
-    handleSelectAddress(userAddresses[0])
+    const defaultId = getDefaultAddressId()
+    const defaultAddr = defaultId && userAddresses.find((a) => String(a.id) === String(defaultId))
+    handleSelectAddress(defaultAddr || userAddresses[0])
   }, [isAuthenticated, userAddresses])
 
   // ── Автозаполнение из профиля авторизованного пользователя ──
@@ -805,7 +811,10 @@ function Checkout() {
                       </Link>
                     </div>
                     <div className="checkout__saved-addresses">
-                      {userAddresses.map((addr) => (
+                      {userAddresses.map((addr) => {
+                        const addrLine = getPropValue(addr.properties, 'ADDRESS')
+                        const isDefault = String(getDefaultAddressId()) === String(addr.id)
+                        return (
                         <div
                           key={addr.id}
                           className={`checkout__saved-address${selectedAddressId === addr.id ? ' is-selected' : ''}`}
@@ -820,19 +829,15 @@ function Checkout() {
                             />
                           </div>
                           <div className="checkout__saved-address-content">
-                            <div className="checkout__saved-address-city">{addr.city}</div>
-                            <div className="checkout__saved-address-details">
-                              {addr.street}, д. {addr.house}
-                              {addr.apartment && `, кв. ${addr.apartment}`}
+                            <div className="checkout__saved-address-city">
+                              {addr.name}
+                              {isDefault && <span className="checkout__saved-address-badge">По умолчанию</span>}
                             </div>
-                            {addr.zip && (
-                              <div className="checkout__saved-address-zip">
-                                Индекс: {addr.zip}
-                              </div>
-                            )}
+                            <div className="checkout__saved-address-details">{addrLine || '—'}</div>
                           </div>
                         </div>
-                      ))}
+                        )
+                      })}
                     </div>
                   </div>
                 )}
