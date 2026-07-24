@@ -9,6 +9,7 @@ const sidebarLinks = [
   { to: '/dostavka/', label: 'Доставка' },
   { to: '/payment/', label: 'Оплата' },
   { to: '/bonus/', label: 'Бонусная программа' },
+  { to: '/personal-service/', label: 'Персональное обслуживание' },
   { to: '/obmen-i-vozvraty/', label: 'Обмен и возврат' },
   { to: '/tradein/', label: 'Трейд-ин' },
   { to: '/garantiya-nizkoy-tseny/', label: 'Гарантия низкой цены' },

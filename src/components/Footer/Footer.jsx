@@ -73,6 +73,7 @@ function Footer() {
                       <ul>
                         <li><Link to="/company/news/">Статьи</Link></li>
                         <li><Link to="/bonus/">Бонусная программа</Link></li>
+                        <li><Link to="/personal-service/">Персональное обслуживание</Link></li>
                         <li><Link to="/dostavka/">Доставка</Link></li>
                         <li><Link to="/payment/">Оплата</Link></li>
                         <li><Link to="/obmen-i-vozvraty/">Обмен и возврат</Link></li>

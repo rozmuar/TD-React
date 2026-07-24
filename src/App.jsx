@@ -25,6 +25,7 @@ import Payment from './pages/Info/Payment'
 import Suppliers from './pages/Info/Suppliers'
 import Wholesale from './pages/Info/Wholesale'
 import Bonus from './pages/Info/Bonus'
+import PersonalService from './pages/Info/PersonalService'
 import Exchange from './pages/Info/Exchange'
 import TradeIn from './pages/Info/TradeIn'
 import LowPrice from './pages/Info/LowPrice'
@@ -69,6 +70,7 @@ function App({ helmetContext }) {
           <Route path="dostavka/" element={<Delivery />} />
           <Route path="payment/" element={<Payment />} />
           <Route path="bonus/" element={<Bonus />} />
+          <Route path="personal-service/" element={<PersonalService />} />
           <Route path="obmen-i-vozvraty/" element={<Exchange />} />
           <Route path="tradein/" element={<TradeIn />} />
           <Route path="garantiya-nizkoy-tseny/" element={<LowPrice />} />
