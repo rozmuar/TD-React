@@ -47,6 +47,28 @@ function Footer() {
                   КПП <span>580001001</span>
                 </div>
               </div>
+              <div className="footer__stores">
+                <div className="footer__store">
+                  <div className="footer__store-name">TOP DISC Платформа</div>
+                  <div className="footer__store-address">Ставского 4 (Напротив АЗС Роснефть)</div>
+                  <div className="footer__store-time">Ежедневно 9:00–21:00</div>
+                </div>
+                <div className="footer__store">
+                  <div className="footer__store-name">TOP DISC Смарт</div>
+                  <div className="footer__store-address">Проспект Победы 124 (Универсам №173 со стороны ТРЦ «Квадрат»)</div>
+                  <div className="footer__store-time">Ежедневно 9:00–20:00</div>
+                </div>
+                <div className="footer__store">
+                  <div className="footer__store-name">TOP DISC Смарт Мини</div>
+                  <div className="footer__store-address">Проспект Строителей 1В (ТЦ «Коллаж», 1 этаж)</div>
+                  <div className="footer__store-time">Ежедневно 10:00–22:00</div>
+                </div>
+                <div className="footer__store">
+                  <div className="footer__store-name">TOP DISC Смарт Мини</div>
+                  <div className="footer__store-address">ул. Мира 60 (ТЦ «Западный», слева от главного входа)</div>
+                  <div className="footer__store-time">Ежедневно 9:00–21:00</div>
+                </div>
+              </div>
               <div className="footer__copyright">
                 © 2007-{new Date().getFullYear()} Top Disc.<br />Все права защищены
               </div>

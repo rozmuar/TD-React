@@ -1810,6 +1810,8 @@ footer {
 }
 
 .footer__left {
+    display: flex;
+    flex-direction: column;
     max-width: 240px;
     min-width: 240px;
     margin-right: 38px;
@@ -1842,8 +1844,33 @@ footer {
     margin-bottom: 4px;
 }
 
+.footer__stores {
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+.footer__store {
+    margin-bottom: 14px;
+}
+
+.footer__store-name {
+    font-size: 14px;
+    line-height: 1.4;
+    font-weight: 500;
+    color: #AEAEAE;
+    margin-bottom: 2px;
+}
+
+.footer__store-address,
+.footer__store-time {
+    font-size: 13px;
+    line-height: 1.4;
+    color: #5D5D5D;
+}
+
 .footer__copyright {
-    margin-top: 151px;
+    margin-top: auto;
+    padding-top: 16px;
 }
 
 .footer__right {
