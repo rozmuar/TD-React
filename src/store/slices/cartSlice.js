@@ -6,6 +6,7 @@ import {
   mergeBasket,
   getGuestFuserId,
   clearGuestFuserId,
+  getProductById,
 } from '../../services/apiClient'
 
 const LOCAL_KEY = 'cart_items'
@@ -63,6 +64,31 @@ function mapServerItem(item) {
 
 const saved = loadCart()
 
+// Серверная корзина (/sale/basket) не возвращает code/section_code товара —
+// без них ссылка на карточку товара в корзине ведёт в никуда. Дотягиваем
+// эти поля отдельным запросом по id, как и для картинок в PersonalOrders.
+async function enrichMissingCodes(items) {
+  const missing = items.filter((i) => i.id && (!i.code || !i.section_code))
+  if (!missing.length) return items
+  const details = await Promise.all(
+    missing.map((i) =>
+      getProductById(i.id)
+        .then((res) => res.data?.result || res.data?.data || null)
+        .catch(() => null)
+    )
+  )
+  const byId = new Map(missing.map((item, idx) => [item.id, details[idx]]))
+  return items.map((item) => {
+    const detail = byId.get(item.id)
+    if (!detail) return item
+    return {
+      ...item,
+      code: item.code || detail.code || '',
+      section_code: item.section_code || detail.category_code || detail.section_code || '',
+    }
+  })
+}
+
 // ============================================================
 // Thunks
 // ============================================================
@@ -75,7 +101,7 @@ export const fetchServerCart = createAsyncThunk(
       const data = res.data?.basket || res.data?.data || []
       const items = Array.isArray(data) ? data : []
       return {
-        items: items.map(mapServerItem),
+        items: await enrichMissingCodes(items.map(mapServerItem)),
         serverTotalPrice: res.data?.total_price ?? null,
       }
     } catch (error) {
@@ -97,7 +123,7 @@ export const mergeGuestCart = createAsyncThunk(
       const data = res.data?.basket || res.data?.data?.basket || []
       const items = Array.isArray(data) ? data : []
       return {
-        items: items.map(mapServerItem),
+        items: await enrichMissingCodes(items.map(mapServerItem)),
         serverTotalPrice: res.data?.total_price ?? null,
         skippedProductIds: Array.isArray(res.data?.skipped_product_ids) ? res.data.skipped_product_ids : [],
       }
