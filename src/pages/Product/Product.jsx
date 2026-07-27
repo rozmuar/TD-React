@@ -293,7 +293,6 @@ function Product() {
           <div className="product">
             <header className="product__header">
               <div className="product__row-badge">
-                <span className="product__badge product__badge--hit">Хит</span>
                 {isAvailable && (
                   <span className="product__bonus mobile-hidden">
                     {Math.round(parseFloat(product.price) * 0.03)} <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
