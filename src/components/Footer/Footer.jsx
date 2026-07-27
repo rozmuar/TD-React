@@ -37,18 +37,18 @@ function Footer() {
                 <img src="/img/footer/logo.png" alt="logo" className="footer__logo" />
               </Link>
               <div className="footer__text">
-                Индивидуальный Предприниматель<br />Ханакин Павел Алексеевич
+                ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ "ТОП ДИСК"
               </div>
               <div className="footer__data">
                 <div className="footer__data-item">
-                  ОГРНИП <span>304583636600069</span>
+                  ИНН <span>5800007220</span>
                 </div>
                 <div className="footer__data-item">
-                  ИНН <span>583609230963</span>
+                  КПП <span>580001001</span>
                 </div>
               </div>
               <div className="footer__copyright">
-                © 2007-2024 Top Disc.<br />Все права защищены
+                © 2007-{new Date().getFullYear()} Top Disc.<br />Все права защищены
               </div>
             </div>
             <div className="footer__right">
