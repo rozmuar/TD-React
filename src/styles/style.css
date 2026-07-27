@@ -308,6 +308,7 @@ a:hover {
 .catalog-menu__l1-item:hover,
 .catalog-menu__l1-item.is-active {
     background: #f7f7f7;
+    color: var(--accent-hover);
     font-weight: 600;
 }
 
@@ -336,6 +337,7 @@ a:hover {
 .catalog-menu__l2-item:hover,
 .catalog-menu__l2-item.is-active {
     background: #f7f7f7;
+    color: var(--accent-hover);
     font-weight: 600;
 }
 
