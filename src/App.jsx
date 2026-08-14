@@ -51,6 +51,7 @@ function App({ helmetContext }) {
         <Route path="company/news/" element={<NewsList />} />
         <Route path="company/news/:newsCode/" element={<NewsDetail />} />
         <Route path="category/:categoryId/" element={<Category />} />
+        <Route path="category/premium/:categoryId/" element={<Category />} />
         <Route path="catalog/:categoryId/" element={<Category />} />
         <Route path="catalog_oth/:categoryId/" element={<Category />} />
         <Route path="catalog/:categoryCode/:productCode/" element={<Product />} />

@@ -260,8 +260,8 @@ export async function fetchPageData(url) {
     return fetchProduct(productMatch[1], productMatch[2])
   }
 
-  // Категория: /catalog/:cat/  /category/:cat/  /catalog_oth/:cat/
-  const categoryMatch = urlPath.match(/^\/(?:catalog|catalog_oth|category)\/([^/]+)\/$/)
+  // Категория: /catalog/:cat/  /category/:cat/  /catalog_oth/:cat/  /category/premium/:cat/
+  const categoryMatch = urlPath.match(/^\/(?:catalog|catalog_oth|category)\/(?:premium\/)?([^/]+)\/$/)
   if (categoryMatch) {
     return fetchCategory(categoryMatch[1], searchParams)
   }

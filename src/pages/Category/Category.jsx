@@ -18,6 +18,23 @@ const categoryCache = new Map()
 let cachedMainCategories = null
 const childrenCache = new Map()
 
+// Премиум-товары (инфоблок 71, см. api_metods.php appMobile::PREMIUM_*):
+// id раздела смещён на PREMIUM_ID_OFFSET, у виртуального корня id = PREMIUM_ROOT_ID.
+// Ссылки на такие категории строим как /category/premium/<code>/, а не /category/<code>/,
+// иначе код может совпасть с кодом раздела основного каталога и подмешать не те товары.
+const PREMIUM_ROOT_ID = -1
+const PREMIUM_ID_OFFSET = 10000000
+
+function isPremiumCategory(cat) {
+  return cat.id === PREMIUM_ROOT_ID || cat.id >= PREMIUM_ID_OFFSET
+}
+
+function categoryUrl(cat) {
+  if (cat.id === PREMIUM_ROOT_ID || cat.code === 'premium') return '/category/premium/'
+  if (isPremiumCategory(cat)) return `/category/premium/${cat.code}/`
+  return `/category/${cat.code}/`
+}
+
 function Category() {
   const { categoryId } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -636,11 +653,11 @@ function Category() {
         <meta name="description" content={`Купить ${mainCategory.name} в интернет-магазине TopDisk`} />
       </Helmet>
       {(() => {
-        const path = `/category/${mainCategory.code}/`
+        const path = categoryUrl(mainCategory)
         const crumbs = [
           { name: 'Главная', url: '/' },
           { name: 'Каталог', url: '/catalog/' },
-          ...breadcrumbsPath.map((c) => ({ name: decodeHtml(c.name), url: `/category/${c.code}/` })),
+          ...breadcrumbsPath.map((c) => ({ name: decodeHtml(c.name), url: categoryUrl(c) })),
           { name: decodeHtml(mainCategory.name) },
         ]
         const breadcrumbs = breadcrumbSchema(crumbs)
@@ -669,7 +686,7 @@ function Category() {
             </li>
             {breadcrumbsPath.map((crumb) => (
               <li key={crumb.id} className="breadcrumbs-item">
-                <Link className="breadcrumbs-link" to={`/category/${crumb.code}/`}>{decodeHtml(crumb.name)}</Link>
+                <Link className="breadcrumbs-link" to={categoryUrl(crumb)}>{decodeHtml(crumb.name)}</Link>
               </li>
             ))}
             <li className="breadcrumbs-item">
@@ -690,9 +707,9 @@ function Category() {
               {subcategories.length > 0 && (
                 <div className="subcategory__grid">
                   {subcategories.map((subcat, index) => (
-                    <Link 
-                      key={subcat.id} 
-                      to={`/category/${subcat.code}/`}
+                    <Link
+                      key={subcat.id}
+                      to={categoryUrl(subcat)}
                       className={`subcategory__card ${index === 6 ? 'subcategory__card--xl' : ''}`}
                       style={{ '--pic': `url(${subcat.ico})` }}
                     >
@@ -961,7 +978,7 @@ function Category() {
                     {childSubcategories.map((sub) => (
                       <Link
                         key={sub.id}
-                        to={`/category/${sub.code}/`}
+                        to={categoryUrl(sub)}
                         className="catalog__main-bar"
                       >
                         {sub.name}
