@@ -146,13 +146,18 @@ function Category() {
     return cachedMainCategories
   }
 
-  // Поиск категории по code с кешированием промежуточных результатов
+  // Поиск категории по code с кешированием промежуточных результатов.
+  // /category/premium/<code>/ — код ищем только в инфоблоке 71 (премиум),
+  // иначе код может совпасть с кодом раздела основного каталога (инфоблок 4)
+  // и подмешать не те товары. Ключ кеша учитывает это пространство имён.
   const findCategory = async (code) => {
-    if (categoryCache.has(code)) return categoryCache.get(code)
+    const isPremiumRoute = location.pathname.startsWith('/category/premium/')
+    const cacheKey = isPremiumRoute ? `premium:${code}` : code
+    if (categoryCache.has(cacheKey)) return categoryCache.get(cacheKey)
 
     try {
-      const categoryByCodeResponse = await getCategoryByCode(code)
-      
+      const categoryByCodeResponse = await getCategoryByCode(code, isPremiumRoute)
+
       if (categoryByCodeResponse.data.result.error !== 0) {
         return null
       }
@@ -163,7 +168,7 @@ function Category() {
       // Уровень 1?
       if (mainCategories.some(cat => cat.id == category.id)) {
         const result = { category, path: [] }
-        categoryCache.set(code, result)
+        categoryCache.set(cacheKey, result)
         return result
       }
       
@@ -183,7 +188,7 @@ function Category() {
       
       if (parent) {
         const result = { category, path: [parent] }
-        categoryCache.set(code, result)
+        categoryCache.set(cacheKey, result)
         return result
       }
       
@@ -208,7 +213,7 @@ function Category() {
           const found = level3Results.find(r => r !== null)
           if (found) {
             const result = { category, path: [found.mainCat, found.level2Cat] }
-            categoryCache.set(code, result)
+            categoryCache.set(cacheKey, result)
             return result
           }
         } catch { /* skip */ }
@@ -216,7 +221,7 @@ function Category() {
       
       // Не определён уровень
       const result = { category, path: [] }
-      categoryCache.set(code, result)
+      categoryCache.set(cacheKey, result)
       return result
     } catch (error) {
       console.error('Ошибка поиска категории:', error)

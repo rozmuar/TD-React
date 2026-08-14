@@ -50,8 +50,8 @@ export const getCategoryFirst = (opts) =>
 export const getCategoryById = (id, opts) =>
   bitrixClient.get('/app_mobile.categoryId.json', { params: { id }, ...opts })
 
-export const getCategoryByCode = (code, opts) =>
-  bitrixClient.get('/app_mobile.categoryIdByCode.json', { params: { code }, ...opts })
+export const getCategoryByCode = (code, premium, opts) =>
+  bitrixClient.get('/app_mobile.categoryIdByCode.json', { params: { code, premium: premium ? 1 : undefined }, ...opts })
 
 export const getAllCategories = (opts) =>
   bitrixClient.get('/app_mobile.category.json', opts)

@@ -92,7 +92,7 @@ function Product() {
         
         // Параллельно загружаем данные категории и товара
         const [categoryByCodeResponse, codeResponse] = await Promise.all([
-          getCategoryByCode(categoryCode, { signal: abortControllerRef.current.signal }),
+          getCategoryByCode(categoryCode, false, { signal: abortControllerRef.current.signal }),
           getProductIdByCode(productCode, { signal: abortControllerRef.current.signal })
         ])
         
