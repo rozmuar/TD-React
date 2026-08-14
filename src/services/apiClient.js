@@ -125,8 +125,20 @@ export const getTradeInData = (opts) =>
 // ============================================================
 // Фильтры
 // ============================================================
-export const getFilters = (categoryId, opts) =>
-  filterClient.get(`/filter/4/${categoryId}`, opts)
+// Премиум-товары (инфоблок 71, см. api_metods.php appMobile::PREMIUM_*):
+// id раздела на фронте смещён на PREMIUM_ID_OFFSET (см. Category.jsx),
+// а /filter/{iblock}/{id} на бэкенде принимает iblock и id как есть, без
+// своего снятия смещения — поэтому распаковываем его здесь.
+const PREMIUM_IBLOCK_ID = 71
+const PREMIUM_ID_OFFSET = 10000000
+
+export const getFilters = (categoryId, opts) => {
+  const id = Number(categoryId)
+  const isPremium = id >= PREMIUM_ID_OFFSET
+  const iblock = isPremium ? PREMIUM_IBLOCK_ID : 4
+  const sectionId = isPremium ? id - PREMIUM_ID_OFFSET : id
+  return filterClient.get(`/filter/${iblock}/${sectionId}`, opts)
+}
 
 // ============================================================
 // Бренды
