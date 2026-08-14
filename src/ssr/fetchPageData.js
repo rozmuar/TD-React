@@ -260,8 +260,10 @@ export async function fetchPageData(url) {
     return fetchProduct(productMatch[1], productMatch[2])
   }
 
-  // Категория: /catalog/:cat/  /category/:cat/  /catalog_oth/:cat/  /category/premium/:cat/
-  const categoryMatch = urlPath.match(/^\/(?:catalog|catalog_oth|category)\/(?:premium\/)?([^/]+)\/$/)
+  // Категория: /catalog/:cat/  /category/:cat/  /category/premium/:cat/
+  // (/catalog_oth/:cat/ сюда не входит — это чистый редирект на /category/premium/:cat/,
+  // предзагружать для него данные категории незачем)
+  const categoryMatch = urlPath.match(/^\/(?:catalog|category)\/(?:premium\/)?([^/]+)\/$/)
   if (categoryMatch) {
     return fetchCategory(categoryMatch[1], searchParams)
   }

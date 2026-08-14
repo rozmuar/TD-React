@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import Layout from './components/Layout/Layout'
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute'
@@ -34,6 +34,16 @@ import Rules from './pages/Info/Rules'
 import Privacy from './pages/Info/Privacy'
 import Oferta from './pages/Info/Oferta'
 
+// /catalog_oth/ — старый URL премиум-товаров (инфоблок 71), заменён на
+// /category/premium/. Редиректим, а не роутим напрямую на Category,
+// чтобы в адресной строке и ссылках, которые кто-то мог сохранить,
+// всегда оставался единый актуальный вид URL.
+function CatalogOthCategoryRedirect() {
+  const { categoryId } = useParams()
+  const { search } = useLocation()
+  return <Navigate to={`/category/premium/${categoryId}/${search}`} replace />
+}
+
 const PersonalLayout = lazy(() => import('./pages/Personal/PersonalLayout'))
 const PersonalHome = lazy(() => import('./pages/Personal/PersonalHome'))
 const PersonalInfo = lazy(() => import('./pages/Personal/PersonalInfo'))
@@ -53,7 +63,8 @@ function App({ helmetContext }) {
         <Route path="category/:categoryId/" element={<Category />} />
         <Route path="category/premium/:categoryId/" element={<Category />} />
         <Route path="catalog/:categoryId/" element={<Category />} />
-        <Route path="catalog_oth/:categoryId/" element={<Category />} />
+        <Route path="catalog_oth/" element={<Navigate to="/category/premium/" replace />} />
+        <Route path="catalog_oth/:categoryId/" element={<CatalogOthCategoryRedirect />} />
         <Route path="catalog/:categoryCode/:productCode/" element={<Product />} />
         <Route path="catalog_oth/:categoryCode/:productCode/" element={<Product />} />
         <Route path="compare/" element={<Compare />} />
