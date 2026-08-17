@@ -187,8 +187,8 @@ function Home() {
 
               <button className="hero-slider-nav hero-slider-next" aria-label="next"></button>
             </div>
-            <div ref={heroPaginationRef} className="swiper-pagination hero-slider__pagination"></div>
           </div>
+          <div ref={heroPaginationRef} className="swiper-pagination hero-slider__pagination"></div>
 
           <div className="hero-row">
             <div className="hero-block hero-block--price">

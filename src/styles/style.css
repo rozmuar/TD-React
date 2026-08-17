@@ -4878,23 +4878,26 @@ footer {
 .hero-slider__pagination.swiper-pagination {
     position: static;
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
-    gap: 8px;
+    gap: 6px 8px;
     margin-top: 12px;
+    max-width: 100%;
 }
 
 .hero-slider__pagination .swiper-pagination-bullet {
-    width: 70px;
-    height: 2px;
+    width: 24px;
+    height: 3px;
     margin: 0 !important;
     background: rgba(0, 0, 0, 0.15);
     opacity: 1;
     transition: .2s;
+    flex: 0 0 auto;
 }
 
 .hero-slider__pagination .swiper-pagination-bullet-active {
     background: var(--accent);
-    width: 70px;
+    width: 24px;
     border-radius: 40px;
 }
 
