@@ -6707,6 +6707,10 @@ p.region-delivery__note {
 }
 
 /* ===== About page (о нас) ===== */
+.about-page {
+  margin: 0 0 40px;
+}
+
 .about-page__hero-text h2 {
   font-size: 26px;
   font-weight: 700;
