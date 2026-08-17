@@ -10,6 +10,7 @@ const STORES = [
   { name: 'TOP DISC Смарт', address: 'Проспект Победы 124 (Универсам №173 со стороны ТРЦ «Квадрат»)', map: 'https://yandex.ru/maps/-/CHd6qVjJ' },
   { name: 'TOP DISC Смарт Мини', address: 'Проспект Строителей 1В (ТЦ «Коллаж», 1 этаж)', map: 'https://yandex.ru/maps/org/kollazh/1801679181/?ll=44.951110%2C53.220241&z=14' },
   { name: 'TOP DISC Смарт Мини', address: 'ул. Мира 60 (ТЦ «Западный», слева от главного входа)', map: 'https://yandex.ru/maps/org/zapadny/243804326412/?ll=44.980551%2C53.186272&z=16' },
+  { name: 'TOP DISC Смарт Мини', address: 'ул. Комсомольская 10 (Заречный, ТЦ «Юбилейный»)', map: 'https://yandex.ru/maps/?ll=45.174261%2C53.193243&z=16&pt=45.174261,53.193243' },
 ]
 
 const PARKING = [

@@ -68,6 +68,11 @@ function Footer() {
                   <div className="footer__store-address">ул. Мира 60 (ТЦ «Западный», слева от главного входа)</div>
                   <div className="footer__store-time">Ежедневно 9:00–21:00</div>
                 </div>
+                <div className="footer__store">
+                  <div className="footer__store-name">TOP DISC Смарт Мини</div>
+                  <div className="footer__store-address">ул. Комсомольская 10 (Заречный, ТЦ «Юбилейный»)</div>
+                  <div className="footer__store-time">Ежедневно 9:00–21:00</div>
+                </div>
               </div>
               <div className="footer__copyright">
                 © 2007-{new Date().getFullYear()} Top Disc.<br />Все права защищены
