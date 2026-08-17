@@ -28,12 +28,27 @@ function Home() {
   const [news, setNews] = useState(ssrMatch ? ssrData.news : [])
   const [dataLoading, setDataLoading] = useState(!ssrMatch)
   const heroPaginationRef = useRef(null)
+  const heroSwiperRef = useRef(null)
 
   // Выравнивание высоты заголовков товаров
   useMatchHeight('.catalog__main-title', [forYouProducts, hurryToBuyProducts, dataLoading])
-  
+
   // Выравнивание высоты заголовков новостей
   useMatchHeight('.news-card__title', [news])
+
+  // Привязка пагинации к внешнему (вынесенному под баннер) элементу.
+  // onBeforeInit ненадёжен: при смене banners меняется loop-режим Swiper,
+  // он полностью переинициализируется и теряет привязку — переподключаем
+  // явно после каждой (пере)инициализации и при изменении числа слайдов.
+  useEffect(() => {
+    const swiper = heroSwiperRef.current
+    if (!swiper || !heroPaginationRef.current || swiper.destroyed) return
+    swiper.params.pagination.el = heroPaginationRef.current
+    swiper.pagination.destroy()
+    swiper.pagination.init()
+    swiper.pagination.render()
+    swiper.pagination.update()
+  }, [banners])
 
   useEffect(() => {
     // Если SSR уже предоставил данные — пропускаем первый запрос
@@ -132,7 +147,7 @@ function Home() {
               <Swiper
                 modules={[Navigation, Pagination]}
                 speed={400}
-                loop={banners.length > 1}
+                loop={true}
                 navigation={{
                   prevEl: '.hero-slider-prev',
                   nextEl: '.hero-slider-next',
@@ -140,8 +155,15 @@ function Home() {
                 pagination={{
                   clickable: true,
                 }}
-                onBeforeInit={(swiper) => {
-                  swiper.params.pagination.el = heroPaginationRef.current
+                onSwiper={(swiper) => {
+                  heroSwiperRef.current = swiper
+                  if (heroPaginationRef.current) {
+                    swiper.params.pagination.el = heroPaginationRef.current
+                    swiper.pagination.destroy()
+                    swiper.pagination.init()
+                    swiper.pagination.render()
+                    swiper.pagination.update()
+                  }
                 }}
                 className="swiper hero-slider__swiper"
               >
