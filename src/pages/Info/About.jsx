@@ -127,14 +127,6 @@ function About() {
         <div className="ps-divider" />
 
         <ImageWithFallback className="about-page__gallery-img" src={`${IMG_BASE}/navigation.jpg`} alt="Навигация по залу" />
-
-        <div className="about-page__footer">
-          <Link to="/catalog/">Каталог</Link>
-          <span aria-hidden="true">·</span>
-          <Link to="/contacts/">Контакты</Link>
-          <span aria-hidden="true">·</span>
-          <a href={MAP_MAIN} target="_blank" rel="noopener noreferrer">Маршрут</a>
-        </div>
       </div>
     </>
   )

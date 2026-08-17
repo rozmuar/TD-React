@@ -6869,19 +6869,6 @@ p.region-delivery__note {
   border-radius: 16px;
 }
 
-.about-page__footer {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 32px;
-  font-size: 14px;
-  color: #888;
-}
-
-.about-page__footer a {
-  color: var(--accent);
-}
-
 @media (max-width: 900px) {
   .about-page__grid {
     grid-template-columns: 1fr;
