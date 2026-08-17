@@ -18,6 +18,9 @@ dist-ssr
 .env.production
 .env.staging
 
+# Локальная копия бэкенда (Bitrix core) для сверки исходников — не часть фронтенда
+/back
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
