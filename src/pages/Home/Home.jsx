@@ -27,6 +27,7 @@ function Home() {
   const [hurryToBuyProducts, setHurryToBuyProducts] = useState(ssrMatch ? ssrData.hurryToBuyProducts : [])
   const [news, setNews] = useState(ssrMatch ? ssrData.news : [])
   const [dataLoading, setDataLoading] = useState(!ssrMatch)
+  const heroPaginationRef = useRef(null)
 
   // Выравнивание высоты заголовков товаров
   useMatchHeight('.catalog__main-title', [forYouProducts, hurryToBuyProducts, dataLoading])
@@ -137,8 +138,10 @@ function Home() {
                   nextEl: '.hero-slider-next',
                 }}
                 pagination={{
-                  el: '.swiper-pagination',
                   clickable: true,
+                }}
+                onBeforeInit={(swiper) => {
+                  swiper.params.pagination.el = heroPaginationRef.current
                 }}
                 className="swiper hero-slider__swiper"
               >
@@ -180,12 +183,11 @@ function Home() {
                     <img src="/img/hero/slide.png" alt="" />
                   </SwiperSlide>
                 )}
-
-                <div className="swiper-pagination"></div>
               </Swiper>
 
               <button className="hero-slider-nav hero-slider-next" aria-label="next"></button>
             </div>
+            <div ref={heroPaginationRef} className="swiper-pagination hero-slider__pagination"></div>
           </div>
 
           <div className="hero-row">

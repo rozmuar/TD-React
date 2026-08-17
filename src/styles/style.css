@@ -4874,25 +4874,27 @@ footer {
     pointer-events: none;
 }
 
-/* ======= pagination (мобила) ======= */
-.hero-slider .swiper-pagination {
-    display: block;
-    text-align: center;
-    bottom: 10px !important;
+/* ======= pagination — выведена под слайдер, не поверх картинки ======= */
+.hero-slider__pagination.swiper-pagination {
+    position: static;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
 }
 
-.hero-slider .swiper-pagination-bullet {
+.hero-slider__pagination .swiper-pagination-bullet {
     width: 70px;
     height: 2px;
-    background: rgba(0, 0, 0, 0.2);
+    margin: 0 !important;
+    background: rgba(0, 0, 0, 0.15);
     opacity: 1;
     transition: .2s;
 }
 
-.hero-slider .swiper-pagination-bullet-active {
-    background: rgba(0, 0, 0, 0.6);
+.hero-slider__pagination .swiper-pagination-bullet-active {
+    background: var(--accent);
     width: 70px;
-
     border-radius: 40px;
 }
 
@@ -4930,7 +4932,7 @@ footer {
     }
 
     /* прячем миниатюры и стрелки */
-    .hero-slider .swiper-pagination {
+    .hero-slider__pagination.swiper-pagination {
         display: none;
     }
 }
