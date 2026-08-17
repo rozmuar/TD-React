@@ -6,14 +6,14 @@ import CallbackModal from '../../components/CallbackModal/CallbackModal'
 const IMG_BASE = 'https://topdisc.ru/personal-service/img'
 
 const BENEFITS = [
-  { icon: <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />, extra: <path d="M9 12l2 2 4-4" />, title: 'Бесплатная консультация', text: 'Экспертно. Без обязательств.' },
-  { icon: <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />, title: 'Работаем с вашим дизайнером', text: 'Или подключим своего.' },
-  { icon: <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />, title: 'Эксклюзив под заказ', text: 'То, чего нет в сетях.' },
-  { icon: <path d="M1 4h22v16H1z" />, title: 'Любая форма оплаты', text: 'Нал, безнал, рассрочка, юрлица.' },
-  { icon: <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3" />, title: 'Индивидуальный подбор цены', text: 'Под ваш проект и бюджет.' },
-  { icon: <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />, title: 'Доставка и хранение', text: 'Привезём, подождём, установим.' },
-  { icon: <path d="M3 18v-6a9 9 0 0 1 18 0v6M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />, title: 'Персональный менеджер', text: 'Один контакт — от подбора до сдачи.' },
-  { icon: <path d="M12 8a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM8.21 13.89L7 23l5-3 5 3-1.21-9.12" />, title: '20 лет опыта', text: 'Решаем сложные задачи.' },
+  ['Бесплатная консультация', 'Экспертно. Без обязательств.'],
+  ['Работаем с вашим дизайнером', 'Или подключим своего.'],
+  ['Эксклюзив под заказ', 'То, чего нет в сетях.'],
+  ['Любая форма оплаты', 'Нал, безнал, рассрочка, юрлица.'],
+  ['Индивидуальный подбор цены', 'Под ваш проект и бюджет.'],
+  ['Доставка и хранение', 'Привезём, подождём, установим.'],
+  ['Персональный менеджер', 'Один контакт — от подбора до сдачи.'],
+  ['20 лет опыта', 'Решаем сложные задачи.'],
 ]
 
 const PAINS = [
@@ -23,11 +23,11 @@ const PAINS = [
 ]
 
 const STEPS = [
-  { title: 'Консультация', text: 'Выясняем ваши потребности и бюджет' },
-  { title: 'Подбор техники', text: 'Подбираем под ваш интерьер' },
-  { title: 'Работа с дизайнером', text: 'Согласовываем с вашим специалистом, в случае вашего сотрудничества' },
-  { title: 'Доставка и хранение', text: 'Привезём в удобное время' },
-  { title: 'Установка и настройка', text: 'Запустим всё под ключ' },
+  ['Консультация', 'Выясняем ваши потребности и бюджет'],
+  ['Подбор техники', 'Подбираем под ваш интерьер'],
+  ['Работа с дизайнером', 'Согласовываем с вашим специалистом, в случае вашего сотрудничества'],
+  ['Доставка и хранение', 'Привезём в удобное время'],
+  ['Установка и настройка', 'Запустим всё под ключ'],
 ]
 
 const KITS = [
@@ -64,12 +64,12 @@ const TESTIMONIALS = [
   {
     name: 'Евгений Якимов',
     role: 'г. Пенза · Операционный директор Blackroom (создание домашних кинозалов в ОАЭ)',
-    text: '«Вчера родители приходили в Top Disc, чтобы настроить новый телефон и перенести данные со старого. Вечером они поделились впечатлениями — об отношении, внимании и уровне сервиса. Отдельное Спасибо просили передать Кириллу. Они были в восторге, насколько человек сделал всё хорошо и с уважением. В общем, Спасибо большое, Паша! 🤝»',
+    text: '«Вчера родители приходили в Top Disc, чтобы настроить новый телефон и перенести данные со старого. Вечером они поделились впечатлениями — об отношении, внимании и уровне сервиса. Отдельное Спасибо просили передать Кириллу. Они были в восторге, насколько человек сделал всё хорошо и с уважением. В общем, Спасибо большое, Паша!»',
   },
   {
     name: 'Денис',
     role: 'г. Пенза',
-    text: '«Кирилл, доброе утро! Спасибо за подробную информацию. Это лучший подход к работе, который мне встречался. Наш выбор V15. Только давайте ещё определимся со стационарным, он нам нужен в первую очередь, так как он сломался, а вертикальный пока ещё дышит 🙂. Возможно разделю покупку на приоритеты.»',
+    text: '«Кирилл, доброе утро! Спасибо за подробную информацию. Это лучший подход к работе, который мне встречался. Наш выбор V15. Только давайте ещё определимся со стационарным, он нам нужен в первую очередь, так как он сломался, а вертикальный пока ещё дышит. Возможно разделю покупку на приоритеты.»',
   },
   {
     name: 'Клиент',
@@ -127,90 +127,99 @@ const FAQ = [
 function FaqItem({ question, answer }) {
   const [open, setOpen] = useState(false)
   return (
-    <div className="personal-service-page__faq-item">
+    <div className="ps-faq__item">
       <button
         type="button"
-        className="personal-service-page__faq-question"
+        className="ps-faq__question"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
       >
         {question}
-        <span className={'personal-service-page__faq-icon' + (open ? ' personal-service-page__faq-icon--open' : '')}>▼</span>
+        <span className={'ps-faq__icon' + (open ? ' ps-faq__icon--open' : '')} aria-hidden="true" />
       </button>
-      {open && <div className="personal-service-page__faq-answer">{answer}</div>}
+      {open && <div className="ps-faq__answer">{answer}</div>}
     </div>
   )
 }
 
 function PersonalService() {
   const [callbackOpen, setCallbackOpen] = useState(false)
+  const openCallback = () => setCallbackOpen(true)
 
   return (
     <>
       <Helmet><title>Персональное обслуживание — Top Disc</title></Helmet>
       <h1 className="info-page__title">Персональное обслуживание</h1>
 
-      <div className="personal-service-page">
-        <div className="personal-service-page__hero">
-          <div className="personal-service-page__hero-badge">Персональный сервис Top Disc</div>
-          <h2 className="personal-service-page__hero-title">
-            Техника, которая подойдёт <span className="personal-service-page__accent">именно вам</span>
-          </h2>
-          <p className="personal-service-page__hero-subtitle">
-            Персональный подбор премиальных комплектов для вашего дома
-          </p>
-          <div className="personal-service-page__hero-actions">
-            <button type="button" className="personal-service-page__btn" onClick={() => setCallbackOpen(true)}>
-              Получить персональную консультацию
-            </button>
-            <a className="personal-service-page__btn personal-service-page__btn--outline" href="https://t.me/topdiscpenza" target="_blank" rel="noopener noreferrer">
-              Telegram
-            </a>
+      <div className="ps-page">
+        <div className="ps-hero">
+          <div className="ps-hero__text">
+            <span className="ps-eyebrow">Персональный сервис Top Disc</span>
+            <h2 className="ps-hero__title">
+              Техника, которая подойдёт <span className="ps-accent">именно вам</span>
+            </h2>
+            <p className="ps-hero__subtitle">
+              Персональный подбор премиальных комплектов для вашего дома — от идеи до установки под ключ.
+            </p>
+            <div className="ps-hero__actions">
+              <button type="button" className="ps-btn" onClick={openCallback}>
+                Получить консультацию
+              </button>
+              <a className="btn--outline-accent" href="https://t.me/topdiscpenza" target="_blank" rel="noopener noreferrer">
+                Telegram
+              </a>
+            </div>
+            <p className="ps-hero__note">Ответим в день обращения</p>
           </div>
-          <p className="personal-service-page__hero-note">Ответим в день обращения</p>
-          <ImageWithFallback className="personal-service-page__hero-img" src={`${IMG_BASE}/orig.png`} alt="Персональный сервис Top Disc" />
+          <div className="ps-hero__frame">
+            <ImageWithFallback className="ps-hero__img" src={`${IMG_BASE}/orig.png`} alt="Персональный сервис Top Disc" />
+          </div>
         </div>
 
-        <div className="personal-service-page__benefits">
-          {BENEFITS.map((b) => (
-            <div className="personal-service-page__benefit" key={b.title}>
-              <svg className="personal-service-page__benefit-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                {b.icon}
-                {b.extra}
-              </svg>
-              <b>{b.title}</b>
-              <span>{b.text}</span>
+        <div className="ps-benefits">
+          {BENEFITS.map(([title, text]) => (
+            <div className="ps-benefits__item" key={title}>
+              <b>{title}</b>
+              <span>{text}</span>
             </div>
           ))}
         </div>
 
-        <h2>Не знаете, что выбрать?</h2>
-        <div className="personal-service-page__pains">
+        <div className="ps-divider" />
+
+        <h2 className="ps-heading ps-heading--center">Не знаете, что выбрать?</h2>
+        <div className="ps-pains">
           {PAINS.map((p) => (
-            <div className="personal-service-page__pain" key={p}>{p}</div>
+            <div className="ps-pains__item" key={p}>{p}</div>
           ))}
         </div>
-        <div className="personal-service-page__cta-center">
-          <button type="button" className="personal-service-page__btn" onClick={() => setCallbackOpen(true)}>
+        <div className="ps-cta-center">
+          <button type="button" className="ps-btn" onClick={openCallback}>
             Мы подберём для вас — бесплатно
           </button>
         </div>
 
-        <h2>Как мы работаем</h2>
-        <div className="personal-service-page__steps">
-          {STEPS.map((s, i) => (
-            <div className="personal-service-page__step" key={s.title}>
-              <div className="personal-service-page__step-num">{i + 1}</div>
-              <b>{s.title}</b>
-              <span>{s.text}</span>
-            </div>
-          ))}
-        </div>
+        <div className="ps-divider" />
 
-        <h2>Какие комплекты выбирают наши клиенты</h2>
-        <div className="personal-service-page__kits">
+        <h2 className="ps-heading">Как мы работаем</h2>
+        <ol className="ps-steps">
+          {STEPS.map(([title, text], i) => (
+            <li className="ps-steps__item" key={title}>
+              <span className="ps-steps__num">{String(i + 1).padStart(2, '0')}</span>
+              <div>
+                <b>{title}</b>
+                <span>{text}</span>
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        <div className="ps-divider" />
+
+        <h2 className="ps-heading">Какие комплекты выбирают наши клиенты</h2>
+        <div className="ps-kits">
           {KITS.map((kit) => (
-            <div className="personal-service-page__kit" key={kit.title}>
+            <div className="ps-kit" key={kit.title}>
               <h3>{kit.title}</h3>
               <p>{kit.text}</p>
               <ul>
@@ -220,61 +229,69 @@ function PersonalService() {
               </ul>
               <button
                 type="button"
-                className="personal-service-page__btn personal-service-page__btn--sm"
-                onClick={() => setCallbackOpen(true)}
+                className="btn--outline-accent"
+                onClick={openCallback}
               >
-                Хочу такой комплект!
+                Хочу такой комплект
               </button>
             </div>
           ))}
         </div>
 
-        <h2>Отзывы наших клиентов</h2>
-        <p className="personal-service-page__intro">
+        <div className="ps-divider" />
+
+        <h2 className="ps-heading">Отзывы наших клиентов</h2>
+        <p className="ps-intro">
           Отдел по работе с персональными клиентами работает не только с комплектацией квартир, но и со всеми
           товарами и услугами торговой площадки Top Disc. А отзывы наших друзей тому подтверждение.
         </p>
-        <div className="personal-service-page__testimonials">
+        <div className="ps-testimonials">
           {TESTIMONIALS.map((t) => (
-            <div className="personal-service-page__testimonial" key={t.name}>
-              <div className="personal-service-page__testimonial-name">{t.name}</div>
-              <div className="personal-service-page__testimonial-role">{t.role}</div>
+            <div className="ps-testimonial" key={t.name}>
               <p>{t.text}</p>
+              <div className="ps-testimonial__name">{t.name}</div>
+              <div className="ps-testimonial__role">{t.role}</div>
             </div>
           ))}
         </div>
-        <p className="personal-service-page__social-footer">Работаем по Пензе и ПФО</p>
+        <p className="ps-social-footer">Работаем по Пензе и ПФО</p>
 
-        <h2>Ваши персональные менеджеры</h2>
-        <div className="personal-service-page__team">
+        <div className="ps-divider" />
+
+        <h2 className="ps-heading">Ваши персональные менеджеры</h2>
+        <div className="ps-team">
           {TEAM.map((m) => (
-            <div className="personal-service-page__member" key={m.name}>
-              {m.photo && <ImageWithFallback className="personal-service-page__member-photo" src={m.photo} alt={m.name} />}
+            <div className="ps-member" key={m.name}>
+              {m.photo
+                ? <ImageWithFallback className="ps-member__photo" src={m.photo} alt={m.name} />
+                : <div className="ps-member__photo ps-member__photo--placeholder">{m.name.charAt(0)}</div>}
               <h3>{m.name}</h3>
-              <p className="personal-service-page__member-position">{m.position}</p>
+              <p className="ps-member__position">{m.position}</p>
               {m.exp && (
-                <div className="personal-service-page__member-exp">
+                <div className="ps-member__exp">
                   {m.exp.map((line) => <p key={line}>{line}</p>)}
                 </div>
               )}
-              {m.quote && <p className="personal-service-page__member-quote">{m.quote}</p>}
-              <div className="personal-service-page__member-btns">
-                <a href={m.tg} target="_blank" rel="noopener noreferrer" className="personal-service-page__member-tg">Telegram</a>
-                <a href={`tel:${m.phone}`} className="personal-service-page__member-call">{m.phoneLabel}</a>
+              {m.quote && <p className="ps-member__quote">{m.quote}</p>}
+              <div className="ps-member__btns">
+                <a href={m.tg} target="_blank" rel="noopener noreferrer" className="btn--outline-accent">Telegram</a>
+                <a href={`tel:${m.phone}`} className="ps-member__call">{m.phoneLabel}</a>
               </div>
             </div>
           ))}
         </div>
 
-        <h2>Часто задаваемые вопросы</h2>
-        <div className="personal-service-page__faq">
+        <div className="ps-divider" />
+
+        <h2 className="ps-heading">Часто задаваемые вопросы</h2>
+        <div className="ps-faq">
           {FAQ.map(([q, a]) => <FaqItem key={q} question={q} answer={a} />)}
         </div>
 
-        <div className="personal-service-page__final">
+        <div className="ps-final">
           <h2>Готовы начать?</h2>
           <p>Оставьте заявку, и мы свяжемся с вами в течение дня</p>
-          <button type="button" className="personal-service-page__btn personal-service-page__btn--green" onClick={() => setCallbackOpen(true)}>
+          <button type="button" className="ps-btn" onClick={openCallback}>
             Получить консультацию
           </button>
         </div>

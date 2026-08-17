@@ -1,223 +1,140 @@
 import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
+import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
+
+const IMG_BASE = 'https://topdisc.ru/o-nas/img'
+const MAP_MAIN = 'https://yandex.ru/maps/49/penza/?ll=45.003509%2C53.192953&mode=poi&poi%5Bpoint%5D=45.003436%2C53.192862&poi%5Buri%5D=ymapsbm1%3A%2F%2Forg%3Foid%3D1123110234&z=20'
+
+const STORES = [
+  { name: 'TOP DISC Платформа', address: 'Ставского 4 (Напротив АЗС Роснефть)', map: MAP_MAIN },
+  { name: 'TOP DISC Смарт', address: 'Проспект Победы 124 (Универсам №173 со стороны ТРЦ «Квадрат»)', map: 'https://yandex.ru/maps/-/CHd6qVjJ' },
+  { name: 'TOP DISC Смарт Мини', address: 'Проспект Строителей 1В (ТЦ «Коллаж», 1 этаж)', map: 'https://yandex.ru/maps/org/kollazh/1801679181/?ll=44.951110%2C53.220241&z=14' },
+  { name: 'TOP DISC Смарт Мини', address: 'ул. Мира 60 (ТЦ «Западный», слева от главного входа)', map: 'https://yandex.ru/maps/org/zapadny/243804326412/?ll=44.980551%2C53.186272&z=16' },
+]
+
+const PARKING = [
+  'Основная парковка — слева от локации «Платформа».',
+  'Дополнительная парковка — во внутреннем дворе (въезд справа от центрального входа).',
+  'Три входа: центральный (ул. Ставского), без ступенек — со стороны ул. Революционной, и из двора — к парковке.',
+]
+
+const CATEGORIES = [
+  {
+    title: 'Смартфоны и гаджеты',
+    text: 'Популярные бренды по выгодным ценам. Топовые новинки и полный комплекс услуг.',
+    badges: [
+      ['Смартфоны', '/catalog/smartfony/'],
+      ['Планшеты', '/catalog/planshety/'],
+      ['Компьютеры и ноутбуки', '/catalog/kompyutery_i_noutbuki/'],
+      ['Игровые приставки', '/catalog/igrovye_pristavki_i_igry/'],
+      ['Повербанки', '/catalog/vneshnie_akb_power_bank_/'],
+      ['Портативные колонки', '/catalog/portativnye_kolonki/'],
+      ['Смарт-часы', '/catalog/smart_chasy_i_fitnes_braslety/'],
+      ['Фитнес-браслеты', '/catalog/fitnes_braslety/'],
+      ['Наушники', '/catalog/naushniki_1/'],
+    ],
+  },
+  {
+    title: 'Техника для дома',
+    text: 'Практичные решения на каждый день: быстро, удобно и по разумной цене.',
+    badges: [
+      ['Роботы-пылесосы', '/catalog/roboty_pylesosy/'],
+      ['Техника для кухни', '/catalog/malaya_bytovaya_tekhnika_dlya_kukhni/'],
+      ['Красота и здоровье', '/catalog/krasota_i_zdorove/'],
+      ['Телевизоры', '/catalog/televizory/'],
+      ['Аксессуары для ТВ', '/catalog/aksessuary_dlya_tv/'],
+    ],
+  },
+  {
+    title: 'Товары для дома и отдыха',
+    text: 'Большой выбор идей для активного (и не очень) времяпровождения — дарите себе и близким движение и эмоции.',
+    badges: [
+      ['Электротранспорт', '/catalog/elektrotransport/'],
+      ['Велосипеды', '/catalog/velosipedy_1/'],
+      ['Для дома и сада', '/catalog/dom_i_sad/'],
+      ['Автотовары', '/catalog/avtotovary/'],
+    ],
+  },
+]
 
 function About() {
   return (
     <>
       <Helmet>
-        <title>О компании — Top Disc</title>
+        <title>О нас — Супермаркет электроники Top Disc в Пензе</title>
         <meta name="description" content="TOP DISC — супермаркет электроники в Пензе. Огромный выбор техники по низким ценам." />
       </Helmet>
 
-      <section className="company">
-        <h1 className="company__title">О компании</h1>
+      <div className="about-page">
+        <h1 className="info-page__title">О нас</h1>
 
-        <div className="company__cards">
-          <article className="card company__card">
-            <div className="card__image">
-              <img src="/img/about/1.png" alt="Вход в магазин TOP DISC" />
-            </div>
-            <p className="card__text">
-              TOP DISC — это супермаркет электроники, который состоит из
-              нескольких локаций с огромным количеством товаров и расположен в самом
-              центре города по адресу:<br /><strong>г. Пенза, ул. Ставского 4.</strong>
-            </p>
-          </article>
-
-          <article className="card company__card">
-            <div className="card__image">
-              <img src="/img/about/2.png" alt="Парковка у магазина" />
-            </div>
-            <p className="card__text">
-              Рядом с магазином расположена удобная парковка для посетителей. Она
-              находится по левую сторону от локации «Платформа».
-            </p>
-          </article>
-
-          <article className="card company__card">
-            <div className="card__image">
-              <img src="/img/about/3.png" alt="Парковка во внутреннем дворе" />
-            </div>
-            <p className="card__text">
-              Также вы можете припарковать своё авто во внутреннем дворе (въезд с
-              правой стороны от центрального входа).
-            </p>
-          </article>
-        </div>
-
-        <div className="company__hero">
-          <div className="company__hero-image">
-            <img src="/img/about/4.png" alt="Центральный вход локации Платформа" />
-          </div>
-          <div className="company__hero-content">
-            <p>
-              Попасть в магазин можно через центральный вход со стороны улицы
-              Ставского. Для большего удобства есть 2‑й вход без ступенек со стороны
-              улицы Революционной и 3‑й выход во внутреннем дворе, через который вы
-              можете попасть на парковку или к зданию локации «Технопорт».
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <div className="company__wrapper">
-        <section className="location">
-          <div className="location__gallery">
-            <figure className="location__photo">
-              <img src="/img/about/5.png" alt="Вход в локацию" />
-            </figure>
-          </div>
-
-          <div className="location__top-row">
-            <div className="location__features">
-              <h2 className="location__title">В локации Технопорт представлены:</h2>
-              <ol className="location__list">
-                <li className="location__item">
-                  <span className="location__num">01</span>
-                  <span className="location__link">крупная бытовая техника</span>
-                </li>
-                <li className="location__item">
-                  <span className="location__num">02</span>
-                  <span className="location__link">кухонная техника</span>
-                </li>
-                <li className="location__item">
-                  <span className="location__num">03</span>
-                  <span className="location__link">компьютеры и ноутбуки</span>
-                </li>
-                <li className="location__item">
-                  <span className="location__num">04</span>
-                  <span className="location__link">телевизоры</span>
-                </li>
-                <li className="location__item">
-                  <span className="location__num">05</span>
-                  <span className="location__link">электросамокаты</span>
-                  <span className="location__etc">и многое другое</span>
-                </li>
-              </ol>
-            </div>
-
-            <aside className="location__access">
-              <div className="location__access-icon">
-                <img src="/img/about/8.png" alt="Точка на карте" />
-              </div>
-              <p className="location__access-text">
-                Так же в локацию Технопорт вы можете пройти с улицы Захарова.
-              </p>
-            </aside>
-          </div>
-
-          <div className="location__description">
-            <p>
-              В TOP DISC большой выбор электротранспорта
-              различных моделей и расцветок на любой вкус. А также
-              самокаты не только для взрослых, но и для
-              детей. Сделайте подарок себе и близким и испытайте незабываемые эмоции от
-              катания.
-            </p>
-            <p>
-              Если Вы давно мечтаете о новом смартфоне, но не хотите переплачивать за
-              него, то мы рады предложить Вам весь ассортимент продукции
-              Apple, XIAOMI, Samsung, Honor, Huawei и Realme
-              по низким ценам. Также в наличии смарт‑часы и фитнес‑браслеты.
-            </p>
-            <p>
-              У нас Вы можете приобрести любую технику
-              Apple, либо из наличия магазина, либо предварительно оформив заказ, если
-              данной техники нет в наличии. На всю продукцию, приобретённую в нашем
-              магазине, действует гарантия.
-            </p>
-          </div>
-
-          <div className="location__row">
-            <div className="location__row-image">
-              <img src="/img/about/9.png" alt="Зона выдачи покупок" />
-            </div>
-            <div className="location__row-content">
-              <p>
-                В нашем магазине Вы найдёте бытовую технику для дома различных
-                производителей. Робот‑пылесос станет Вашим
-                незаменимым помощником. А новая техника для
-                кухни по привлекательной цене поможет приготовить не только вкусную,
-                но и полезную еду для всей семьи. Так же представлена техника для
-                поддержания красоты и Вашего здоровья.
-              </p>
-              <p>
-                В продаже представлены телевизоры различной
-                диагонали и все необходимые для просмотра
-                аксессуары.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <section className="assortment">
-          <div className="assortment__text">
-            <p>
-              А так же у нас огромный ассортимент
-              кабелей и зарядных устройств для мобильных
-              телефонов, аксессуаров и комплектующих для компьютеров.
-            </p>
-            <p>
-              В продаже имеются игровые приставки
-              Sega, Dendy, Sony Playstation, XBOX, Nintendo,
-              аксессуары и видеоигры к ним.
-            </p>
-            <p>
-              Настольные игры, транспорт на радиоуправлении, конструкторы, мягкие игрушки…
-              У нас Вы найдёте подарок на любой вкус и возраст!
-            </p>
-            <p>
-              Огромный выбор защитных плёнок и стёкол, а так
-              же чехлов для самых популярных моделей
-              смартфонов.
-            </p>
-          </div>
-
-          <div className="assortment__row">
-            <div className="assortment__row-image">
-              <img src="/img/about/10.png" alt="Вывеска пунктов выдачи" />
-            </div>
-            <div className="assortment__row-content">
-              <p>
-                В TOP DISC также есть пункты выдачи сервиса доставки «Boxberry»,
-                «Wildberries», «Ozon», «СДЭК».
-              </p>
-            </div>
-          </div>
-
-          <div className="assortment__row-bottom">
-            <div className="assortment__about">
-              <p>
-                Мы работаем только с проверенными поставщиками и производителями, поэтому
-                весь товар отвечает строгим стандартам качества и имеет официальную
-                гарантию от производителя. Профессиональные консультанты всегда помогут
-                Вам в выборе интересующего Вас товара. Низкие цены и гибкая система скидок,
-                несомненно, порадуют Вас и позволят существенно сэкономить на покупке.
-              </p>
-              <p>
-                В скором времени у нас планируется расширение. Откроется новая локация
-                «Депо», где будут представлены игрушки, товары для спорта и отдыха и многое
-                другое!
-              </p>
-            </div>
-
-            <div className="assortment__footer">
-              <figure className="assortment__footer-image">
-                <img src="/img/about/bot.png" alt="Робот с коробками" />
-              </figure>
-              <div className="assortment__footer-content">
-                <p className="assortment__footer-title">
-                  Весь ассортимент<br />товаров Вы можете<br />посмотреть здесь
-                </p>
-                <Link to="/catalog/" className="button button--primary">В каталог</Link>
-              </div>
-            </div>
-          </div>
-
-          <p className="assortment__note">
-            Документ о происхождении СОУТ № 271585 от 17.02.2021
+        <div className="about-page__hero-text">
+          <h2>TOP DISC — эксперт по электронике и бытовой технике в Пензе</h2>
+          <p className="about-page__lead">
+            Мы объединяем лучшие бренды, выгодные решения и клиентский сервис. В наших магазинах
+            и онлайн-каталоге — тысячи актуальных моделей: от смарт-устройств до техники для дома.
+            Работаем честно, с официальной гарантией и помогаем подобрать то, что подходит именно вам.
           </p>
-        </section>
+          <div className="about-page__actions">
+            <Link className="ps-btn" to="/catalog/">Смотреть каталог</Link>
+            <a className="btn--outline-accent" href={MAP_MAIN} target="_blank" rel="noopener noreferrer">Проложить маршрут</a>
+          </div>
+        </div>
+
+        <ImageWithFallback className="about-page__hero-img" src={`${IMG_BASE}/top.jpg`} alt="TOP DISC" />
+
+        <div className="about-page__grid">
+          <div className="about-page__card">
+            <h2>Наши розничные точки</h2>
+            <ul className="about-page__stores">
+              {STORES.map((s, i) => (
+                <li key={i}>
+                  <strong>{s.name}</strong> — {s.address}.
+                  <div><a href={s.map} target="_blank" rel="noopener noreferrer">Открыть на карте</a></div>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="about-page__card">
+            <h2>Парковка и входы главного супермаркета (Платформа)</h2>
+            <ul className="about-page__checklist">
+              {PARKING.map((p) => <li key={p}>{p}</li>)}
+            </ul>
+          </div>
+        </div>
+
+        <div className="about-page__photo-grid">
+          <ImageWithFallback src={`${IMG_BASE}/kbt.jpg`} alt="Бытовая техника в зале" />
+          <ImageWithFallback src={`${IMG_BASE}/phone.jpg`} alt="Смартфоны в зале" />
+        </div>
+
+        <div className="ps-divider" />
+
+        <div className="about-page__categories">
+          {CATEGORIES.map((cat) => (
+            <div className="about-page__category" key={cat.title}>
+              <h2>{cat.title}</h2>
+              <p>{cat.text}</p>
+              <div className="about-page__badges">
+                {cat.badges.map(([label, url]) => (
+                  <Link className="about-page__badge" to={url} key={label}>{label}</Link>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="ps-divider" />
+
+        <ImageWithFallback className="about-page__gallery-img" src={`${IMG_BASE}/navigation.jpg`} alt="Навигация по залу" />
+
+        <div className="about-page__footer">
+          <Link to="/catalog/">Каталог</Link>
+          <span aria-hidden="true">·</span>
+          <Link to="/contacts/">Контакты</Link>
+          <span aria-hidden="true">·</span>
+          <a href={MAP_MAIN} target="_blank" rel="noopener noreferrer">Маршрут</a>
+        </div>
       </div>
     </>
   )
