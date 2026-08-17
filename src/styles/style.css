@@ -7671,6 +7671,50 @@ p.region-delivery__note {
   }
 
   /* =========================
+       Store locations list
+    ========================= */
+  .contacts__stores-title {
+    margin: 0 0 16px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
+  .contacts__stores {
+    margin-bottom: 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .contacts__store {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-radius: 12px;
+    padding: 20px;
+    background-color: #F9F9F9;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #1a1a1a;
+  }
+
+  .contacts__store strong {
+    font-size: 15px;
+  }
+
+  .contacts__store-hours {
+    color: #44BD31;
+    font-weight: 500;
+  }
+
+  .contacts__store-note {
+    margin-top: 6px;
+    font-size: 12px;
+    color: #777;
+  }
+
+  /* =========================
        Map embed
     ========================= */
   .contacts__map iframe {
@@ -7751,6 +7795,10 @@ p.region-delivery__note {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
       gap: 12px;
+    }
+
+    .contacts__stores {
+      grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
     }
   }
 

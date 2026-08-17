@@ -3,6 +3,34 @@ import { useEffect, useRef } from 'react'
 import JsonLd from '../../components/JsonLd/JsonLd'
 import { breadcrumbSchema, storeSchema } from '../../utils/jsonLd'
 
+const STORES = [
+  {
+    name: 'TOP DISC Платформа',
+    address: 'Ставского 4 (Напротив АЗС Роснефть)',
+    hours: 'Ежедневно с 9:00 до 21:00',
+    coords: [53.192862, 45.003436],
+    note: 'ТОП Сервис — с 1 апреля 2026 года режим работы сервисного центра: Пн–Пт 9:00–19:00, Сб–Вс 9:00–16:00',
+  },
+  {
+    name: 'TOP DISC Смарт',
+    address: 'Проспект Победы 124 (Универсам №173 со стороны ТРЦ «Квадрат»)',
+    hours: 'Ежедневно с 9:00 до 20:00',
+    coords: [53.227478, 44.937608],
+  },
+  {
+    name: 'TOP DISC Смарт Мини',
+    address: 'Проспект Строителей 1В (ТЦ «Коллаж», 1 этаж)',
+    hours: 'Ежедневно с 10:00 до 22:00',
+    coords: [53.220241, 44.951110],
+  },
+  {
+    name: 'TOP DISC Смарт Мини',
+    address: 'ул. Мира 60 (ТЦ «Западный», слева от главного входа)',
+    hours: 'Ежедневно с 9:00 до 21:00',
+    coords: [53.186272, 44.980551],
+  },
+]
+
 function Contacts() {
   const mapRef = useRef(null)
 
@@ -10,26 +38,29 @@ function Contacts() {
     if (!mapRef.current || mapRef.current.dataset.loaded) return
     mapRef.current.dataset.loaded = 'true'
 
-    const checkYmaps = () => {
-      if (window.ymaps) {
-        window.ymaps.ready(() => {
-          const map = new window.ymaps.Map(mapRef.current, {
-            center: [53.195041, 45.018434],
-            zoom: 16,
-          })
-          map.geoObjects.add(new window.ymaps.Placemark([53.195041, 45.018434], {
-            balloonContent: 'TOP DISC — г. Пенза, ул. Ставского, д. 4',
+    const initMap = () => {
+      window.ymaps.ready(() => {
+        const map = new window.ymaps.Map(mapRef.current, {
+          center: STORES[0].coords,
+          zoom: 12,
+        })
+        STORES.forEach((store) => {
+          map.geoObjects.add(new window.ymaps.Placemark(store.coords, {
+            balloonContentHeader: store.name,
+            balloonContentBody: `${store.address}<br>${store.hours}`,
+            hintContent: store.name,
           }))
         })
-      }
+        map.setBounds(map.geoObjects.getBounds(), { checkZoomRange: true, zoomMargin: 40 })
+      })
     }
 
     if (window.ymaps) {
-      checkYmaps()
+      initMap()
     } else {
       const script = document.createElement('script')
       script.src = 'https://api-maps.yandex.ru/2.1/?apikey=&lang=ru_RU'
-      script.onload = checkYmaps
+      script.onload = initMap
       document.head.appendChild(script)
     }
   }, [])
@@ -38,7 +69,7 @@ function Contacts() {
     <>
       <Helmet>
         <title>Контакты — Top Disc</title>
-        <meta name="description" content="Контакты магазина Top Disc: телефон, адрес, режим работы." />
+        <meta name="description" content="Контакты магазина Top Disc: телефон, адреса всех точек, режим работы." />
       </Helmet>
       <JsonLd data={[
         storeSchema(),
@@ -82,22 +113,34 @@ function Contacts() {
           </div>
         </div>
 
+        <h2 className="contacts__stores-title">Наши розничные точки</h2>
+        <div className="contacts__stores">
+          {STORES.map((s, i) => (
+            <div className="contacts__store" key={i}>
+              <strong>{s.name}</strong>
+              <span>{s.address}</span>
+              <span className="contacts__store-hours">{s.hours}</span>
+              {s.note && <span className="contacts__store-note">{s.note}</span>}
+            </div>
+          ))}
+        </div>
+
         <div ref={mapRef} style={{ width: '100%', height: 400 }} />
 
         <section className="contacts__about">
           <div className="contacts__about-text">
             <h2 className="contacts__about-title">О компании</h2>
             <p>
-              <strong>Top Disc</strong> – оптово‑розничный супермаркет электроники,
-              образованный в 2007 году, расположенный по адресу: г. Пенза, ул.
-              Ставского, 4.
+              <strong>Top Disc</strong> — онлайн-платформа по продаже техники и электроники,
+              образованная в 2007 году.
             </p>
             <p>
               Компания Top Disc заинтересована в поставщиках компьютерных и
               сотовых аксессуаров, автoаксессуаров, портативной электроники и
               сопутствующих товаров. Лояльно относимся к новым брендам, выходящим на
               рынок. Мы с радостью ответим на все вопросы по работе компании, выслушаем
-              конструктивную критику или добрые отзывы о нашей работе.
+              конструктивную критику или добрые отзывы о нашей работе. Присылайте ваши
+              письма по адресу <a href="mailto:info@topdisc.ru">info@topdisc.ru</a>.
             </p>
           </div>
         </section>
