@@ -437,7 +437,11 @@ function Checkout() {
       .then(async (res) => {
         if (cancelled) return
         const raw = res.data?.result?.stores || []
-        const active = raw.filter((s) => s.active === 'Y' && s.address)
+        // shippingCenter='Y' — внутренний склад/буфер отгрузки (не точка
+        // самовывоза для клиента), у таких записей в ADDRESS часто лежит
+        // не адрес, а служебное название ("Депо", "Склад - Технопорт"),
+        // что дополнительно ломало геокодирование на карте.
+        const active = raw.filter((s) => s.active === 'Y' && s.address && s.shippingCenter !== 'Y')
         if (!active.length) return
         const mapped = active.map((s) => ({
           id: s.id,
