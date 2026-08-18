@@ -2578,6 +2578,7 @@ footer {
 .hits-green .catalog__main-button {
     display: block;
     margin: 0 auto;
+    width: auto;
 }
 
 /* ---------- mobile ≤768 px ---------- */
