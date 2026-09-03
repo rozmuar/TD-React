@@ -18,6 +18,45 @@ import JsonLd from '../../components/JsonLd/JsonLd'
 import AddToCartButton from '../../components/AddToCartButton/AddToCartButton'
 import { productSchema, breadcrumbSchema } from '../../utils/jsonLd'
 
+// Skeleton-заглушка на время загрузки товара (вместо пустого экрана)
+function ProductSkeleton() {
+  return (
+    <>
+      <div className="breadcrumbs">
+        <div className="container">
+          <ul className="breadcrumbs-list">
+            <li className="breadcrumbs-item"><Link className="breadcrumbs-link" to="/">Главная</Link></li>
+            <li className="breadcrumbs-item"><Link className="breadcrumbs-link" to="/catalog/">Каталог</Link></li>
+          </ul>
+        </div>
+      </div>
+      <div className="container">
+        <div className="product-info">
+          <div className="product-gallery">
+            <div className="product-gallery__thumbs">
+              <div className="skeleton" style={{ width: '100%', height: '100%' }} />
+            </div>
+            <div className="product-gallery__main">
+              <div className="skeleton" style={{ width: '100%', height: '100%' }} />
+            </div>
+          </div>
+          <div className="product">
+            <div className="skeleton" style={{ width: 90, height: 20, marginBottom: 16 }} />
+            <div className="skeleton" style={{ width: '95%', height: 24, marginBottom: 10 }} />
+            <div className="skeleton" style={{ width: '55%', height: 24, marginBottom: 24 }} />
+            <div className="skeleton" style={{ width: 140, height: 16, marginBottom: 24 }} />
+            <div className="skeleton" style={{ width: 160, height: 34, marginBottom: 30 }} />
+            <div className="product__actions">
+              <div className="skeleton" style={{ flex: 1, height: 50, borderRadius: 8 }} />
+              <div className="skeleton" style={{ flex: 1, height: 50, borderRadius: 8 }} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}
+
 function Product() {
   const { categoryCode, productCode } = useParams()
   const navigate = useNavigate()
@@ -191,7 +230,7 @@ function Product() {
   }
 
   if (!product) {
-    return null // Показываем prerendered контент
+    return <ProductSkeleton />
   }
 
   return (
