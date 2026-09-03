@@ -1038,7 +1038,7 @@ function Category() {
                         to={categoryUrl(sub)}
                         className="catalog__main-bar"
                       >
-                        {sub.name}
+                        {decodeHtml(sub.name)}
                       </Link>
                     ))}
                   </div>
