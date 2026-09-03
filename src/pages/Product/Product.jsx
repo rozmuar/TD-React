@@ -180,6 +180,9 @@ function Product() {
   const hasPrice = parseFloat(product?.price) > 0
   const isAvailable = hasPrice && hasStock
 
+  // Баллы приходят с бэкенда полем bonus — не показываем, если 0/пусто
+  const productBonus = Math.round(parseFloat(product?.bonus) || 0)
+
   // Всегда рендерим все характеристики, скрываем через CSS
   const allSpecs = product?.properties || []
 
@@ -293,17 +296,17 @@ function Product() {
           <div className="product">
             <header className="product__header">
               <div className="product__row-badge">
-                {isAvailable && (
+                {isAvailable && productBonus > 0 && (
                   <span className="product__bonus mobile-hidden">
-                    {Math.round(parseFloat(product.bonus) || 0)} <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
+                    {productBonus} <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
                   </span>
                 )}
               </div>
               <h1 className="product__title">
                 {decodeHtml(product.name)}
-                {isAvailable && (
+                {isAvailable && productBonus > 0 && (
                   <span className="product__bonus desktop-hidden">
-                    {Math.round(parseFloat(product.bonus) || 0)} <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
+                    {productBonus} <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
                   </span>
                 )}
               </h1>

@@ -71,10 +71,12 @@ function ProductCard({ product }) {
                 <div className="catalog__main-oldprice">{formattedOldPrice} ₽</div>
               )}
             </div>
-            <div className="catalog__main-score">
-              <div className="catalog__main-score-num">{score}</div>
-              <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
-            </div>
+            {score > 0 && (
+              <div className="catalog__main-score">
+                <div className="catalog__main-score-num">{score}</div>
+                <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
+              </div>
+            )}
           </div>
           <AddToCartButton product={product} className="catalog__main-button" />
         </>
