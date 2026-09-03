@@ -295,7 +295,7 @@ function Product() {
               <div className="product__row-badge">
                 {isAvailable && (
                   <span className="product__bonus mobile-hidden">
-                    {Math.round(parseFloat(product.price) * 0.03)} <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
+                    {Math.round(parseFloat(product.bonus) || 0)} <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
                   </span>
                 )}
               </div>
@@ -303,7 +303,7 @@ function Product() {
                 {decodeHtml(product.name)}
                 {isAvailable && (
                   <span className="product__bonus desktop-hidden">
-                    {Math.round(parseFloat(product.price) * 0.03)} <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
+                    {Math.round(parseFloat(product.bonus) || 0)} <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
                   </span>
                 )}
               </h1>

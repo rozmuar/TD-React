@@ -282,7 +282,7 @@ function Home() {
                           )}
                         </div>
                         <div className="catalog__main-score">
-                          <div className="catalog__main-score-num">{Math.round(price * 0.03)}</div>
+                          <div className="catalog__main-score-num">{Math.round(parseFloat(product.bonus) || 0)}</div>
                           <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
                         </div>
                       </div>

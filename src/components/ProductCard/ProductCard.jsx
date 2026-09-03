@@ -44,10 +44,10 @@ function ProductCard({ product }) {
     [product.oldPrice]
   )
 
-  // Баллы = 3% от цены
-  const score = useMemo(() => 
-    Math.round(parseFloat(product.price) * 0.03),
-    [product.price]
+  // Баллы приходят с бэкенда полем bonus (app_mobile.product_list)
+  const score = useMemo(() =>
+    Math.round(parseFloat(product.bonus) || 0),
+    [product.bonus]
   )
 
   return (
