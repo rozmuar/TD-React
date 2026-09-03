@@ -35,6 +35,60 @@ function categoryUrl(cat) {
   return `/category/${cat.code}/`
 }
 
+// ── Skeleton-заглушки на время загрузки (вместо текста "Загрузка...") ──
+function ProductCardSkeleton() {
+  return (
+    <div className="catalog__main-item">
+      <div className="catalog__main-imagewrapper">
+        <div className="skeleton" style={{ width: '100%', height: '100%' }} />
+      </div>
+      <div className="skeleton" style={{ width: '90%', height: 14, marginBottom: 8 }} />
+      <div className="skeleton" style={{ width: '55%', height: 14, marginBottom: 14 }} />
+      <div className="catalog__main-row">
+        <div className="skeleton" style={{ width: 70, height: 20 }} />
+        <div className="skeleton" style={{ width: 30, height: 16 }} />
+      </div>
+      <div className="skeleton" style={{ width: '100%', height: 44, borderRadius: 8, marginTop: 12 }} />
+    </div>
+  )
+}
+
+function FilterSkeleton() {
+  return (
+    <div className="category-skeleton__filter">
+      <div className="skeleton" style={{ width: '50%', height: 16, marginBottom: 16 }} />
+      <div className="skeleton" style={{ width: '80%', height: 12, marginBottom: 10 }} />
+      <div className="skeleton" style={{ width: '65%', height: 12, marginBottom: 10 }} />
+      <div className="skeleton" style={{ width: '70%', height: 12 }} />
+    </div>
+  )
+}
+
+function CategorySkeleton({ cards = 8 }) {
+  return (
+    <div className="catalog">
+      <div className="container">
+        <div className="skeleton" style={{ width: 260, height: 30, marginBottom: 28 }} />
+        <div className="catalog__row">
+          <aside className="catalog__filters mobile-hidden">
+            {Array.from({ length: 4 }).map((_, i) => <FilterSkeleton key={i} />)}
+          </aside>
+          <div className="catalog__main">
+            <div className="catalog__main-bars">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="skeleton category-skeleton__tag" style={{ width: 90, height: 28 }} />
+              ))}
+            </div>
+            <div className="catalog__main-list">
+              {Array.from({ length: cards }).map((_, i) => <ProductCardSkeleton key={i} />)}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function Category() {
   const { categoryId } = useParams()
   const [searchParams, setSearchParams] = useSearchParams()
@@ -644,9 +698,7 @@ function Category() {
             </ul>
           </div>
         </div>
-        <div className="container">
-          <div className="catalog__loading">Загрузка категории...</div>
-        </div>
+        <CategorySkeleton />
       </>
     )
   }
@@ -1020,7 +1072,7 @@ function Category() {
                 {/* Товары */}
                 <div className="catalog__main-list">
                   {loading && filteredProducts.length === 0 ? (
-                    <div className="catalog__loading">Загрузка товаров...</div>
+                    Array.from({ length: 8 }).map((_, i) => <ProductCardSkeleton key={i} />)
                   ) : filteredProducts.length > 0 ? (
                     filteredProducts.map(product => (
                       <ProductCard key={product.id} product={product} />

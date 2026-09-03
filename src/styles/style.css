@@ -1393,6 +1393,46 @@ input[type="search"]::-webkit-search-cancel-button {
 }
 
 /* ---------- базовые настройки боковой колонки ---------- */
+/* ========== Skeleton-заглушки на время загрузки каталога ========== */
+@keyframes skeleton-shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+.skeleton {
+    position: relative;
+    overflow: hidden;
+    background-color: #EDEDED;
+    border-radius: 6px;
+}
+
+.skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+    animation: skeleton-shimmer 1.5s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .skeleton::after {
+        animation: none;
+    }
+}
+
+.category-skeleton__tag {
+    border-radius: 70px;
+}
+
+.category-skeleton__filter {
+    padding: 16px 0;
+    border-bottom: 1px solid #EDEDED;
+}
+
+.category-skeleton__filter:last-child {
+    border-bottom: none;
+}
+
 .catalog__filters {
     flex-direction: column;
     width: 278px;
