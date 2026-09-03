@@ -106,6 +106,10 @@ function Category() {
   const [filters, setFilters] = useState(ssrMatch ? ssrData.filters : null)
   const [loading, setLoading] = useState(!ssrMatch)
   const [mainCategory, setMainCategory] = useState(ssrMatch ? ssrData.mainCategory : null)
+  // true, когда известно не только mainCategory, но и то, какой у неё макет
+  // (сетка подкатегорий или список товаров) — до этого момента держим
+  // skeleton, иначе на миг мелькает не тот layout ("схлопывание")
+  const [categoryReady, setCategoryReady] = useState(ssrMatch)
   const [categoryDescription, setCategoryDescription] = useState(ssrMatch ? ssrData.categoryDescription : '')
   const [breadcrumbsPath, setBreadcrumbsPath] = useState(ssrMatch ? ssrData.breadcrumbsPath : [])
   const [totalPages, setTotalPages] = useState(ssrMatch ? ssrData.totalPages : 1)
@@ -297,6 +301,7 @@ function Category() {
     setIsProductListPage(false)
     setTotalPages(1)
     setMainCategory(null)
+    setCategoryReady(false)
     setChildSubcategories([])
     setActiveFilters({})
     setAppliedFilters({})
@@ -413,7 +418,8 @@ function Category() {
         }
         
         setIsProductListPage(showProductList)
-        
+        setCategoryReady(true)
+
         // Загрузка фильтров
         if (needProducts) {
           try {
@@ -480,6 +486,9 @@ function Category() {
         }
       } finally {
         setLoading(false)
+        // Страховка: если запрос прервался ошибкой раньше, чем успели узнать
+        // layout категории, не оставляем skeleton висеть вечно
+        setCategoryReady(true)
         // Флаг для prerender скрипта
         const root = document.getElementById('root')
         if (root) root.dataset.ready = 'true'
@@ -679,8 +688,9 @@ function Category() {
     )
   }
 
-  // Показываем заглушку пока категория загружается
-  if (!mainCategory) {
+  // Показываем заглушку, пока не известны и категория, и её макет
+  // (сетка подкатегорий vs список товаров) — иначе на миг мелькает не тот layout
+  if (!mainCategory || !categoryReady) {
     return (
       <>
         <Helmet>
@@ -844,6 +854,13 @@ function Category() {
                 
                 {/* Динамические фильтры */}
                 {(() => {
+                  // Пока фильтры ещё грузятся — держим skeleton-заглушки,
+                  // а не null, иначе блок фильтров схлопывается и снова
+                  // "распухает", когда данные приходят
+                  if (loading && !filters) {
+                    return <>{Array.from({ length: 4 }).map((_, i) => <FilterSkeleton key={i} />)}</>
+                  }
+
                   if (!filters || !filters.ITEMS || !Array.isArray(filters.ITEMS)) {
                     return null
                   }
