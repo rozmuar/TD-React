@@ -36,7 +36,7 @@ function ProductSkeleton() {
             <div className="product-gallery__thumbs">
               <div className="skeleton" style={{ width: '100%', height: '100%' }} />
             </div>
-            <div className="product-gallery__main">
+            <div className="product-gallery__main" style={{ flex: 'none', width: 517, maxWidth: '100%' }}>
               <div className="skeleton" style={{ width: '100%', height: '100%' }} />
             </div>
           </div>
