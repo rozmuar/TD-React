@@ -109,11 +109,14 @@ async function createServer() {
         const linkStr = helmet.link?.toString() || ''
         const scriptStr = helmet.script?.toString() || ''
 
-        // Если страница сама задаёт description — убираем дефолтный
-        // из index.html, иначе поисковик берёт первый (статический)
-        // тег и игнорирует наш, специфичный для страницы.
+        // Если страница сама задаёт description/keywords — убираем дефолтные
+        // из index.html, иначе поисковик берёт первый (статический) тег
+        // и игнорирует наш, специфичный для страницы.
         if (metaStr.includes('name="description"')) {
           finalHtml = finalHtml.replace(/<meta name="description"[^>]*>\s*/, '')
+        }
+        if (metaStr.includes('name="keywords"')) {
+          finalHtml = finalHtml.replace(/<meta name="keywords"[^>]*>\s*/, '')
         }
 
         // JSON-LD (schema.org) рендерится через <script> внутри Helmet
