@@ -226,7 +226,7 @@ function Product() {
   }
 
   const getArtikul = () => {
-    return product?.sku || product?.properties?.find(p => p.name === 'Артикул')?.value || product?.id
+    return product?.sku || product?.properties?.find(p => p.name === 'Артикул')?.value || null
   }
 
   // Доступность: цена > 0 и quantity > 0
@@ -375,7 +375,7 @@ function Product() {
 
             {/* Рейтинг / Артикул */}
             <div className="product__meta">
-              <span className="product__sku">Артикул: {getArtikul()}</span>
+              {getArtikul() && <span className="product__sku">Артикул: {getArtikul()}</span>}
               <div className="product__meta-right">
                 <span className="product__rating">
                   <img src="/img/star.png" alt="star" />
