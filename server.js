@@ -109,14 +109,26 @@ async function createServer() {
         const linkStr = helmet.link?.toString() || ''
         const scriptStr = helmet.script?.toString() || ''
 
-        // Если страница сама задаёт description/keywords — убираем дефолтные
-        // из index.html, иначе поисковик берёт первый (статический) тег
-        // и игнорирует наш, специфичный для страницы.
-        if (metaStr.includes('name="description"')) {
-          finalHtml = finalHtml.replace(/<meta name="description"[^>]*>\s*/, '')
-        }
-        if (metaStr.includes('name="keywords"')) {
-          finalHtml = finalHtml.replace(/<meta name="keywords"[^>]*>\s*/, '')
+        // Если страница сама задаёт description/keywords/OG/Twitter-теги —
+        // убираем дефолтные из index.html, иначе поисковик/соцсеть берёт
+        // первый (статический, общий) тег и игнорирует наш, специфичный
+        // для страницы.
+        const OVERRIDABLE_META = [
+          'name="description"',
+          'name="keywords"',
+          'property="og:type"',
+          'property="og:title"',
+          'property="og:description"',
+          'property="og:image"',
+          'property="twitter:card"',
+          'property="twitter:title"',
+          'property="twitter:description"',
+          'property="twitter:image"',
+        ]
+        for (const attr of OVERRIDABLE_META) {
+          if (metaStr.includes(attr)) {
+            finalHtml = finalHtml.replace(new RegExp(`<meta ${attr}[^>]*>\\s*`), '')
+          }
         }
 
         // JSON-LD (schema.org) рендерится через <script> внутри Helmet

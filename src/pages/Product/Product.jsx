@@ -253,12 +253,25 @@ function Product() {
     return <ProductSkeleton />
   }
 
+  const pageTitle = decodeHtml(product.seo?.title) || `${decodeHtml(product.name)} - TopDisk`
+  const pageDescription = decodeHtml(product.seo?.description) || `Купить ${decodeHtml(product.name)} в интернет-магазине TopDisk`
+
   return (
     <>
       <Helmet>
-        <title>{decodeHtml(product.seo?.title) || `${decodeHtml(product.name)} - TopDisk`}</title>
-        <meta name="description" content={decodeHtml(product.seo?.description) || `Купить ${decodeHtml(product.name)} в интернет-магазине TopDisk`} />
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
         {product.seo?.keywords && <meta name="keywords" content={decodeHtml(product.seo.keywords)} />}
+
+        <meta property="og:type" content="product" />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        {product.image && <meta property="og:image" content={product.image} />}
+
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta property="twitter:title" content={pageTitle} />
+        <meta property="twitter:description" content={pageDescription} />
+        {product.image && <meta property="twitter:image" content={product.image} />}
       </Helmet>
       <JsonLd data={[
         productSchema(
