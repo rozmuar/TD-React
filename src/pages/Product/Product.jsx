@@ -226,7 +226,7 @@ function Product() {
   }
 
   const getArtikul = () => {
-    return product?.sku || product?.properties?.find(p => p.name === 'Артикул')?.value || null
+    return product?.sky || product?.properties?.find(p => p.name === 'Артикул')?.value || null
   }
 
   // Доступность: цена > 0 и quantity > 0

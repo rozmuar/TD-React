@@ -119,7 +119,7 @@ export function productSchema(product, opts = {}) {
     if (p) brand = p.value || p.text
   }
 
-  const sku = product.sku || product.article
+  const sku = product.sky || product.sku || product.article
     || (Array.isArray(product.properties)
       ? (product.properties.find((p) => p?.name === 'Артикул')?.value)
       : null)
