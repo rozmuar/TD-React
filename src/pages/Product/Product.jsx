@@ -17,6 +17,7 @@ import CreditModal from '../../components/CreditModal/CreditModal'
 import JsonLd from '../../components/JsonLd/JsonLd'
 import AddToCartButton from '../../components/AddToCartButton/AddToCartButton'
 import { productSchema, breadcrumbSchema } from '../../utils/jsonLd'
+import { getBadgeClass } from '../../utils/productBadge'
 
 // Достаём массив картинок галереи из свойства "Галерея" (JSON-строка со
 // доп. фото) + основное фото первым — используется и для начального
@@ -369,6 +370,9 @@ function Product() {
           <div className="product">
             <header className="product__header">
               <div className="product__row-badge">
+                {product.badge && (
+                  <span className={`product__badge product__badge--${getBadgeClass(product.badge)}`}>{product.badge}</span>
+                )}
                 {isAvailable && productBonus > 0 && (
                   <span className="product__bonus mobile-hidden">
                     {productBonus} <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />

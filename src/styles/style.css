@@ -3236,8 +3236,33 @@ footer {
     color: #fff;
 }
 
-.product__badge--hit {
+.product__badge--hit,
+.catalog__main-badge--hit {
     background: #EB3D4D;
+}
+
+.product__badge--new,
+.catalog__main-badge--new {
+    background: #2F80ED;
+}
+
+.product__badge--sale,
+.catalog__main-badge--sale {
+    background: #FF7A00;
+}
+
+/* Бейдж поверх картинки товара в каталоге/списках */
+.catalog__main-badge {
+    position: absolute;
+    top: 8px;
+    left: 0;
+    z-index: 1;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.3;
+    color: #fff;
 }
 
 .product__title {
