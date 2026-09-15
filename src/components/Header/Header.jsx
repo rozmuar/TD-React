@@ -36,6 +36,18 @@ function Header() {
 
   useEffect(() => () => clearTimeout(cartBumpTimer.current), [])
 
+  // Поиск Diginetica (автокомплит + выдача) — тот же виджет, что и на
+  // topdisc.ru. Скрипт сам находит поле по id="title-search-input" и
+  // строит свой оверлей — с нашей стороны ничего больше не нужно.
+  useEffect(() => {
+    if (document.querySelector('script[src*="cdn.diginetica.net"]')) return
+    const script = document.createElement('script')
+    script.src = '//cdn.diginetica.net/7077/client.js'
+    script.defer = true
+    script.async = true
+    document.head.appendChild(script)
+  }, [])
+
   // Автоматически открываем модалку авторизации при редиректе с защищённой страницы
   useEffect(() => {
     if (location.state?.requireAuth && !isAuthenticated) {
@@ -101,7 +113,7 @@ function Header() {
             {/* Поиск */}
             <form className="header__search" onSubmit={(e) => e.preventDefault()}>
               <button className="header__search-btn" aria-label="Найти"></button>
-              <input type="search" className="header__search-input" placeholder="Поиск по каталогу" />
+              <input type="search" id="title-search-input" className="header__search-input" placeholder="Поиск по каталогу" autoComplete="off" />
             </form>
 
             {/* Иконки действий справа */}
