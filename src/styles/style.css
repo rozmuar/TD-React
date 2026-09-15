@@ -3369,6 +3369,7 @@ footer {
     font-weight: 400;
     color: #999999;
     padding-bottom: 2px;
+    text-decoration: line-through;
 }
 
 /* Магазины */

@@ -39,9 +39,12 @@ function ProductCard({ product }) {
     [product.price]
   )
   
-  const formattedOldPrice = useMemo(() => 
-    product.oldPrice ? Math.floor(product.oldPrice).toLocaleString('ru-RU') : null,
-    [product.oldPrice]
+  const oldPrice = product.oldPrice ?? product.old_price
+  const formattedOldPrice = useMemo(() =>
+    parseFloat(oldPrice) > 0 && parseFloat(oldPrice) > parseFloat(product.price)
+      ? Math.floor(oldPrice).toLocaleString('ru-RU')
+      : null,
+    [oldPrice, product.price]
   )
 
   // Баллы приходят с бэкенда полем bonus (app_mobile.product_list)

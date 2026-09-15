@@ -113,7 +113,7 @@ function Product() {
 
   const handleToggleFavorite = () => {
     if (!product) return
-    dispatch(toggleFavorite({ id: product.id, name: product.name, code: product.code, section_code: categoryCode, image: product.image, price: product.price, oldPrice: product.oldPrice }))
+    dispatch(toggleFavorite({ id: product.id, name: product.name, code: product.code, section_code: categoryCode, image: product.image, price: product.price, oldPrice: getOldPrice() }))
   }
 
   const handleToggleCompare = () => {
@@ -121,7 +121,7 @@ function Product() {
     if (isInCompare) {
       dispatch(removeFromCompare(product.id))
     } else {
-      dispatch(addToCompare({ id: product.id, name: product.name, code: product.code, section_code: categoryCode, image: product.image, price: product.price, oldPrice: product.oldPrice }))
+      dispatch(addToCompare({ id: product.id, name: product.name, code: product.code, section_code: categoryCode, image: product.image, price: product.price, oldPrice: getOldPrice() }))
     }
   }
 
@@ -217,7 +217,7 @@ function Product() {
     code: product.code,
     section_code: categoryCode,
     price: parseFloat(product.price),
-    oldPrice: product.oldPrice,
+    oldPrice: product.oldPrice ?? product.old_price ?? null,
     image: product.image,
   }
 
@@ -227,6 +227,11 @@ function Product() {
 
   const getArtikul = () => {
     return product?.sky || product?.properties?.find(p => p.name === 'Артикул')?.value || null
+  }
+
+  const getOldPrice = () => {
+    const oldPrice = parseFloat(product?.oldPrice ?? product?.old_price)
+    return oldPrice > 0 && oldPrice > parseFloat(product?.price) ? oldPrice : null
   }
 
   // Доступность: цена > 0 и quantity > 0
@@ -370,6 +375,9 @@ function Product() {
             {/* ЦЕНА (mobile) */}
             {isAvailable && (
               <div className="product__price-block desktop-hidden">
+                {getOldPrice() && (
+                  <span className="product__old-price">{getOldPrice().toLocaleString()} ₽</span>
+                )}
                 <span className="product__price">{parseFloat(product.price).toLocaleString()} ₽</span>
               </div>
             )}
@@ -415,6 +423,9 @@ function Product() {
             {/* ЦЕНА (desktop) */}
             {isAvailable && (
               <div className="product__price-block mobile-hidden">
+                {getOldPrice() && (
+                  <span className="product__old-price">{getOldPrice().toLocaleString()} ₽</span>
+                )}
                 <span className="product__price">{parseFloat(product.price).toLocaleString()} ₽</span>
               </div>
             )}

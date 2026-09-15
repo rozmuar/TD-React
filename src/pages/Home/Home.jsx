@@ -254,7 +254,8 @@ function Home() {
             >
               {displayedForYou.map((product) => {
                 const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price
-                const oldPrice = product.oldPrice ? (typeof product.oldPrice === 'string' ? parseFloat(product.oldPrice) : product.oldPrice) : null
+                const rawOldPrice = product.oldPrice ?? product.old_price
+                const oldPrice = parseFloat(rawOldPrice) > 0 && parseFloat(rawOldPrice) > price ? parseFloat(rawOldPrice) : null
                 
                 // Определяем URL товара
                 const productUrl = product.code && (product.section_code || product.category_code)
@@ -384,7 +385,11 @@ function Home() {
               watchOverflow={true}
               className="swiper hits-green__swiper"
             >
-              {hurryToBuyProducts.slice(0, 20).map((product) => (
+              {hurryToBuyProducts.slice(0, 20).map((product) => {
+                const price = parseFloat(product.price)
+                const rawOldPrice = product.oldPrice ?? product.old_price
+                const oldPrice = parseFloat(rawOldPrice) > 0 && parseFloat(rawOldPrice) > price ? parseFloat(rawOldPrice) : null
+                return (
                 <SwiperSlide key={product.id}>
                   <div className="catalog__main-item">
                     <div className="catalog__main-imagewrapper">
@@ -393,13 +398,16 @@ function Home() {
                       </Link>
                     </div>
                     <div className="catalog__main-prices">
-                      <div className="catalog__main-price">{parseFloat(product.price).toLocaleString()} ₽</div>
+                      <div className="catalog__main-price">{price.toLocaleString()} ₽</div>
+                      {oldPrice && (
+                        <div className="catalog__main-oldprice">{oldPrice.toLocaleString()} ₽</div>
+                      )}
                     </div>
                     <Link to={`/catalog/${product.section_code || product.category_code}/${product.code}`} className="catalog__main-title">{decodeHtml(product.name)}</Link>
                     <AddToCartButton product={product} className="catalog__main-button" />
                   </div>
                 </SwiperSlide>
-              ))}
+              )})}
             </Swiper>
 
             <button className="hits-green__nav hits-green__nav--next" aria-label="Следующий"></button>
