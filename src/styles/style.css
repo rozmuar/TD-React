@@ -2298,14 +2298,20 @@ footer {
     gap: 20px;
 }
 
-@media (min-width:769px) {
+@media (min-width:993px) {
+
+    .subcategory__grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+}
+
+@media (min-width:769px) and (max-width:992px) {
 
     .subcategory__grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-
-        grid-template-rows: repeat(3, 1fr);
-
         gap: 20px;
     }
 
