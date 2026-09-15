@@ -3469,7 +3469,7 @@ footer {
     min-height: 250px;
     border-radius: 18px;
     text-decoration: none;
-    background-image: var(--pic), linear-gradient(180deg, #F6F6F6 0%, #EFEFEF 100%);
+    background-image: var(--pic), linear-gradient(90deg, #e2eaf2, #ecf1f7, #e2eaf2);
     background-position: bottom right, 0 0;
     background-size: contain, 100% 100%;
     background-repeat: no-repeat;
@@ -3483,6 +3483,10 @@ footer {
 .catalog__card--xl {
     grid-row: span 2;
     border-radius: 16px;
+}
+
+.catalog__card:not(.catalog__card--xl) {
+    aspect-ratio: 1 / 1;
 }
 
 @media (max-width:992px) {
