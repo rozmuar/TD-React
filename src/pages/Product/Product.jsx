@@ -251,8 +251,9 @@ function Product() {
   return (
     <>
       <Helmet>
-        <title>{decodeHtml(product.name)} - TopDisk</title>
-        <meta name="description" content={`Купить ${decodeHtml(product.name)} в интернет-магазине TopDisk`} />
+        <title>{decodeHtml(product.seo?.title) || `${decodeHtml(product.name)} - TopDisk`}</title>
+        <meta name="description" content={decodeHtml(product.seo?.description) || `Купить ${decodeHtml(product.name)} в интернет-магазине TopDisk`} />
+        {product.seo?.keywords && <meta name="keywords" content={decodeHtml(product.seo.keywords)} />}
       </Helmet>
       <JsonLd data={[
         productSchema(
@@ -357,7 +358,7 @@ function Product() {
                 )}
               </div>
               <h1 className="product__title">
-                {decodeHtml(product.name)}
+                {decodeHtml(product.seo?.h1) || decodeHtml(product.name)}
                 {isAvailable && productBonus > 0 && (
                   <span className="product__bonus desktop-hidden">
                     {productBonus} <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />

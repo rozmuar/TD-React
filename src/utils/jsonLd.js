@@ -140,7 +140,8 @@ export function productSchema(product, opts = {}) {
     seller: { '@id': `${SITE_URL}/#organization` },
   } : undefined
 
-  const description = product.description
+  const description = product.seo?.description
+    || product.description
     || product.preview_text
     || `Купить ${product.name} в интернет-магазине ${SITE_NAME}`
 
