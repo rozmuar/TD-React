@@ -126,8 +126,12 @@ function Product() {
     }
   }
 
+  // ВРЕМЕННО: диагностика бага "остаётся старый товар после SPA-перехода"
+  console.log('[PRODUCT RENDER]', { productCode, categoryCode, ssrMatch, productInState: product?.code, productName: product?.name })
+
   // Сброс состояния при смене товара
   useEffect(() => {
+    console.log('[RESET EFFECT]', { productCode, categoryCode, ssrResetGuardCurrent: ssrResetGuard.current })
     if (ssrResetGuard.current) {
       ssrResetGuard.current = false
       return
@@ -139,6 +143,7 @@ function Product() {
   }, [productCode, categoryCode])
 
   useEffect(() => {
+    console.log('[FETCH EFFECT]', { productCode, categoryCode, ssrFetchGuardCurrent: ssrFetchGuard.current })
     // Если SSR предоставил данные — пропускаем первый запрос
     if (ssrFetchGuard.current) {
       ssrFetchGuard.current = false
@@ -179,7 +184,8 @@ function Product() {
         
         if (response.data.result) {
           const productData = response.data.result
-          
+
+          console.log('[FETCH SUCCESS] setProduct called with:', { code: productData.code, name: productData.name, requestedProductCode: productCode })
           setProduct(productData)
           
           // Парсим sost_text для составного описания
