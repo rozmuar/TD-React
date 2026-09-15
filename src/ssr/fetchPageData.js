@@ -254,8 +254,9 @@ export async function fetchPageData(url) {
     return fetchHome()
   }
 
-  // Товар: /catalog/:cat/:prod/  или /catalog_oth/:cat/:prod/
-  const productMatch = urlPath.match(/^\/(?:catalog|catalog_oth)\/([^/]+)\/([^/]+)\/$/)
+  // Товар: /catalog/:cat/:prod  или /catalog_oth/:cat/:prod (канонически без
+  // слеша на конце — см. server.js, который 301-редиректит вариант со слешем)
+  const productMatch = urlPath.match(/^\/(?:catalog|catalog_oth)\/([^/]+)\/([^/]+?)\/?$/)
   if (productMatch) {
     return fetchProduct(productMatch[1], productMatch[2])
   }
