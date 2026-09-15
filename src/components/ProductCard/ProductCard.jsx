@@ -57,11 +57,11 @@ function ProductCard({ product }) {
           <button className={`action-btn favorite${isInFavorites ? ' is-active' : ''}`} type="button" aria-label="Добавить в избранное" onClick={handleToggleFavorite}></button>
           <button className="action-btn compare" type="button" aria-label="Добавить к сравнению" onClick={handleToggleCompare} style={isInCompare ? { backgroundColor: 'var(--accent, #44BD31)' } : undefined}></button>
         </div>
-        <Link to={`/catalog/${product.section_code}/${product.code}/`}>
+        <Link to={`/catalog/${product.section_code}/${product.code}`}>
             <ImageWithFallback className="catalog__main-image" alt={decodeHtml(product.name)} src={product.image} />
         </Link>
       </div>
-      <Link to={`/catalog/${product.section_code}/${product.code}/`} className="catalog__main-title">{decodeHtml(product.name)}</Link>
+      <Link to={`/catalog/${product.section_code}/${product.code}`} className="catalog__main-title">{decodeHtml(product.name)}</Link>
       {isAvailable ? (
         <>
           <div className="catalog__main-row">

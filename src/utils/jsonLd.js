@@ -106,7 +106,7 @@ export function breadcrumbSchema(items) {
 export function productSchema(product, opts = {}) {
   if (!product || !product.name) return null
   const path = opts.path
-    || (product.section_code && product.code ? `/catalog/${product.section_code}/${product.code}/` : '')
+    || (product.section_code && product.code ? `/catalog/${product.section_code}/${product.code}` : '')
   const url = absUrl(path)
 
   const images = []
@@ -186,7 +186,7 @@ export function itemListSchema(products, opts = {}) {
     description: opts.description,
     numberOfItems: products.length,
     itemListElement: products.slice(0, 50).map((p, idx) => {
-      const path = p.section_code && p.code ? `/catalog/${p.section_code}/${p.code}/` : null
+      const path = p.section_code && p.code ? `/catalog/${p.section_code}/${p.code}` : null
       return {
         '@type': 'ListItem',
         position: idx + 1,

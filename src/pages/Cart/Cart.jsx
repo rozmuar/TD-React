@@ -155,11 +155,11 @@ function Cart() {
                         onChange={() => dispatch(toggleItemSelected(item.id))}
                       />
                     </label>
-                    <Link to={`/catalog/${item.section_code}/${item.code}/`} className="cart__item-img">
+                    <Link to={`/catalog/${item.section_code}/${item.code}`} className="cart__item-img">
                       <ImageWithFallback src={item.image} alt={decodeHtml(item.name)} />
                     </Link>
                     <div className="cart__item-info">
-                      <Link to={`/catalog/${item.section_code}/${item.code}/`} className="cart__item-name">
+                      <Link to={`/catalog/${item.section_code}/${item.code}`} className="cart__item-name">
                         {decodeHtml(item.name)}
                       </Link>
                       <div className="cart__item-controls">

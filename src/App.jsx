@@ -65,8 +65,8 @@ function App({ helmetContext }) {
         <Route path="catalog/:categoryId/" element={<Category />} />
         <Route path="catalog_oth/" element={<Navigate to="/category/premium/" replace />} />
         <Route path="catalog_oth/:categoryId/" element={<CatalogOthCategoryRedirect />} />
-        <Route path="catalog/:categoryCode/:productCode/" element={<Product />} />
-        <Route path="catalog_oth/:categoryCode/:productCode/" element={<Product />} />
+        <Route path="catalog/:categoryCode/:productCode" element={<Product />} />
+        <Route path="catalog_oth/:categoryCode/:productCode" element={<Product />} />
         <Route path="compare/" element={<Compare />} />
         <Route path="favorites/" element={<Favorites />} />
         <Route path="brands/" element={<BrandList />} />

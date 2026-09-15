@@ -258,7 +258,7 @@ function Home() {
                 
                 // Определяем URL товара
                 const productUrl = product.code && (product.section_code || product.category_code)
-                  ? `/catalog/${product.section_code || product.category_code}/${product.code}/`
+                  ? `/catalog/${product.section_code || product.category_code}/${product.code}`
                   : '#'
                 
                 return (
@@ -388,14 +388,14 @@ function Home() {
                 <SwiperSlide key={product.id}>
                   <div className="catalog__main-item">
                     <div className="catalog__main-imagewrapper">
-                      <Link to={`/catalog/${product.section_code || product.category_code}/${product.code}/`}>
+                      <Link to={`/catalog/${product.section_code || product.category_code}/${product.code}`}>
                         <ImageWithFallback className="catalog__main-image" alt={decodeHtml(product.name)} src={product.image} />
                       </Link>
                     </div>
                     <div className="catalog__main-prices">
                       <div className="catalog__main-price">{parseFloat(product.price).toLocaleString()} ₽</div>
                     </div>
-                    <Link to={`/catalog/${product.section_code || product.category_code}/${product.code}/`} className="catalog__main-title">{decodeHtml(product.name)}</Link>
+                    <Link to={`/catalog/${product.section_code || product.category_code}/${product.code}`} className="catalog__main-title">{decodeHtml(product.name)}</Link>
                     <AddToCartButton product={product} className="catalog__main-button" />
                   </div>
                 </SwiperSlide>

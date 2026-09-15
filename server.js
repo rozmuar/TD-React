@@ -44,10 +44,22 @@ async function createServer() {
   // отдаём чистый HTML-шелл, клиент рендерит сам (нет hydration mismatch)
   const CLIENT_ONLY_RE = /^\/(?:cart|personal|compare|favorites)\//
 
+  // Карточка товара — канонический URL без слеша на конце (как на topdisc.ru),
+  // категории/инфостраницы, наоборот, со слешем — их не трогаем.
+  // /catalog/<section>/<code>/ → 301 → /catalog/<section>/<code>
+  const PRODUCT_TRAILING_SLASH_RE = /^\/(catalog|catalog_oth)\/([^/]+)\/([^/]+)\/$/
+
   // Все запросы обрабатываем SSR
   app.use(async (req, res) => {
     const url = req.originalUrl
     const urlPath = url.split('?')[0]
+
+    const productSlashMatch = urlPath.match(PRODUCT_TRAILING_SLASH_RE)
+    if (productSlashMatch) {
+      const [, prefix, section, code] = productSlashMatch
+      const qs = url.includes('?') ? url.slice(url.indexOf('?')) : ''
+      return res.redirect(301, `/${prefix}/${section}/${code}${qs}`)
+    }
 
     try {
       let template, render

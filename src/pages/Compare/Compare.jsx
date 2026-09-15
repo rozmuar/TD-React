@@ -116,10 +116,10 @@ function Compare() {
                 {products.map((p) => (
                   <div className="compare__product" key={p.id}>
                     <button className="compare__product-remove" onClick={() => handleRemove(p.id)} aria-label="Убрать">×</button>
-                    <Link to={`/catalog/${p.section_code}/${p.code}/`} className="compare__product-img">
+                    <Link to={`/catalog/${p.section_code}/${p.code}`} className="compare__product-img">
                       <ImageWithFallback src={p.image} alt={decodeHtml(p.name)} />
                     </Link>
-                    <Link to={`/catalog/${p.section_code}/${p.code}/`} className="compare__product-name">
+                    <Link to={`/catalog/${p.section_code}/${p.code}`} className="compare__product-name">
                       {decodeHtml(p.name)}
                     </Link>
                     <div className="compare__product-prices">

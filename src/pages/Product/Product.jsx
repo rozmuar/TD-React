@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import { useParams, Link, useNavigate } from 'react-router-dom'
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useSSRData } from '../../context/SSRDataContext'
 import { addToCompare, removeFromCompare } from '../../store/slices/compareSlice'
@@ -60,7 +60,16 @@ function ProductSkeleton() {
 function Product() {
   const { categoryCode, productCode } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
   const dispatch = useDispatch()
+
+  // Канонический URL карточки товара — без слеша на конце (как на topdisc.ru).
+  // Категории/инфостраницы, наоборот, со слешем — тут не трогаем.
+  useEffect(() => {
+    if (location.pathname.endsWith('/')) {
+      navigate(location.pathname.slice(0, -1) + location.search, { replace: true })
+    }
+  }, [location.pathname, location.search, navigate])
 
   // SSR данные
   const ssrData = useSSRData()
@@ -207,7 +216,7 @@ function Product() {
   }
 
   const handleColorChange = (colorCode) => {
-    navigate(`/catalog/${categoryCode}/${colorCode}/`)
+    navigate(`/catalog/${categoryCode}/${colorCode}`)
   }
 
   const getArtikul = () => {
@@ -242,7 +251,7 @@ function Product() {
       <JsonLd data={[
         productSchema(
           { ...product, name: decodeHtml(product.name), images: gallery },
-          { path: `/catalog/${categoryCode}/${productCode}/` }
+          { path: `/catalog/${categoryCode}/${productCode}` }
         ),
         breadcrumbSchema([
           { name: 'Главная', url: '/' },
