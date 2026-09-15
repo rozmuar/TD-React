@@ -6,6 +6,23 @@ import { sanitizeHtml } from '../../utils/sanitizeHtml'
 import JsonLd from '../../components/JsonLd/JsonLd'
 import { breadcrumbSchema, collectionPageSchema } from '../../utils/jsonLd'
 
+// ── Skeleton-заглушка на время загрузки списка категорий ──
+function CatalogSkeleton() {
+  return (
+    <div className="catalog__grid">
+      {Array.from({ length: 9 }).map((_, i) => (
+        <div
+          key={i}
+          className={`catalog__card ${i === 0 ? 'catalog__card--xl' : ''}`}
+          style={{ backgroundImage: 'none' }}
+        >
+          <div className="skeleton" style={{ position: 'absolute', inset: 0, borderRadius: 18 }} />
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function Catalog() {
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
@@ -75,9 +92,7 @@ function Catalog() {
           <h1 className="catalog__title">Каталог</h1>
 
           {loading ? (
-            <div className="catalog__grid">
-              <div style={{padding: '20px'}}>Загрузка категорий...</div>
-            </div>
+            <CatalogSkeleton />
           ) : categories.length === 0 ? (
             <div className="catalog__grid">
               <div style={{padding: '20px'}}>Нет доступных категорий</div>
