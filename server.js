@@ -1,7 +1,7 @@
 import express from 'express'
 import fs from 'fs'
 import path from 'path'
-import { fileURLToPath } from 'url'
+import { fileURLToPath, pathToFileURL } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const isProduction = process.env.NODE_ENV === 'production'
@@ -88,7 +88,9 @@ async function createServer() {
           return res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).end(shell)
         }
         // Динамический импорт собранного SSR-бандла
-        const serverEntry = await import(serverEntryPath)
+        // pathToFileURL: dynamic import() needs a valid file:// URL on Windows
+        // (a raw "D:\..." path throws ERR_UNSUPPORTED_ESM_URL_SCHEME there)
+        const serverEntry = await import(pathToFileURL(serverEntryPath).href)
         render = serverEntry.render
       }
 
@@ -97,7 +99,7 @@ async function createServer() {
       // Вставляем отрендеренный HTML
       let finalHtml = template.replace('<!--ssr-outlet-->', appHtml)
 
-      // Обновляем <title> и мета из react-helmet-async
+      // Обновляем <title>, мета, ссылки и JSON-LD из react-helmet-async
       if (helmet) {
         const titleStr = helmet.title?.toString() || ''
         if (titleStr) {
@@ -105,10 +107,22 @@ async function createServer() {
         }
         const metaStr = helmet.meta?.toString() || ''
         const linkStr = helmet.link?.toString() || ''
-        if (metaStr || linkStr) {
+        const scriptStr = helmet.script?.toString() || ''
+
+        // Если страница сама задаёт description — убираем дефолтный
+        // из index.html, иначе поисковик берёт первый (статический)
+        // тег и игнорирует наш, специфичный для страницы.
+        if (metaStr.includes('name="description"')) {
+          finalHtml = finalHtml.replace(/<meta name="description"[^>]*>\s*/, '')
+        }
+
+        // JSON-LD (schema.org) рендерится через <script> внутри Helmet
+        // (см. JsonLd.jsx) — без scriptStr вся структурированная разметка
+        // (Product/CollectionPage/BreadcrumbList) молча терялась при SSR.
+        if (metaStr || linkStr || scriptStr) {
           finalHtml = finalHtml.replace(
             '</head>',
-            `${metaStr}${linkStr}</head>`
+            `${metaStr}${linkStr}${scriptStr}</head>`
           )
         }
       }

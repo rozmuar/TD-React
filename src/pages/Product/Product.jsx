@@ -18,6 +18,23 @@ import JsonLd from '../../components/JsonLd/JsonLd'
 import AddToCartButton from '../../components/AddToCartButton/AddToCartButton'
 import { productSchema, breadcrumbSchema } from '../../utils/jsonLd'
 
+// Достаём массив картинок галереи из свойства "Галерея" (JSON-строка со
+// доп. фото) + основное фото первым — используется и для начального
+// SSR-состояния, и после клиентской дозагрузки товара.
+function parseGalleryFromProduct(productData) {
+  if (!productData) return []
+  const galleryProp = productData.properties?.find(p => p.name === 'Галерея')
+  if (galleryProp && galleryProp.value) {
+    try {
+      const images = JSON.parse(galleryProp.value)
+      return [productData.image, ...images]
+    } catch {
+      return [productData.image]
+    }
+  }
+  return [productData.image]
+}
+
 // Skeleton-заглушка на время загрузки товара (вместо пустого экрана)
 function ProductSkeleton() {
   return (
@@ -81,7 +98,7 @@ function Product() {
   const [category, setCategory] = useState(ssrMatch ? ssrData.category : null)
   const [loading, setLoading] = useState(!ssrMatch)
   const [thumbsSwiper, setThumbsSwiper] = useState(null)
-  const [gallery, setGallery] = useState(ssrMatch && ssrData.product?.images ? ssrData.product.images : [])
+  const [gallery, setGallery] = useState(ssrMatch ? parseGalleryFromProduct(ssrData.product) : [])
   const [selectedColor, setSelectedColor] = useState(null)
   const [showAllSpecs, setShowAllSpecs] = useState(false)
   const [sostText, setSostText] = useState(ssrMatch && ssrData.product?.sost_text ? ssrData.product.sost_text : [])
@@ -171,18 +188,7 @@ function Product() {
             setSostText([])
           }
           
-          // Парсим галерею из properties
-          const galleryProp = productData.properties?.find(p => p.name === 'Галерея')
-          if (galleryProp && galleryProp.value) {
-            try {
-              const images = JSON.parse(galleryProp.value)
-              setGallery([productData.image, ...images])
-            } catch {
-              setGallery([productData.image])
-            }
-          } else {
-            setGallery([productData.image])
-          }
+          setGallery(parseGalleryFromProduct(productData))
         }
       } catch (error) {
         if (error.name !== 'CanceledError') {
