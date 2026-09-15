@@ -247,7 +247,7 @@ function Product() {
         breadcrumbSchema([
           { name: 'Главная', url: '/' },
           { name: 'Каталог', url: '/catalog/' },
-          ...(category ? [{ name: decodeHtml(category.name), url: `/category/${category.code}/` }] : []),
+          ...(category ? [{ name: decodeHtml(category.name), url: `/catalog/${category.code}/` }] : []),
           { name: decodeHtml(product.name) },
         ]),
       ]} />
@@ -264,7 +264,7 @@ function Product() {
             </li>
             {category && (
               <li className="breadcrumbs-item">
-                <Link className="breadcrumbs-link" to={`/category/${category.code}/`}>{decodeHtml(category.name)}</Link>
+                <Link className="breadcrumbs-link" to={`/catalog/${category.code}/`}>{decodeHtml(category.name)}</Link>
               </li>
             )}
           </ul>

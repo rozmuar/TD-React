@@ -32,7 +32,7 @@ function isPremiumCategory(cat) {
 function categoryUrl(cat) {
   if (cat.id === PREMIUM_ROOT_ID || cat.code === 'premium') return '/category/premium/'
   if (isPremiumCategory(cat)) return `/category/premium/${cat.code}/`
-  return `/category/${cat.code}/`
+  return `/catalog/${cat.code}/`
 }
 
 // ── Skeleton-заглушки на время загрузки (вместо текста "Загрузка...") ──

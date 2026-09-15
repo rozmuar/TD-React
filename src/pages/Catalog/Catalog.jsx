@@ -87,7 +87,7 @@ function Catalog() {
               {categories.map((category, index) => (
                 <Link 
                   key={category.id} 
-                  to={`/category/${category.code}/`} 
+                  to={`/catalog/${category.code}/`}
                   className={`catalog__card ${index === 0 ? 'catalog__card--xl' : ''}`}
                   style={{ '--pic': `url(${category.ico})` }}
                 >

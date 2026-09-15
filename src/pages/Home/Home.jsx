@@ -308,7 +308,7 @@ function Home() {
             {popularCategories.slice(0, 9).map((category, index) => (
               <Link
                 key={category.id}
-                to={`/category/${category.code}/`}
+                to={`/catalog/${category.code}/`}
                 className={`popular-card ${index === 0 ? 'popular-card--xl' : ''} ${getCategoryClass(category.code)}`}
                 style={category.ico ? { backgroundImage: `url(${category.ico})` } : {}}
               >
