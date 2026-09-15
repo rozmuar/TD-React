@@ -111,7 +111,10 @@ function Header() {
             </button>
 
             {/* Поиск */}
-            <form className="header__search" onSubmit={(e) => e.preventDefault()}>
+            {/* search-from — класс, за который цепляется виджет Diginetica
+                (openButtonSelector в его конфиге) для позиционирования
+                выпадающей панели результатов относительно формы поиска */}
+            <form className="header__search search-from" onSubmit={(e) => e.preventDefault()}>
               <button className="header__search-btn" aria-label="Найти"></button>
               <input type="search" id="title-search-input" className="header__search-input" placeholder="Поиск по каталогу" autoComplete="off" />
             </form>

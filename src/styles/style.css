@@ -11054,3 +11054,32 @@ a.order-card__product-name:hover {
     grid-template-columns: 1fr;
   }
 }
+
+/* ---------- Diginetica: коррекция позиции оверлея поиска ----------
+   Штатный расчёт позиции в виджете (//cdn.diginetica.net/7077/client.js)
+   ориентирован на классы/контейнеры старой вёрстки сайта (bitlate_pro),
+   которых в новой вёрстке нет — измерение внутри виджета молча
+   проваливается, и панель выдачи растягивается на весь экран вместо
+   компактной панели под поиском. Задаём позицию сами, поверх дефолтов
+   виджета. */
+#digi-shield {
+    top: 118px !important;
+}
+
+.digi-ac {
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    max-width: 900px !important;
+    width: calc(100% - 32px) !important;
+}
+
+@media (max-width: 768px) {
+    #digi-shield {
+        top: 61px !important;
+    }
+
+    .digi-ac {
+        width: calc(100% - 16px) !important;
+    }
+}
