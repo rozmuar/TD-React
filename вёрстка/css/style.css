@@ -3483,6 +3483,8 @@ footer {
 .catalog__card--xl {
     grid-row: span 2;
     border-radius: 16px;
+        background-size: cover;
+    background-position: center;
 }
 
 .catalog__card:not(.catalog__card--xl) {
