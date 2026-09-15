@@ -2385,6 +2385,10 @@ footer {
     transition: box-shadow .2s;
 }
 
+.subcategory__card:not(.subcategory__card--xl) {
+    aspect-ratio: 1 / 1;
+}
+
 .subcategory__card:hover {
     box-shadow: 0 4px 12px rgb(0 0 0 / 8%);
 }
