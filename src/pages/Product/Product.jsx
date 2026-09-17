@@ -14,6 +14,7 @@ import { sanitizeHtml } from '../../utils/sanitizeHtml'
 import PreorderModal from '../../components/PreorderModal/PreorderModal'
 import FindCheaperModal from '../../components/FindCheaperModal/FindCheaperModal'
 import CreditModal from '../../components/CreditModal/CreditModal'
+import OneClickModal from '../../components/OneClickModal/OneClickModal'
 import JsonLd from '../../components/JsonLd/JsonLd'
 import AddToCartButton from '../../components/AddToCartButton/AddToCartButton'
 import { productSchema, breadcrumbSchema } from '../../utils/jsonLd'
@@ -106,6 +107,7 @@ function Product() {
   const [showPreorder, setShowPreorder] = useState(false)
   const [showFindCheaper, setShowFindCheaper] = useState(false)
   const [showCredit, setShowCredit] = useState(false)
+  const [showOneClick, setShowOneClick] = useState(false)
   const abortControllerRef = useRef(null)
   const compareItems = useSelector((s) => s.compare.items)
   const isInCompare = product ? compareItems.some((i) => i.id === product.id) : false
@@ -478,7 +480,7 @@ function Product() {
                   <AddToCartButton product={cartProduct} className="product__btn product__btn--primary">
                     Добавить в корзину
                   </AddToCartButton>
-                  <button className="product__btn product__btn--outline">Купить в 1 клик</button>
+                  <button className="product__btn product__btn--outline" onClick={() => setShowOneClick(true)}>Купить в 1 клик</button>
                 </>
               ) : (
                 <button className="product__btn product__btn--preorder" onClick={() => setShowPreorder(true)}>
@@ -599,9 +601,14 @@ function Product() {
         zIndex: 100
       }}>
         {isAvailable ? (
-          <AddToCartButton product={cartProduct} className="product__btn product__btn--primary" style={{width: '100%'}}>
-            Добавить в корзину
-          </AddToCartButton>
+          <div style={{display: 'flex', gap: 8}}>
+            <AddToCartButton product={cartProduct} className="product__btn product__btn--primary" style={{width: '100%'}}>
+              Добавить в корзину
+            </AddToCartButton>
+            <button className="product__btn product__btn--outline" style={{width: '100%'}} onClick={() => setShowOneClick(true)}>
+              В 1 клик
+            </button>
+          </div>
         ) : (
           <button className="product__btn product__btn--preorder" onClick={() => setShowPreorder(true)} style={{width: '100%'}}>
             Хочу под заказ
@@ -632,6 +639,15 @@ function Product() {
           productId={product.id}
           productPrice={product.price}
           onClose={() => setShowCredit(false)}
+        />
+      )}
+
+      {showOneClick && (
+        <OneClickModal
+          productName={decodeHtml(product.name)}
+          productId={product.id}
+          productPrice={product.price}
+          onClose={() => setShowOneClick(false)}
         />
       )}
     </>
