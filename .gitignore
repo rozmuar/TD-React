@@ -20,6 +20,7 @@ dist-ssr
 
 # Локальная копия бэкенда (Bitrix core) для сверки исходников — не часть фронтенда
 /back
+/bitrix
 
 # Editor directories and files
 .vscode/*
