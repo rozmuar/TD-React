@@ -11,6 +11,7 @@ import { decodeHtml } from '../../utils/decodeHtml'
 import { sanitizeHtml } from '../../utils/sanitizeHtml'
 import { useSSRData } from '../../context/SSRDataContext'
 import AddToCartButton from '../../components/AddToCartButton/AddToCartButton'
+import ProductCard from '../../components/ProductCard/ProductCard'
 
 function Home() {
   const dispatch = useDispatch()
@@ -253,42 +254,9 @@ function Home() {
               className="swiper hits__swiper"
             >
               {displayedForYou.map((product) => {
-                const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price
-                const rawOldPrice = product.oldPrice ?? product.old_price
-                const oldPrice = parseFloat(rawOldPrice) > 0 && parseFloat(rawOldPrice) > price ? parseFloat(rawOldPrice) : null
-                
-                // Определяем URL товара
-                const productUrl = product.code && (product.section_code || product.category_code)
-                  ? `/catalog/${product.section_code || product.category_code}/${product.code}`
-                  : '#'
-                
                 return (
                   <SwiperSlide key={product.id}>
-                    <div className="catalog__main-item">
-                      <div className="catalog__main-imagewrapper">
-                        <div className="catalog__main-item-action-buttons">
-                          <button className="action-btn favorite" type="button" aria-label="Добавить в избранное"></button>
-                          <button className="action-btn compare" type="button" aria-label="Добавить к сравнению"></button>
-                        </div>
-                        <Link to={productUrl}>
-                          <ImageWithFallback className="catalog__main-image" alt={decodeHtml(product.name)} src={product.image} />
-                        </Link>
-                      </div>
-                      <Link to={productUrl} className="catalog__main-title">{decodeHtml(product.name)}</Link>
-                      <div className="catalog__main-row">
-                        <div className="catalog__main-prices">
-                          <div className="catalog__main-price">{price.toLocaleString()} ₽</div>
-                          {oldPrice && (
-                            <div className="catalog__main-oldprice">{oldPrice.toLocaleString()} ₽</div>
-                          )}
-                        </div>
-                        <div className="catalog__main-score">
-                          <div className="catalog__main-score-num">{Math.round(parseFloat(product.bonus) || 0)}</div>
-                          <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
-                        </div>
-                      </div>
-                      <AddToCartButton product={product} className="catalog__main-button" />
-                    </div>
+                    <ProductCard product={product} />
                   </SwiperSlide>
                 )
               })}
@@ -404,7 +372,9 @@ function Home() {
                       )}
                     </div>
                     <Link to={`/catalog/${product.section_code || product.category_code}/${product.code}`} className="catalog__main-title">{decodeHtml(product.name)}</Link>
-                    <AddToCartButton product={product} className="catalog__main-button" />
+                    {parseInt(product.quantity) > 0 && price > 0 && (
+                      <AddToCartButton product={product} className="catalog__main-button" />
+                    )}
                   </div>
                 </SwiperSlide>
               )})}

@@ -13,6 +13,9 @@ function AddToCartButton({ product, className = '', children = 'В корзин�
   useEffect(() => () => clearTimeout(timerRef.current), [])
 
   const handleClick = () => {
+    // addToCart() молча ничего не делает, если у товара нет id (см. cartSlice.js) —
+    // не показываем "Добавлено", если добавлять было нечего
+    if (!product?.id) return
     dispatch(addToCart(product))
     setAdded(true)
     clearTimeout(timerRef.current)
