@@ -313,7 +313,7 @@ function Home() {
                 className={`popular-card ${index === 0 ? 'popular-card--xl' : ''} ${getCategoryClass(category.code)}`}
                 style={category.ico ? { backgroundImage: `url(${category.ico})` } : {}}
               >
-                <span className="popular-card__title" dangerouslySetInnerHTML={{ __html: sanitizeHtml(category.name.replace(/ /g, '<br />')) }} />
+                <span className="popular-card__title" dangerouslySetInnerHTML={{ __html: sanitizeHtml(category.name.replace(/ /g, ' ')) }} />
               </Link>
             ))}
           </div>
