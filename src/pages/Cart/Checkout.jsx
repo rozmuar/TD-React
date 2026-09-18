@@ -563,11 +563,17 @@ function Checkout() {
 
       dispatch(clearCart())
 
-      // Проверяем наличие онлайн-оплаты
+      // Проверяем наличие онлайн-оплаты.
+      // Раньше вели на личный кабинет Bitrix (/personal/order/payment/),
+      // который требует настоящей Bitrix-сессии — у SPA её нет (авторизация
+      // через JWT в заголовке, не через куки), поэтому там всегда было
+      // "Заказ не найден". Новый эндпоинт сам инициирует оплату на бэкенде
+      // и не завязан на сессию — доступ по паре реальных ID заказа/платежа.
       const payment = data.payment?.find((p) => !p.paid)
       if (payment) {
-        const payUrl = `https://topdisc.ru/personal/order/payment/?ORDER_ID=${data.order.id}&PAYMENT_ID=${payment.id}`
-        window.location.href = payUrl
+        // Этот код выполняется только в браузере (клик по кнопке) — как и
+        // filterClient, используем относительный путь через nginx-прокси.
+        window.location.href = `/api/mobile/v1/sale/payment/${data.order.id}/${payment.id}/pay`
         return
       }
 
