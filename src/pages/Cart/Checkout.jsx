@@ -20,6 +20,25 @@ import { getDefaultAddressId } from '../../utils/defaultAddress'
 const DADATA_TOKEN = import.meta.env.VITE_DADATA_TOKEN
 const DADATA_URL = 'https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address'
 
+async function geocodeAddress(address) {
+  if (!address) return null
+  try {
+    const res = await fetch(DADATA_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Authorization: 'Token ' + DADATA_TOKEN,
+      },
+      body: JSON.stringify({ query: address, count: 1 }),
+    })
+    const json = await res.json()
+    const d = json.suggestions?.[0]?.data
+    if (d?.geo_lat && d?.geo_lon) return { lat: Number(d.geo_lat), lng: Number(d.geo_lon) }
+  } catch {}
+  return null
+}
+
 async function suggestCity(query) {
   if (!query || query.length < 2) return []
   const res = await fetch(DADATA_URL, {
@@ -221,6 +240,7 @@ function Checkout() {
   const [deliveryLoading, setDeliveryLoading] = useState(false)
   const [deliveryMethod, setDeliveryMethod] = useState(null)
   const [cdekPoints, setCdekPoints] = useState([])            // пункты самовывоза выбранного способа доставки
+  const geoCacheRef = useRef({})                              // адрес → {lat,lng}|null, чтобы не геокодировать повторно
   const [cdekLoading, setCdekLoading] = useState(false)
   const [selectedStore, setSelectedStore] = useState(null)
   const [storePickerOpen, setStorePickerOpen] = useState(false)
@@ -364,6 +384,38 @@ function Checkout() {
     }))
     setCdekPoints(mapped)
   }
+
+  // ── Геокодируем через DaData точки без GPS в Bitrix ──────
+  // Не у всех магазинов в Bitrix заполнены GPS_N/GPS_S (часто только у
+  // недавно добавленных) — без этого такие точки просто не появлялись бы
+  // на карте. Кэш по адресу в ref (не в state) не даёт эффекту зациклиться:
+  // повторный вызов calculate() пересоздаёт cdekPoints с теми же lat=0 из
+  // Bitrix, но адрес уже есть в кэше — второй запрос к DaData не уйдёт.
+  useEffect(() => {
+    const needGeo = cdekPoints.filter((p) => !p.lat && !p.lng && p.address && !(p.address in geoCacheRef.current))
+    if (!needGeo.length) return
+    let cancelled = false
+    ;(async () => {
+      // Свои магазины в Bitrix хранят адрес без города ("ул. Ставского, д. 4"),
+      // а DaData без города по умолчанию находит более крупный тёзка-город
+      // (проверено: без префикса эта улица геокодируется в Новосибирск).
+      // cityConfirmed уже подтверждён на шаге 1 — используем его.
+      const results = await Promise.allSettled(
+        needGeo.map((p) => geocodeAddress(cityConfirmed ? `${cityConfirmed}, ${p.address}` : p.address))
+      )
+      needGeo.forEach((p, i) => {
+        const r = results[i]
+        geoCacheRef.current[p.address] = r.status === 'fulfilled' ? r.value : null
+      })
+      if (cancelled) return
+      setCdekPoints((prev) => prev.map((p) => {
+        if (p.lat || p.lng) return p
+        const cached = geoCacheRef.current[p.address]
+        return cached ? { ...p, lat: cached.lat, lng: cached.lng } : p
+      }))
+    })()
+    return () => { cancelled = true }
+  }, [cdekPoints])
 
   // ── Получаем location code при подтверждении города ─────
   useEffect(() => {
