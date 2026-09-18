@@ -94,8 +94,8 @@ export const initTidAuth = createAsyncThunk(
     try {
       const res = await tidInit(phone)
       return {
-        redirectUrl: res.data?.redirect_url || res.data?.data?.redirect_url,
-        sessionId: res.data?.session_id || res.data?.data?.session_id,
+        redirectUrl: res.data?.message?.auth_url || res.data?.auth_url || res.data?.redirect_url || res.data?.data?.redirect_url,
+        sessionId: res.data?.message?.session_id || res.data?.session_id || res.data?.data?.session_id,
       }
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Ошибка инициализации T-ID')
