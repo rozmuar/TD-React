@@ -7,7 +7,6 @@ import { fetchUserAddresses } from '../../store/slices/userSlice'
 import {
   getLocationCode, getCheckoutContext, calculateCheckout, submitCheckout,
   sendSmsCode, verifySmsCode,
-  getBitrixStoreList,
   getUserProfile,
   getGuestFuserId,
 } from '../../services/apiClient'
@@ -20,25 +19,6 @@ import { getDefaultAddressId } from '../../utils/defaultAddress'
 // ── DaData подсказки городов ──────────────────────────────
 const DADATA_TOKEN = import.meta.env.VITE_DADATA_TOKEN
 const DADATA_URL = 'https://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address'
-
-async function geocodeAddress(address) {
-  if (!address) return null
-  try {
-    const res = await fetch(DADATA_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-        Authorization: 'Token ' + DADATA_TOKEN,
-      },
-      body: JSON.stringify({ query: address, count: 1 }),
-    })
-    const json = await res.json()
-    const d = json.suggestions?.[0]?.data
-    if (d?.geo_lat && d?.geo_lon) return { lat: Number(d.geo_lat), lng: Number(d.geo_lon) }
-  } catch {}
-  return null
-}
 
 async function suggestCity(query) {
   if (!query || query.length < 2) return []
@@ -134,8 +114,6 @@ function YandexMap({ lat, lng, zoom = 15, points, height = 250, onSelect }) {
 
   return <div ref={containerRef} style={{ width: '100%', height }} />
 }
-
-const DEFAULT_STORES = []
 
 // ── Маска телефона ────────────────────────────────────────
 function formatPhoneInput(value) {
@@ -242,8 +220,7 @@ function Checkout() {
   const [deliveryMethods, setDeliveryMethods] = useState([])
   const [deliveryLoading, setDeliveryLoading] = useState(false)
   const [deliveryMethod, setDeliveryMethod] = useState(null)
-  const [stores, setStores] = useState(DEFAULT_STORES)        // магазины самовывоза
-  const [cdekPoints, setCdekPoints] = useState([])            // ПВЗ СДЭК
+  const [cdekPoints, setCdekPoints] = useState([])            // пункты самовывоза выбранного способа доставки
   const [cdekLoading, setCdekLoading] = useState(false)
   const [selectedStore, setSelectedStore] = useState(null)
   const [storePickerOpen, setStorePickerOpen] = useState(false)
@@ -363,22 +340,29 @@ function Checkout() {
     if (data.errors?.length) setCheckoutErrors(data.errors)
     else setCheckoutErrors([])
 
-    // Пункты самовывоза СДЭК — из ответа calculate/context
-    const cdek = co.selected_delivery?.pickup_points
+    // Пункты самовывоза выбранного способа доставки — из calculate/context.
+    // Формат поля отличается в зависимости от источника на бэкенде: свои
+    // магазины сайта (Bitrix store — title/address/schedule/phone/gps_n/gps_s)
+    // для "Самовывоз"/"Самовывоз Ставского 4", либо реальные ПВЗ СДЭК
+    // (latitude/longitude/full_address/work_time/phones) для профиля СДЭК.
+    // Раньше свои магазины тянулись отдельным запросом catalog.store.list
+    // с фильтром по shippingCenter≠'Y', который ошибочно резал "Платформа
+    // Витрина" (Ставского, 4) — эта точка помечена в Bitrix shippingCenter='Y',
+    // хотя она customer-facing. Источник pickup_points уже отдаёт ровно тот
+    // список точек, что настроен у службы доставки в админке — доверяем ему.
+    const rawPickupPoints = co.selected_delivery?.pickup_points
       || co.available_deliveries?.find((d) => d.selected)?.pickup_points
       || []
-    if (cdek.length) {
-      const mapped = cdek.map((p) => ({
-        id: p.id || p.code,
-        name: p.name || p.city_name || 'Пункт СДЭК',
-        address: p.address || p.full_address || '',
-        hours: p.work_time || p.schedule || '',
-        phone: p.phones?.[0]?.number || '',
-        lat: Number(p.latitude || p.lat || 0),
-        lng: Number(p.longitude || p.lng || 0),
-      }))
-      setCdekPoints(mapped)
-    }
+    const mapped = rawPickupPoints.map((p) => ({
+      id: p.id || p.code,
+      name: p.name || p.title || p.city_name || 'Пункт выдачи',
+      address: p.address || p.full_address || '',
+      hours: p.work_time || p.schedule || '',
+      phone: p.phones?.[0]?.number || p.phone || '',
+      lat: Number(p.latitude || p.lat || p.gps_n || 0),
+      lng: Number(p.longitude || p.lng || p.gps_s || 0),
+    }))
+    setCdekPoints(mapped)
   }
 
   // ── Получаем location code при подтверждении города ─────
@@ -431,43 +415,6 @@ function Checkout() {
       }
       if (!cancelled) setDeliveryLoading(false)
     })()
-
-    // Магазины (самовывоз) — из Bitrix catalog.store.list
-    getBitrixStoreList()
-      .then(async (res) => {
-        if (cancelled) return
-        const raw = res.data?.result?.stores || []
-        // shippingCenter='Y' — внутренний склад/буфер отгрузки (не точка
-        // самовывоза для клиента), у таких записей в ADDRESS часто лежит
-        // не адрес, а служебное название ("Депо", "Склад - Технопорт"),
-        // что дополнительно ломало геокодирование на карте.
-        const active = raw.filter((s) => s.active === 'Y' && s.address && s.shippingCenter !== 'Y')
-        if (!active.length) return
-        const mapped = active.map((s) => ({
-          id: s.id,
-          name: s.title || 'Пункт выдачи',
-          address: s.address,
-          hours: s.schedule || '',
-          phone: s.phone || '',
-          lat: Number(s.GPS_N || s.gpsN || 0),
-          lng: Number(s.GPS_S || s.gpsS || 0),
-        }))
-        // Геокодируем адреса без координат через DaData
-        const needGeo = mapped.filter((s) => !s.lat && !s.lng)
-        if (needGeo.length) {
-          const results = await Promise.allSettled(
-            needGeo.map((s) => geocodeAddress(s.address))
-          )
-          results.forEach((r, i) => {
-            if (r.status === 'fulfilled' && r.value) {
-              needGeo[i].lat = r.value.lat
-              needGeo[i].lng = r.value.lng
-            }
-          })
-        }
-        if (!cancelled) setStores([...mapped])
-      })
-      .catch(() => {})
 
     return () => { cancelled = true }
   }, [cityConfirmed, isAuthenticated, locationCode])
@@ -1046,7 +993,7 @@ function Checkout() {
                             </div>
                             <div className="checkout__store-layout">
                               <div className="checkout__store-list">
-                                {stores
+                                {cdekPoints
                                   .filter((s) => !storeSearch || s.name.toLowerCase().includes(storeSearch.toLowerCase()) || s.address.toLowerCase().includes(storeSearch.toLowerCase()))
                                   .map((store) => (
                                     <div className="checkout__store-item" key={store.id}>
@@ -1067,7 +1014,7 @@ function Checkout() {
                                   lat={selectedStore ? selectedStore.lat : 53.1867}
                                   lng={selectedStore ? selectedStore.lng : 45.0052}
                                   zoom={13}
-                                  points={stores.filter((s) => s.lat && s.lng)}
+                                  points={cdekPoints.filter((s) => s.lat && s.lng)}
                                   height={400}
                                   onSelect={(store) => { setSelectedStore(store); setStorePickerOpen(false) }}
                                 />
