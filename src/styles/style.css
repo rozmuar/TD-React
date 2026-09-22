@@ -276,7 +276,7 @@ a:hover {
     top: 100%;
     left: 0;
     right: 0;
-    z-index: 100;
+    z-index: 1500;
 }
 
 .catalog-menu__overlay {
