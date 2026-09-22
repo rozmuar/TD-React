@@ -17,6 +17,7 @@ import Favorites from './pages/Favorites/Favorites'
 import Cart from './pages/Cart/Cart'
 import Checkout from './pages/Cart/Checkout'
 import OrderSuccess from './pages/Cart/OrderSuccess'
+import PaymentResult from './pages/Cart/PaymentResult'
 import InfoLayout from './pages/Info/InfoLayout'
 import About from './pages/Info/About'
 import Contacts from './pages/Info/Contacts'
@@ -74,6 +75,7 @@ function App({ helmetContext }) {
         <Route path="cart/" element={<Cart />} />
         <Route path="cart/checkout/" element={<Checkout />} />
         <Route path="cart/success/" element={<OrderSuccess />} />
+        <Route path="cart/payment-result/:orderId/" element={<PaymentResult />} />
         <Route element={<InfoLayout />}>
           <Route path="o-nas/" element={<About />} />
           <Route path="contacts/" element={<Contacts />} />
