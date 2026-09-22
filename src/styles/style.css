@@ -411,8 +411,9 @@ a:hover {
 /* ============================================================
    КАТАЛОГ-МЕНЮ — мобильная версия
    Десктопные 3 колонки рядом (560px+) не влезают в экран — вместо этого
-   полноэкранная выезжающая сверху панель с одним уровнем на экране за раз
-   (drill-down: L1 -> L2 -> L3, кнопка "назад" в шапке)
+   выезжающая слева направо боковая панель (drawer) с одним уровнем
+   категорий на экране за раз (drill-down: L1 -> L2 -> L3, кнопка
+   "назад" в шапке)
    ============================================================ */
 @media (max-width: 786px) {
     .catalog-menu {
@@ -425,18 +426,18 @@ a:hover {
 
     .catalog-menu__dropdown {
         flex-direction: column;
-        max-width: none;
-        width: 100%;
+        max-width: 340px;
+        width: 85%;
         height: 100%;
         max-height: none;
         min-height: 0;
         border-radius: 0;
-        animation: catalogMenuSlideDown .25s ease-out;
+        animation: catalogMenuSlideRight .25s ease-out;
     }
 
-    @keyframes catalogMenuSlideDown {
-        from { transform: translateY(-100%); }
-        to { transform: translateY(0); }
+    @keyframes catalogMenuSlideRight {
+        from { transform: translateX(-100%); }
+        to { transform: translateX(0); }
     }
 
     .catalog-menu__mobile-header {
