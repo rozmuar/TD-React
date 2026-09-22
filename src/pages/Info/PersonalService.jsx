@@ -3,8 +3,7 @@ import { Helmet } from 'react-helmet-async'
 import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
 import CallbackModal from '../../components/CallbackModal/CallbackModal'
 
-// Относительный путь — резолвится через nginx-прокси /personal-service/ на back.topdisc.ru
-const IMG_BASE = '/personal-service/img'
+const IMG_BASE = 'https://back.topdisc.ru/personal-service/img'
 
 const BENEFITS = [
   ['Бесплатная консультация', 'Экспертно. Без обязательств.'],

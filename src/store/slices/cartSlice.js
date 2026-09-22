@@ -10,9 +10,9 @@ import {
 } from '../../services/apiClient'
 
 const LOCAL_KEY = 'cart_items'
-// Пустая строка — картинки уже относительные (/upload/...), резолвятся
-// через nginx-прокси на back.topdisc.ru (см. nginx-production.conf)
-const SITE_ORIGIN = ''
+// Картинки грузятся напрямую с бэкенда, не через прокси фронтенда —
+// для <img src> CORS не нужен, а лишний прокси-хоп только замедляет
+const SITE_ORIGIN = 'https://back.topdisc.ru'
 
 function resolveImage(url) {
   if (!url) return ''
