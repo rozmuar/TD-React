@@ -23,9 +23,95 @@
     <!-- Robots -->
     <meta name="robots" content="index, follow" />
     <meta name="googlebot" content="index, follow" />
+
+    <meta name="yandex-verification" content="e88fa1299f9593d2" />
+
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+      (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+      m[i].l=1*new Date();
+      for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+      k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+      (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+      ym(41288789, "init", {
+        clickmap:true,
+        trackLinks:true,
+        accurateTrackBounce:true,
+        webvisor:true,
+        ecommerce:"dataLayer"
+      });
+    </script>
+    <!-- /Yandex.Metrika counter -->
+
+    <!-- Roistat Counter -->
+    <script>
+      (function(w, d, s, h, id) {
+        w.roistatProjectId = id; w.roistatHost = h;
+        var p = d.location.protocol == "https:" ? "https://" : "http://";
+        var u = /^.*roistat_visit=[^;]+(.*)?$/.test(d.cookie) ? "/dist/module.js" : "/api/site/1.0/"+id+"/init?referrer="+encodeURIComponent(d.location.href);
+        var js = d.createElement(s); js.charset="UTF-8"; js.async = 1; js.src = p+h+u; var js2 = d.getElementsByTagName(s)[0]; js2.parentNode.insertBefore(js, js2);
+      })(window, document, 'script', 'cloud.roistat.com', '99cc8a966971acc8690f4dc8ebc00733');
+    </script>
+    <!-- /Roistat Counter -->
+
+    <!-- Mango calltracking -->
+    <script>
+      (function(w, d, u, i, o, s, p) {
+        if (d.getElementById(i)) { return; } w['MangoObject'] = o;
+        w[o] = w[o] || function() { (w[o].q = w[o].q || []).push(arguments) }; w[o].u = u; w[o].t = 1 * new Date();
+        s = d.createElement('script'); s.async = 1; s.id = i; s.src = u;
+        p = d.getElementsByTagName('script')[0]; p.parentNode.insertBefore(s, p);
+      }(window, document, '//widgets.mango-office.ru/widgets/mango.js', 'mango-js', 'mgo'));
+      mgo({calltracking: {id: 17029, elements: [{"selector":".mgo-number"}]}});
+    </script>
+    <!-- /Mango -->
+
+    <!-- JivoSite + Roistat integration -->
+    <script type="text/javascript">
+      var getCookie = window.getCookie || function (name) {
+        var matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"));
+        return matches ? decodeURIComponent(matches[1]) : 'nocookie';
+      };
+      function jivo_onLoadCallback() {
+        var visit = getCookie('roistat_visit');
+        if (visit === 'nocookie') {
+          window.onRoistatAllModulesLoaded = function () {
+            window.roistat.registerOnVisitProcessedCallback(function () {
+              jivo_api.setUserToken(window.roistat.getVisit());
+            });
+          };
+        } else {
+          jivo_api.setUserToken(visit);
+        }
+      }
+    </script>
+    <script src="//code-ya.jivosite.com/widget/g56GzxB0iJ" async></script>
+    <!-- /JivoSite -->
   </head>
   <body>
+    <noscript><div><img src="https://mc.yandex.ru/watch/41288789" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
     <div id="root"><!--ssr-outlet--></div>
+
+    <!-- Top.Mail.Ru counter -->
+    <script type="text/javascript">
+      var _tmr = window._tmr || (window._tmr = []);
+      _tmr.push({id: "3510809", type: "pageView", start: (new Date()).getTime(), pid: (function () {
+        var m = document.cookie.match(/(?:^|; )roistat_visit=([^;]*)/);
+        return m ? decodeURIComponent(m[1]) : '';
+      })()});
+      (function (d, w, id) {
+        if (d.getElementById(id)) return;
+        var ts = d.createElement("script"); ts.type = "text/javascript"; ts.async = true; ts.id = id;
+        ts.src = "https://top-fwz1.mail.ru/js/code.js";
+        var f = function () {var s = d.getElementsByTagName("script")[0]; s.parentNode.insertBefore(ts, s);};
+        if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); }
+      })(document, window, "tmr-code");
+    </script>
+    <noscript><div><img src="https://top-fwz1.mail.ru/counter?id=3510809;js=na" style="position:absolute;left:-9999px;" alt="Top.Mail.Ru" /></div></noscript>
+    <!-- /Top.Mail.Ru counter -->
+
     <script type="module" src="/src/entry-client.jsx"></script>
   </body>
 </html>
