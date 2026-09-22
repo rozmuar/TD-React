@@ -7,6 +7,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const isProduction = process.env.NODE_ENV === 'production'
 const PORT = process.env.PORT || 3000
 
+// ВРЕМЕННО, пока переиздают сертификат back.topdisc.ru — убрать эту строку
+// сразу после
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+
 console.log('🚀 Starting server...')
 console.log('📦 NODE_ENV:', process.env.NODE_ENV)
 console.log('🏭 isProduction:', isProduction)

@@ -1,7 +1,8 @@
 import { Fragment } from 'react'
 import { Helmet } from 'react-helmet-async'
 
-const IMG_BASE = 'https://topdisc.ru/bonus/img'
+// Относительный путь — резолвится через nginx-прокси /bonus/ на back.topdisc.ru
+const IMG_BASE = '/bonus/img'
 
 const TIERS = [
   { level: 'Старт', range: '0 – 20 000 ₽', count: '0', activation: 'через 15 дней', accrual: '1%', writeoff: '10%' },

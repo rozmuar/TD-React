@@ -2,7 +2,8 @@ import { Helmet } from 'react-helmet-async'
 import { Link } from 'react-router-dom'
 import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
 
-const IMG_BASE = 'https://topdisc.ru/o-nas/img'
+// Относительный путь — резолвится через nginx-прокси /o-nas/ на back.topdisc.ru
+const IMG_BASE = '/o-nas/img'
 const MAP_MAIN = 'https://yandex.ru/maps/49/penza/?ll=45.003509%2C53.192953&mode=poi&poi%5Bpoint%5D=45.003436%2C53.192862&poi%5Buri%5D=ymapsbm1%3A%2F%2Forg%3Foid%3D1123110234&z=20'
 
 const STORES = [

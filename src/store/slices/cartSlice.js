@@ -10,7 +10,9 @@ import {
 } from '../../services/apiClient'
 
 const LOCAL_KEY = 'cart_items'
-const SITE_ORIGIN = 'https://topdisc.ru'
+// Пустая строка — картинки уже относительные (/upload/...), резолвятся
+// через nginx-прокси на back.topdisc.ru (см. nginx-production.conf)
+const SITE_ORIGIN = ''
 
 function resolveImage(url) {
   if (!url) return ''

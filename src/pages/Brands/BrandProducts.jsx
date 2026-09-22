@@ -144,7 +144,7 @@ function BrandProducts() {
         <div className="container">
           <div className="brand-header">
             <div className="brand-header__top">
-              {brand?.image && brand.image !== 'https://topdisc.ru' && (
+              {brand?.image && brand.image !== '/' && brand.image !== 'https://topdisc.ru' && (
                 <div className="brand-header__logo">
                   <img src={brand.image} alt={brandName} />
                 </div>

@@ -1,7 +1,20 @@
 import axios from 'axios'
 
+// Бэкенд (весь Bitrix — API, rest, uploads) переехал с topdisc.ru на
+// back.topdisc.ru (2026-09-22). В браузере оба клиента идут через
+// относительный путь и nginx-прокси на том же домене topdisc.ru — это
+// не просто стиль, а необходимость: сертификат back.topdisc.ru пока не
+// покрывает сам этот хост (SAN: topdisc.ru, www.topdisc.ru), прямой
+// кросс-доменный запрos браузера туда завершится ошибкой сертификата.
+// SSR (Node.js) идёт напрямую по абсолютному URL — прокси тут нет, поэтому
+// используется отдельный httpsAgent с отключённой проверкой сертификата
+// (см. ниже) — ВРЕМЕННО, до переиздания сертификата с back.topdisc.ru в SAN.
+const _isSSR = typeof window === 'undefined'
+
 // Centralized Bitrix REST API base URL
-const BITRIX_REST_URL = import.meta.env.VITE_BITRIX_REST_URL || 'https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e'
+const BITRIX_REST_URL = _isSSR
+  ? (import.meta.env.VITE_BITRIX_REST_URL || 'https://back.topdisc.ru/rest/28531/ky7kc0zinte6jb7e')
+  : '/api/rest/28531/ky7kc0zinte6jb7e'
 
 // Inject Redux store для 401-interceptor (вызывается из main.jsx, избегает circular imports)
 let _store = null
@@ -12,10 +25,19 @@ export const injectStore = (store) => {
 // Filter API base URL (separate service)
 // SSR (Node.js) — используем абсолютный URL из env
 // Браузер — всегда релятивный /api/mobile/v1 (через nginx proxy), игнорируем VITE_FILTER_API_URL
-const _isSSR = typeof window === 'undefined'
 const FILTER_API_URL = _isSSR
-  ? (import.meta.env.VITE_FILTER_API_URL || 'https://topdisc.ru/mobile/v1')
+  ? (import.meta.env.VITE_FILTER_API_URL || 'https://back.topdisc.ru/mobile/v1')
   : '/api/mobile/v1'
+
+// ВРЕМЕННО: сертификат back.topdisc.ru не проходит проверку хоста в Node —
+// см. комментарий выше. Убрать вместе с NODE_TLS_REJECT_UNAUTHORIZED в
+// server.js/prerender.js, как только сертификат переиздадут с back.topdisc.ru
+// в SAN (см. память проекта: checkout_payment_redirect_fix и связанные
+// заметки про миграцию API 2026-09-22). Флаг глобальный (весь процесс
+// Node), а не httpsAgent на конкретный клиент — так проще: без него
+// требуется либо `require('https')` (падает в SSR-сборке, она чистый ESM),
+// либо статический `import 'https'`, который тянется и в клиентский бандл,
+// где модуля 'https' просто нет.
 
 export const bitrixClient = axios.create({
   baseURL: BITRIX_REST_URL,
@@ -23,6 +45,41 @@ export const bitrixClient = axios.create({
 
 export const filterClient = axios.create({
   baseURL: FILTER_API_URL,
+})
+
+// Старый REST (app_mobile.*.json, через bitrixClient) отдаёт ссылки на файлы
+// (картинки товаров/баннеров/новостей) уже готовыми абсолютными URL вида
+// "https://topdisc.ru/upload/...". Это не относительный путь, который можно
+// было бы просто по-новому префиксовать — сам Bitrix ещё не знает, что его
+// домен сменился на back.topdisc.ru (настройка "адрес сайта" в админке не
+// обновлена), и topdisc.ru эти файлы больше не отдаёт вообще (проверено:
+// соединение не устанавливается). Приводим такие ссылки к относительному
+// пути — дальше их резолвит nginx-прокси на back.topdisc.ru (см.
+// nginx-production.conf: /upload/, /local/, /bonus/, /o-nas/,
+// /personal-service/). Временный фикс для чужого бага в данных, не в коде
+// этого репозитория — снять, когда Bitrix начнёт отдавать верный домен сам.
+const STALE_HOST_RE = /^https?:\/\/(?:back\.)?topdisc\.ru(\/.*)?$/i
+function stripStaleHost(value) {
+  if (typeof value === 'string') {
+    const m = value.match(STALE_HOST_RE)
+    return m ? (m[1] || '/') : value
+  }
+  if (Array.isArray(value)) return value.map(stripStaleHost)
+  if (value && typeof value === 'object') {
+    for (const key of Object.keys(value)) value[key] = stripStaleHost(value[key])
+    return value
+  }
+  return value
+}
+bitrixClient.interceptors.response.use((response) => {
+  if (response.data) response.data = stripStaleHost(response.data)
+  return response
+})
+// На всякий случай — не только bitrixClient встречал абсолютные ссылки на
+// topdisc.ru в данных (пока не проверено исчерпывающе по всем ручкам mobile/v1)
+filterClient.interceptors.response.use((response) => {
+  if (response.data) response.data = stripStaleHost(response.data)
+  return response
 })
 
 // При 401 — токен протух/недействителен → автоматический логаут

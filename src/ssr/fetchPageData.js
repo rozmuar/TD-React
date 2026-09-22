@@ -3,18 +3,26 @@
  * Использует прямые axios-запросы без localStorage / browser API.
  */
 import axios from 'axios'
+import https from 'https'
 
 const BITRIX_URL =
   (typeof process !== 'undefined' && process.env.VITE_BITRIX_REST_URL) ||
-  'https://topdisc.ru/rest/28531/ky7kc0zinte6jb7e'
+  'https://back.topdisc.ru/rest/28531/ky7kc0zinte6jb7e'
 
-// На сервере /api/mobile/* → обращаемся напрямую к topdisc.ru
+// На сервере /api/mobile/* → обращаемся напрямую к back.topdisc.ru
+// (весь Bitrix-бэкенд переехал с topdisc.ru на back.topdisc.ru, 2026-09-22)
 const FILTER_URL =
   (typeof process !== 'undefined' && process.env.VITE_FILTER_API_URL) ||
-  'https://topdisc.ru/mobile/v1'
+  'https://back.topdisc.ru/mobile/v1'
 
-const api = axios.create({ baseURL: BITRIX_URL, timeout: 6000 })
-const filterApi = axios.create({ baseURL: FILTER_URL, timeout: 6000 })
+// ВРЕМЕННО: сертификат back.topdisc.ru пока не покрывает сам этот хост
+// (SAN: topdisc.ru, www.topdisc.ru) — без этого Node отклоняет соединение
+// (ERR_TLS_CERT_ALTNAME_INVALID). Убрать httpsAgent, как только сертификат
+// переиздадут с back.topdisc.ru в SAN.
+const ssrHttpsAgent = new https.Agent({ rejectUnauthorized: false })
+
+const api = axios.create({ baseURL: BITRIX_URL, timeout: 6000, httpsAgent: ssrHttpsAgent })
+const filterApi = axios.create({ baseURL: FILTER_URL, timeout: 6000, httpsAgent: ssrHttpsAgent })
 
 // Безопасный вызов: возвращает data или null при ошибке
 async function safe(promise) {

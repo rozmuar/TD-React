@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 
-const FALLBACK_IMAGE = 'https://topdisc.ru/local/templates/bitlate_pro/images/top_no.png'
+// Относительный путь — резолвится через nginx-прокси /local/ на back.topdisc.ru
+// (весь Bitrix-бэкенд переехал туда, 2026-09-22; прямой абсолютный URL на
+// back.topdisc.ru упёрся бы в несовпадение сертификата хоста)
+const FALLBACK_IMAGE = '/local/templates/bitlate_pro/images/top_no.png'
 
 function ImageWithFallback({ src, alt, className, style, ...props }) {
   const [imgSrc, setImgSrc] = useState(src || FALLBACK_IMAGE)

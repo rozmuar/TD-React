@@ -7,7 +7,8 @@
 - `POST /checkout/calculate`
 - `POST /checkout/submit`
 
-Ниже примеры даны для базового пути `https://topdisc.ru/mobile/v1`.
+Ниже примеры даны для базового пути `https://back.topdisc.ru/mobile/v1` (Bitrix-бэкенд
+переехал с topdisc.ru на back.topdisc.ru, 2026-09-22).
 
 ---
 

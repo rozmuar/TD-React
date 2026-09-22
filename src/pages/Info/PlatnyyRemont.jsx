@@ -1,7 +1,9 @@
 import { Helmet } from 'react-helmet-async'
 import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
 
-const UPLOAD_BASE = 'https://topdisc.ru'
+// Пустая строка — все icon/src в этом файле уже относительные (/upload/...),
+// резолвятся через nginx-прокси /upload/ на back.topdisc.ru
+const UPLOAD_BASE = ''
 
 const DEVICES = [
   { icon: '/upload/iblock/e88/1m05nr0ya7v59lcr1zu5cjlrlfell8z5.png', label: 'Техника Apple' },
