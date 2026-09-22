@@ -402,6 +402,114 @@ a:hover {
     border-radius: 4px;
 }
 
+/* Мобильная шапка меню (назад / заголовок / закрыть) — на десктопе скрыта,
+   колонки видны все сразу через hover */
+.catalog-menu__mobile-header {
+    display: none;
+}
+
+/* ============================================================
+   КАТАЛОГ-МЕНЮ — мобильная версия
+   Десктопные 3 колонки рядом (560px+) не влезают в экран — вместо этого
+   полноэкранная выезжающая сверху панель с одним уровнем на экране за раз
+   (drill-down: L1 -> L2 -> L3, кнопка "назад" в шапке)
+   ============================================================ */
+@media (max-width: 786px) {
+    .catalog-menu {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+
+    .catalog-menu__dropdown {
+        flex-direction: column;
+        max-width: none;
+        width: 100%;
+        height: 100%;
+        max-height: none;
+        min-height: 0;
+        border-radius: 0;
+        animation: catalogMenuSlideDown .25s ease-out;
+    }
+
+    @keyframes catalogMenuSlideDown {
+        from { transform: translateY(-100%); }
+        to { transform: translateY(0); }
+    }
+
+    .catalog-menu__mobile-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+        padding: 14px 16px;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .catalog-menu__mobile-back,
+    .catalog-menu__mobile-close {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        flex-shrink: 0;
+        border: 0;
+        background: none;
+        padding: 0;
+        color: #242424;
+        cursor: pointer;
+    }
+
+    .catalog-menu__mobile-back-spacer {
+        width: 28px;
+        flex-shrink: 0;
+    }
+
+    .catalog-menu__mobile-title {
+        flex: 1;
+        text-align: center;
+        font-size: 16px;
+        font-weight: 600;
+        color: #242424;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Только активный уровень виден, во всю ширину, во весь остаток панели */
+    .catalog-menu__l1,
+    .catalog-menu__l2,
+    .catalog-menu__l3 {
+        display: none;
+    }
+
+    .catalog-menu__l1.is-mobile-level,
+    .catalog-menu__l2.is-mobile-level,
+    .catalog-menu__l3.is-mobile-level {
+        display: block;
+        width: 100%;
+        min-width: 0;
+        flex: 1;
+        border-right: 0;
+    }
+
+    .catalog-menu__l1-item,
+    .catalog-menu__l2-item,
+    .catalog-menu__l3-item {
+        padding: 14px 16px;
+        font-size: 16px;
+    }
+
+    /* Увеличенная область тапа под стрелку drill-down */
+    .catalog-menu__arrow {
+        padding: 10px;
+        margin: -10px -10px -10px 8px;
+    }
+}
+
 /* header relative для позиционирования меню */
 .header__bottom {
     position: relative;
