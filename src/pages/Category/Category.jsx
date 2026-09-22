@@ -476,6 +476,13 @@ function Category() {
           if (appliedFilters._price?.max !== undefined) {
             filterPairs.push(`price_max=${encodeURIComponent(appliedFilters._price.max)}`)
           }
+          // "В наличии" тоже теперь считает сервер (CATALOG_QUANTITY > 0 в
+          // самом SQL-запросе) — раньше фильтровалось только на уже
+          // полученной странице из 20 товаров, из-за чего результат зависел
+          // от того, что попало именно в неё, а не от всего каталога
+          if (appliedFilters._inStock === true) {
+            filterPairs.push('in_stock=1')
+          }
 
           const productParams = { cat: foundCategory.id, page: currentPage, prods: 20, sort: sortOrder }
           if (filterPairs.length > 0) {
@@ -637,20 +644,13 @@ function Category() {
     setSearchParams(new URLSearchParams(), { replace: true })
   }, [setSearchParams])
 
-  // Клиентская дофильтрация — только «В наличии». Цена и обычные
-  // фильтры (одно и несколько значений в группе) теперь целиком считает
-  // сервер (см. filterPairs выше), клиентская дофильтрация по ним раньше
-  // не работала: продукты из app_mobile.product_list.json не содержат
-  // ни properties (для мультизначных фильтров), ни store/inStock
-  // (для наличия) — только квартиру. Единственное реальное поле
-  // наличия в ответе — quantity, по нему и фильтруем; серверной поддержки
-  // фильтра "в наличии" нет вообще, поэтому это по-прежнему дофильтрация
-  // уже полученной страницы (и не пересчитывает пагинацию) — с этим
-  // ограничением ничего не поделать без изменений на бэкенде.
-  const filteredProducts = useMemo(() => {
-    if (!products.length || appliedFilters._inStock !== true) return products
-    return products.filter(product => Number(product.quantity) > 0)
-  }, [products, appliedFilters._inStock])
+  // Цена, "в наличии" и обычные фильтры (одно и несколько значений
+  // в группе) теперь целиком считает сервер (см. filterPairs выше) —
+  // клиентская дофильтрация больше не нужна, products уже отфильтрован
+  // и корректно пагинирован по всему каталогу, а не только по текущей
+  // странице. filteredProducts оставлен алиасом, чтобы не переписывать
+  // разметку ниже.
+  const filteredProducts = products
 
   // Категория не найдена (загрузка завершена, но данных нет)
   if (!mainCategory && !loading) {
