@@ -446,21 +446,40 @@ function Category() {
 
         // Товары запрашиваем ТОЛЬКО если они нужны для отображения
         if (needProducts) {
-          // Собираем фильтры для API
-          const filterParams = []
+          // Собираем фильтры для API — один параметр filters, внутри которого
+          // ключи и значения склеены через "&"/"=" в одну строку. Бэкенд
+          // (api_metods.php::parseFilters) сам разбирает эту строку вручную
+          // (explode('&')/explode('=')) — это НЕ обычный query-string, который
+          // разбирал бы PHP через $_GET, а собственный парсер, который умеет
+          // копить повторяющиеся ключи в массив. Раньше здесь отправляли
+          // filters как МАССИВ (несколько параметров filters=...&filters=...) —
+          // на уровне PHP $_GET такой повтор без [] схлопывается, выживает
+          // только последний, поэтому при выборе больше одной группы фильтров
+          // все остальные молча терялись. А если в одной группе выбирали
+          // больше одного значения — такую группу вообще не отправляли,
+          // рассчитывая на клиентскую дофильтрацию, которая никогда не
+          // работала (продукты не содержат poля properties, по которому
+          // должна была фильтровать). Здесь же сервер прекрасно умеет
+          // фильтровать по массиву значений для одного свойства — просто
+          // нужно было отправить всё одной строкой.
+          const filterPairs = []
           for (const [key, values] of Object.entries(appliedFilters)) {
             if (key.startsWith('_')) continue
             if (!values || !values.length) continue
-            // API поддерживает одно значение на ключ (берёт последнее)
-            // Если выбрано одно значение — отправляем. Если несколько — не отправляем (фильтруем клиентски)
-            if (values.length === 1) {
-              filterParams.push(`${key}=${values[0]}`)
+            for (const v of values) {
+              filterPairs.push(`${encodeURIComponent(key)}=${encodeURIComponent(v)}`)
             }
+          }
+          if (appliedFilters._price?.min !== undefined) {
+            filterPairs.push(`price_min=${encodeURIComponent(appliedFilters._price.min)}`)
+          }
+          if (appliedFilters._price?.max !== undefined) {
+            filterPairs.push(`price_max=${encodeURIComponent(appliedFilters._price.max)}`)
           }
 
           const productParams = { cat: foundCategory.id, page: currentPage, prods: 20, sort: sortOrder }
-          if (filterParams.length > 0) {
-            productParams.filters = filterParams
+          if (filterPairs.length > 0) {
+            productParams.filters = filterPairs.join('&')
           }
 
           const productsResponse = await getProductList(
@@ -618,49 +637,20 @@ function Category() {
     setSearchParams(new URLSearchParams(), { replace: true })
   }, [setSearchParams])
 
-  // Фильтрация товаров на клиенте (цена, наличие, мультизначения)
+  // Клиентская дофильтрация — только «В наличии». Цена и обычные
+  // фильтры (одно и несколько значений в группе) теперь целиком считает
+  // сервер (см. filterPairs выше), клиентская дофильтрация по ним раньше
+  // не работала: продукты из app_mobile.product_list.json не содержат
+  // ни properties (для мультизначных фильтров), ни store/inStock
+  // (для наличия) — только квартиру. Единственное реальное поле
+  // наличия в ответе — quantity, по нему и фильтруем; серверной поддержки
+  // фильтра "в наличии" нет вообще, поэтому это по-прежнему дофильтрация
+  // уже полученной страницы (и не пересчитывает пагинацию) — с этим
+  // ограничением ничего не поделать без изменений на бэкенде.
   const filteredProducts = useMemo(() => {
-    if (!products.length) return products
-
-    // Мультизначные CODE-фильтры (не отправленные в API)
-    const multiValueFilters = {}
-    for (const [key, values] of Object.entries(appliedFilters)) {
-      if (key.startsWith('_')) continue
-      if (values && values.length > 1) {
-        multiValueFilters[key] = values
-      }
-    }
-
-    const hasPrice = appliedFilters._price && (appliedFilters._price.min !== undefined || appliedFilters._price.max !== undefined)
-    const hasInStock = appliedFilters._inStock === true
-    const hasMultiValue = Object.keys(multiValueFilters).length > 0
-
-    if (!hasPrice && !hasInStock && !hasMultiValue) return products
-
-    return products.filter(product => {
-      // Фильтр по цене
-      if (hasPrice) {
-        const price = parseFloat(product.price)
-        if (appliedFilters._price.min !== undefined && price < appliedFilters._price.min) return false
-        if (appliedFilters._price.max !== undefined && price > appliedFilters._price.max) return false
-      }
-      // Фильтр «В наличии»
-      if (hasInStock) {
-        const hasStore = product.store && Array.isArray(product.store) &&
-          product.store.some(s => parseInt(s.AMOUNT) > 0)
-        const inStock = product.inStock !== undefined ? product.inStock : hasStore
-        if (!inStock) return false
-      }
-      // Мультизначные фильтры — клиентская фильтрация по свойствам товара
-      if (hasMultiValue && product.properties) {
-        for (const [code, allowedValues] of Object.entries(multiValueFilters)) {
-          const prop = product.properties.find(p => p.CODE === code)
-          if (prop && !allowedValues.includes(prop.VALUE)) return false
-        }
-      }
-      return true
-    })
-  }, [products, appliedFilters])
+    if (!products.length || appliedFilters._inStock !== true) return products
+    return products.filter(product => Number(product.quantity) > 0)
+  }, [products, appliedFilters._inStock])
 
   // Категория не найдена (загрузка завершена, но данных нет)
   if (!mainCategory && !loading) {
