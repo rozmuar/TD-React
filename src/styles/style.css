@@ -214,10 +214,24 @@ a:hover {
 }
 
 /* ---------- НИЖНЯЯ ПОЛОСА ---------- */
+/* Логотип — широкий шрифтовой знак (1500x258, ~5.8:1), задаём высотой,
+   а не фиксированной шириной, как раньше со старым квадратным лого —
+   иначе пропорционально сжимается по высоте и выглядит мелко */
 .header__logo {
-    width: 129px;
-    height: auto;
-    min-width: 129px
+    display: flex;
+    align-items: center;
+    height: 32px;
+}
+
+.header__logo img {
+    height: 100%;
+    width: auto;
+}
+
+/* Мобильный логотип рядом с кнопкой каталога — на десктопе скрыт,
+   показывается в мобильном медиа-запросе ниже */
+.header__logo-mobile {
+    display: none;
 }
 
 /* маленькая зелёная точка */
@@ -557,6 +571,20 @@ input[type="search"]::-webkit-search-cancel-button {
 
     .header__bottom .header__row {
         gap: 6px;
+    }
+
+    /* Логотип рядом с кнопкой каталога — на десктопе скрыт (см. выше),
+       здесь единственное место, где он показывается */
+    .header__logo-mobile {
+        display: flex;
+        align-items: center;
+        height: 20px;
+        flex-shrink: 0;
+    }
+
+    .header__logo-mobile img {
+        height: 100%;
+        width: auto;
     }
 
     .header__catalog {

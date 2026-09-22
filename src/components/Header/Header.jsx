@@ -91,9 +91,14 @@ function Header() {
         {/* НИЖНЯЯ ПОЛОСА */}
         <div className="header__bottom">
           <div className="header__row">
-            {/* Логотип */}
+            {/* Логотип (десктоп) */}
             <Link to="/" className="header__logo">
-              <img src="/img/header/logo.png" alt="logo" />
+              <img src="/img/header/logo.png" alt="TopDisc" />
+            </Link>
+
+            {/* Логотип (мобильный, рядом с кнопкой каталога — на десктопе скрыт через header__logo-mobile) */}
+            <Link to="/" className="header__logo-mobile" aria-label="TopDisc">
+              <img src="/img/header/logo.png" alt="TopDisc" />
             </Link>
 
             {/* Каталог */}
