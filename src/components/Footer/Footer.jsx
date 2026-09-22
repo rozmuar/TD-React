@@ -1,30 +1,38 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import CallbackModal from '../CallbackModal/CallbackModal'
+
+// Разметка нижнего мобильного бара должна соответствовать вёрстке
+// (вёрстка/index.html + вёрстка/css/style.css) — иконки там не <img>, а
+// CSS-маска на псевдоэлементе ::before (.mobile-nav__item::before,
+// .nav-catalog/.nav-cart/.nav-favorite/.nav-user), сам <nav> обязан иметь
+// класс mobile-nav, а каждый пункт — mobile-nav__item + модификатор.
+// Без этих классов CSS блока (padding/flex/border-radius/тень) просто не
+// применяется — сам блок отображался без стилей.
+const NAV_ITEMS = [
+  { to: '/catalog/', mod: 'nav-catalog', label: 'Каталог' },
+  { to: '/cart/', mod: 'nav-cart', label: 'Корзина' },
+  { to: '/favorites/', mod: 'nav-favorite', label: 'Избранное' },
+  { to: '/personal/', mod: 'nav-user', label: 'Кабинет' },
+]
 
 function Footer() {
   const [callbackOpen, setCallbackOpen] = useState(false)
+  const { pathname } = useLocation()
   return (
     <>
       {/* Мобильный бар */}
       <footer className="mobile-bar">
-        <nav>
-          <Link to="/catalog/">
-            <img src="/img/footer/catalog.svg" alt="Каталог" />
-            <span>Каталог</span>
-          </Link>
-          <Link to="/cart/">
-            <img src="/img/footer/cart.svg" alt="Корзина" />
-            <span>Корзина</span>
-          </Link>
-          <Link to="/favorites/">
-            <img src="/img/footer/favorite.svg" alt="Избранное" />
-            <span>Избранное</span>
-          </Link>
-          <Link to="/profile/">
-            <img src="/img/footer/profile.svg" alt="Кабинет" />
-            <span>Кабинет</span>
-          </Link>
+        <nav className="mobile-nav">
+          {NAV_ITEMS.map((item) => (
+            <Link
+              key={item.to}
+              to={item.to}
+              className={`mobile-nav__item ${item.mod}${pathname.startsWith(item.to) ? ' is-active' : ''}`}
+            >
+              <span>{item.label}</span>
+            </Link>
+          ))}
         </nav>
       </footer>
 
