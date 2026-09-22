@@ -14,8 +14,20 @@ function CatalogMenu({ isOpen, onClose }) {
   // кнопкой. На десктопе это состояние ни на что не влияет (там все
   // колонки видны одновременно через hover, см. CSS)
   const [mobileLevel, setMobileLevel] = useState(0)
+  // Явно знаем, мобильный сейчас режим или нет (а не полагаемся на CSS) —
+  // от этого зависит, должен ли тап по пункту с подкатегориями открывать
+  // следующий уровень вместо перехода по ссылке
+  const [isMobile, setIsMobile] = useState(false)
   const menuRef = useRef(null)
   const hoverTimeout = useRef(null)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 786px)')
+    const update = () => setIsMobile(mq.matches)
+    update()
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
 
   // Загрузка меню (с кешем)
   useEffect(() => {
@@ -85,29 +97,36 @@ function CatalogMenu({ isOpen, onClose }) {
   }, [onClose])
 
   // Тап по пункту с подкатегориями на мобильном — не переходим по ссылке,
-  // а открываем следующий уровень (drill-down). На десктопе клик по такому
-  // пункту всё равно должен вести на страницу категории (там подкатегории
-  // уже открыты через hover) — поэтому это поведение включаем только через
-  // CSS/медиа-запрос, а здесь просто не мешаем обычной навигации, если
-  // используется как обычная ссылка. Различить "тач это или мышь" в JS
-  // ненадёжно, поэтому решение простое: клик по СТРЕЛКЕ — всегда drill-down
-  // (работает и как основной способ на мобильном, и не мешает на десктопе),
-  // клик по остальной части строки — обычная навигация.
-  const handleL1DrillDown = useCallback((e, item) => {
+  // а открываем следующий уровень (drill-down); вся строка целиком, а не
+  // только стрелка — та слишком мелкая мишень для пальца, плюс её
+  // видимость зависела от флага is_parent из API, который не всегда точно
+  // отражает реальное наличие children. Наличие подкатегорий проверяем
+  // по самому массиву children. На десктопе (isMobile=false) поведение не
+  // меняется — там подкатегории уже открываются через hover, клик ведёт
+  // на страницу категории как раньше.
+  const handleL1Click = useCallback((e, item) => {
+    const hasChildren = item.children?.length > 0
+    if (!isMobile || !hasChildren) {
+      handleNavigate()
+      return
+    }
     e.preventDefault()
-    e.stopPropagation()
     setActiveL1(item.id)
-    const firstL2 = item.children?.find(c => c.children?.length)
+    const firstL2 = item.children.find(c => c.children?.length)
     setActiveL2(firstL2?.id || null)
     setMobileLevel(1)
-  }, [])
+  }, [isMobile, handleNavigate])
 
-  const handleL2DrillDown = useCallback((e, item) => {
+  const handleL2Click = useCallback((e, item) => {
+    const hasChildren = item.children?.length > 0
+    if (!isMobile || !hasChildren) {
+      handleNavigate()
+      return
+    }
     e.preventDefault()
-    e.stopPropagation()
     setActiveL2(item.id)
     setMobileLevel(2)
-  }, [])
+  }, [isMobile, handleNavigate])
 
   const handleMobileBack = useCallback(() => {
     setMobileLevel((lvl) => Math.max(0, lvl - 1))
@@ -156,15 +175,11 @@ function CatalogMenu({ isOpen, onClose }) {
               to={item.link}
               className={`catalog-menu__l1-item${item.id === activeL1 ? ' is-active' : ''}`}
               onMouseEnter={() => handleL1Enter(item.id)}
-              onClick={handleNavigate}
+              onClick={(e) => handleL1Click(e, item)}
             >
               <span>{decodeHtml(item.text)}</span>
-              {item.is_parent && (
-                <svg
-                  className="catalog-menu__arrow"
-                  width="6" height="10" viewBox="0 0 6 10" fill="none"
-                  onClick={(e) => handleL1DrillDown(e, item)}
-                >
+              {(item.is_parent || item.children?.length > 0) && (
+                <svg className="catalog-menu__arrow" width="6" height="10" viewBox="0 0 6 10" fill="none">
                   <path d="M1 1l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               )}
@@ -181,15 +196,11 @@ function CatalogMenu({ isOpen, onClose }) {
                 to={item.link}
                 className={`catalog-menu__l2-item${item.id === activeL2 ? ' is-active' : ''}`}
                 onMouseEnter={() => handleL2Enter(item.id)}
-                onClick={handleNavigate}
+                onClick={(e) => handleL2Click(e, item)}
               >
                 <span>{decodeHtml(item.text)}</span>
                 {item.children?.length > 0 && (
-                  <svg
-                    className="catalog-menu__arrow"
-                    width="6" height="10" viewBox="0 0 6 10" fill="none"
-                    onClick={(e) => handleL2DrillDown(e, item)}
-                  >
+                  <svg className="catalog-menu__arrow" width="6" height="10" viewBox="0 0 6 10" fill="none">
                     <path d="M1 1l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 )}
