@@ -9,7 +9,7 @@ export const SITE_NAME = 'TopDisc'
 export const SITE_LEGAL_NAME = 'Top Disc'
 export const SITE_LOGO = `${SITE_URL}/img/header/logo.png`
 
-const ORG_PHONE = '+7-800-500-21-41'
+const ORG_PHONE = '+7-841-223-65-66'
 const ORG_ADDRESS = {
   streetAddress: 'ул. Ставского, д. 4',
   addressLocality: 'Пенза',

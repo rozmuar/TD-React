@@ -83,7 +83,7 @@ function Header() {
             {/* «Обратный звонок» + телефон */}
             <div className="header__contacts">
               <a href="#" className="header__callback" onClick={(e) => { e.preventDefault(); setCallbackOpen(true) }}>Обратный звонок</a>
-              <a href="tel:+78005002141" className="header__phone">8 (800) 500-21-41</a>
+              <a href="tel:+78412236566" className="header__phone">8 841 223 65 66</a>
             </div>
           </div>
         </div>

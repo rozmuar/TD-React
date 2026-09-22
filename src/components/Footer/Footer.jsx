@@ -96,8 +96,8 @@ function Footer() {
                 <div className="footer__contacts">
                   <div className="footer__contacts-left">
                     <div className="footer__title">Контакты</div>
-                    <a className="footer__phone" href="tel:8(800)500-21-41">
-                      8 (800) 500-21-41
+                    <a className="footer__phone" href="tel:+78412236566">
+                      8 841 223 65 66
                     </a>
                     <div className="footer__address">Пенза, улица Ставского, 4, корп. 1</div>
                     <div className="footer__worktime">Ежедневно 9:00-21:00</div>

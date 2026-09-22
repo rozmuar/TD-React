@@ -95,7 +95,7 @@ function Contacts() {
             </div>
             <div className="info-card__content">
               <span className="info-card__label">Телефон:</span>
-              <span><a href="tel:+78005002141">8 (800) 500‑21‑41</a></span>
+              <span><a href="tel:+78412236566">8 841 223 65 66</a></span>
             </div>
           </div>
 
