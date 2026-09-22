@@ -1,14 +1,12 @@
 import axios from 'axios'
 
 // Бэкенд (весь Bitrix — API, rest, uploads) переехал с topdisc.ru на
-// back.topdisc.ru (2026-09-22). В браузере оба клиента идут через
-// относительный путь и nginx-прокси на том же домене topdisc.ru — это
-// не просто стиль, а необходимость: сертификат back.topdisc.ru пока не
-// покрывает сам этот хост (SAN: topdisc.ru, www.topdisc.ru), прямой
-// кросс-доменный запрos браузера туда завершится ошибкой сертификата.
-// SSR (Node.js) идёт напрямую по абсолютному URL — прокси тут нет, поэтому
-// используется отдельный httpsAgent с отключённой проверкой сертификата
-// (см. ниже) — ВРЕМЕННО, до переиздания сертификата с back.topdisc.ru в SAN.
+// back.topdisc.ru (2026-09-22; сертификат на back.topdisc.ru переиздан
+// с этим хостом в SAN, всё по-нормальному). В браузере оба клиента всё
+// равно идут через относительный путь и nginx-прокси на том же домене
+// topdisc.ru — не из-за сертификата, а чтобы избежать CORS и держать
+// единый домен для cookies/сессии. SSR (Node.js) идёт напрямую по
+// абсолютному URL — прокси тут нет.
 const _isSSR = typeof window === 'undefined'
 
 // Centralized Bitrix REST API base URL
@@ -28,16 +26,6 @@ export const injectStore = (store) => {
 const FILTER_API_URL = _isSSR
   ? (import.meta.env.VITE_FILTER_API_URL || 'https://back.topdisc.ru/mobile/v1')
   : '/api/mobile/v1'
-
-// ВРЕМЕННО: сертификат back.topdisc.ru не проходит проверку хоста в Node —
-// см. комментарий выше. Убрать вместе с NODE_TLS_REJECT_UNAUTHORIZED в
-// server.js/prerender.js, как только сертификат переиздадут с back.topdisc.ru
-// в SAN (см. память проекта: checkout_payment_redirect_fix и связанные
-// заметки про миграцию API 2026-09-22). Флаг глобальный (весь процесс
-// Node), а не httpsAgent на конкретный клиент — так проще: без него
-// требуется либо `require('https')` (падает в SSR-сборке, она чистый ESM),
-// либо статический `import 'https'`, который тянется и в клиентский бандл,
-// где модуля 'https' просто нет.
 
 export const bitrixClient = axios.create({
   baseURL: BITRIX_REST_URL,
