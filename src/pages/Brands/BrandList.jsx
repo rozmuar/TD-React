@@ -105,8 +105,8 @@ function BrandList() {
   return (
     <>
       <Helmet>
-        <title>Бренды — TopDisk</title>
-        <meta name="description" content="Каталог брендов интернет-магазина TopDisk. Техника и электроника ведущих мировых производителей." />
+        <title>Бренды — TopDisc</title>
+        <meta name="description" content="Каталог брендов интернет-магазина TopDisc. Техника и электроника ведущих мировых производителей." />
       </Helmet>
 
       <div className="breadcrumbs">

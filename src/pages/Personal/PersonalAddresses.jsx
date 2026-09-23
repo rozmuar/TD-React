@@ -5,7 +5,7 @@ export default function PersonalAddresses() {
   return (
     <>
       <Helmet>
-        <title>Мои адреса - TopDisk</title>
+        <title>Мои адреса - TopDisc</title>
         <meta name="description" content="Управление адресами доставки" />
       </Helmet>
 

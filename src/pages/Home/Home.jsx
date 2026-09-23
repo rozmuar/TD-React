@@ -133,9 +133,9 @@ function Home() {
   return (
     <>
       <Helmet>
-        <title>TopDisk - Интернет-магазин электроники и бытовой техники</title>
-        <meta name="description" content="TopDisk - интернет-магазин электроники, смартфонов, гаджетов, бытовой техники. Быстрая доставка, низкие цены, гарантия качества." />
-        <meta property="og:title" content="TopDisk - Интернет-магазин электроники" />
+        <title>TopDisc - Интернет-магазин электроники и бытовой техники</title>
+        <meta name="description" content="TopDisc - интернет-магазин электроники, смартфонов, гаджетов, бытовой техники. Быстрая доставка, низкие цены, гарантия качества." />
+        <meta property="og:title" content="TopDisc - Интернет-магазин электроники" />
         <meta property="og:description" content="Интернет-магазин электроники и бытовой техники" />
       </Helmet>
       {/* HERO-секция */}

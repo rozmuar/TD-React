@@ -125,8 +125,8 @@ function NewsList() {
   return (
     <>
       <Helmet>
-        <title>Новости - TopDisk</title>
-        <meta name="description" content="Новости интернет-магазина TopDisk" />
+        <title>Новости - TopDisc</title>
+        <meta name="description" content="Новости интернет-магазина TopDisc" />
       </Helmet>
 
       <div className="breadcrumbs">

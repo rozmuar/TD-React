@@ -53,14 +53,14 @@ function Catalog() {
   return (
     <>
       <Helmet>
-        <title>Каталог товаров - TopDisk</title>
-        <meta name="description" content="Каталог товаров интернет-магазина TopDisk. Смартфоны, бытовая техника, электроника, компьютеры и многое другое." />
-        <meta property="og:title" content="Каталог товаров - TopDisk" />
+        <title>Каталог товаров - TopDisc</title>
+        <meta name="description" content="Каталог товаров интернет-магазина TopDisc. Смартфоны, бытовая техника, электроника, компьютеры и многое другое." />
+        <meta property="og:title" content="Каталог товаров - TopDisc" />
       </Helmet>
       <JsonLd data={[
         collectionPageSchema({
           name: 'Каталог товаров',
-          description: 'Каталог товаров интернет-магазина TopDisk',
+          description: 'Каталог товаров интернет-магазина TopDisc',
           path: '/catalog/',
           breadcrumbs: breadcrumbSchema([
             { name: 'Главная', url: '/' },

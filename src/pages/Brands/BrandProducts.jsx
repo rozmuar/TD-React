@@ -120,8 +120,8 @@ function BrandProducts() {
   return (
     <>
       <Helmet>
-        <title>{brandName} — купить в TopDisk</title>
-        <meta name="description" content={`Товары бренда ${brandName} в интернет-магазине TopDisk. Выгодные цены, быстрая доставка.`} />
+        <title>{brandName} — купить в TopDisc</title>
+        <meta name="description" content={`Товары бренда ${brandName} в интернет-магазине TopDisc. Выгодные цены, быстрая доставка.`} />
       </Helmet>
 
       <div className="breadcrumbs">

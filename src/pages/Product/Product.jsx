@@ -256,8 +256,8 @@ function Product() {
     return <ProductSkeleton />
   }
 
-  const pageTitle = decodeHtml(product.seo?.title) || `${decodeHtml(product.name)} - TopDisk`
-  const pageDescription = decodeHtml(product.seo?.description) || `Купить ${decodeHtml(product.name)} в интернет-магазине TopDisk`
+  const pageTitle = decodeHtml(product.seo?.title) || `${decodeHtml(product.name)} - TopDisc`
+  const pageDescription = decodeHtml(product.seo?.description) || `Купить ${decodeHtml(product.name)} в интернет-магазине TopDisc`
 
   return (
     <>

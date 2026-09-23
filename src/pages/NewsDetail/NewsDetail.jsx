@@ -166,7 +166,7 @@ function NewsDetail() {
   return (
     <>
       <Helmet>
-        <title>{newsItem.name} - TopDisk</title>
+        <title>{newsItem.name} - TopDisc</title>
         <meta name="description" content={newsItem.preview_text || newsItem.name} />
       </Helmet>
       <JsonLd data={[

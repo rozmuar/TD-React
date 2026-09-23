@@ -657,7 +657,7 @@ function Category() {
     return (
       <>
         <Helmet>
-          <title>Категория не найдена - TopDisk</title>
+          <title>Категория не найдена - TopDisc</title>
         </Helmet>
         <div className="breadcrumbs">
           <div className="container">
@@ -684,7 +684,7 @@ function Category() {
     return (
       <>
         <Helmet>
-          <title>Загрузка... - TopDisk</title>
+          <title>Загрузка... - TopDisc</title>
         </Helmet>
         <div className="breadcrumbs">
           <div className="container">
@@ -706,8 +706,8 @@ function Category() {
   return (
     <>
       <Helmet>
-        <title>{mainCategory.name} - TopDisk</title>
-        <meta name="description" content={`Купить ${mainCategory.name} в интернет-магазине TopDisk`} />
+        <title>{mainCategory.name} - TopDisc</title>
+        <meta name="description" content={`Купить ${mainCategory.name} в интернет-магазине TopDisc`} />
       </Helmet>
       {(() => {
         const path = categoryUrl(mainCategory)
@@ -723,7 +723,7 @@ function Category() {
         }) : null
         const collection = collectionPageSchema({
           name: decodeHtml(mainCategory.name),
-          description: `Купить ${decodeHtml(mainCategory.name)} в интернет-магазине TopDisk`,
+          description: `Купить ${decodeHtml(mainCategory.name)} в интернет-магазине TopDisc`,
           path,
           breadcrumbs,
           itemList,
