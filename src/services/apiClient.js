@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { stripStaleHost } from '../utils/stripStaleHost'
 
 // Бэкенд (весь Bitrix — API, rest, uploads) переехал с topdisc.ru на
 // back.topdisc.ru (2026-09-22; сертификат на back.topdisc.ru переиздан
@@ -48,29 +49,9 @@ export const filterClient = axios.create({
 // время заворачивать всё через фронтенд; сертификат почижен, костыль
 // снят). Временный фикс для чужого бага в данных, не в коде этого
 // репозитория — снять, когда Bitrix начнёт отдавать верный домен сам.
-const STALE_HOST_RE = /^https?:\/\/(?:back\.)?topdisc\.ru(\/.*)?$/i
-function stripStaleHost(value) {
-  if (typeof value === 'string') {
-    const m = value.match(STALE_HOST_RE)
-    if (!m) return value
-    // Без пути (голый "https://topdisc.ru") — это Bitrix-плейсхолдер
-    // "картинки/файла нет", а не реальная ссылка. Раньше здесь
-    // подставлялся такой же голый "https://back.topdisc.ru" — не пустая
-    // строка, поэтому ImageWithFallback и подобные "src || FALLBACK"
-    // проверки не срабатывали, <img> реально запрашивал корень
-    // back.topdisc.ru/, а тот отдаёт 503 (шлюз техобслуживания не пускает
-    // ничего, кроме rest/mobile-v1/admin/1С/bitrix-tools). Пустая строка
-    // здесь — то же самое "нет значения", что было и с относительным
-    // путём в первой версии этого фикса.
-    return m[1] || ''
-  }
-  if (Array.isArray(value)) return value.map(stripStaleHost)
-  if (value && typeof value === 'object') {
-    for (const key of Object.keys(value)) value[key] = stripStaleHost(value[key])
-    return value
-  }
-  return value
-}
+// Сама функция stripStaleHost вынесена в src/utils/stripStaleHost.js —
+// используется и здесь (браузер/SSR через bitrixClient/filterClient), и в
+// src/ssr/fetchPageData.js (SSR-only fetcher с собственными axios-инстансами).
 bitrixClient.interceptors.response.use((response) => {
   if (response.data) response.data = stripStaleHost(response.data)
   return response

@@ -3,6 +3,7 @@
  * Использует прямые axios-запросы без localStorage / browser API.
  */
 import axios from 'axios'
+import { stripStaleHost } from '../utils/stripStaleHost'
 
 const BITRIX_URL =
   (typeof process !== 'undefined' && process.env.VITE_BITRIX_REST_URL) ||
@@ -16,6 +17,18 @@ const FILTER_URL =
 
 const api = axios.create({ baseURL: BITRIX_URL, timeout: 6000 })
 const filterApi = axios.create({ baseURL: FILTER_URL, timeout: 6000 })
+
+// Эти инстансы отдельные от bitrixClient/filterClient (apiClient.js) — без
+// этого interceptor'а в серверно отрисованный HTML и window.__SSR_DATA__
+// попадали сырые ссылки на topdisc.ru вместо back.topdisc.ru.
+api.interceptors.response.use((response) => {
+  if (response.data) response.data = stripStaleHost(response.data)
+  return response
+})
+filterApi.interceptors.response.use((response) => {
+  if (response.data) response.data = stripStaleHost(response.data)
+  return response
+})
 
 // Безопасный вызов: возвращает data или null при ошибке
 async function safe(promise) {
