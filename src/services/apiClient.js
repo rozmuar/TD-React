@@ -431,6 +431,7 @@ export const calculateCheckout = async (data) => {
     totals: co?.totals,
     errors: res.data?.errors,
     missing: co?.missing_required_properties,
+    debug_trace: res.data?.debug_trace,
   })
   return res
 }
