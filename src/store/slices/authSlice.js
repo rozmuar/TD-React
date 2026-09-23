@@ -54,6 +54,7 @@ export const fetchUserProfile = createAsyncThunk(
         phone: user.phone || user.PERSONAL_PHONE,
         gender: user.gender || user.PERSONAL_GENDER,
         photo: user.photo || user.PERSONAL_PHOTO,
+        is_wholesale: Boolean(user.is_wholesale),
       }
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Ошибка загрузки профиля')

@@ -8,6 +8,7 @@ import { decodeHtml } from '../../utils/decodeHtml'
 import PreorderModal from '../PreorderModal/PreorderModal'
 import AddToCartButton from '../AddToCartButton/AddToCartButton'
 import { getBadgeClass } from '../../utils/productBadge'
+import { useWholesalePrice } from '../../hooks/useWholesalePrice'
 
 function ProductCard({ product }) {
   const dispatch = useDispatch()
@@ -16,6 +17,7 @@ function ProductCard({ product }) {
   const favoriteItems = useSelector((s) => s.favorites.items)
   const isInFavorites = favoriteItems.some((i) => i.id === product.id)
   const [showPreorder, setShowPreorder] = useState(false)
+  const { price, isOpt } = useWholesalePrice(product)
 
   const handleToggleCompare = () => {
     if (isInCompare) {
@@ -31,21 +33,21 @@ function ProductCard({ product }) {
 
   // Доступность: цена > 0 и наличие
   const hasStock = parseInt(product.quantity) > 0
-  const hasPrice = parseFloat(product.price) > 0
+  const hasPrice = parseFloat(price) > 0
   const isAvailable = hasPrice && hasStock
 
   // Кешируем форматирование цен
   const formattedPrice = useMemo(() => 
-    Math.floor(product.price).toLocaleString('ru-RU'), 
-    [product.price]
+    Math.floor(price).toLocaleString('ru-RU'), 
+    [price]
   )
   
   const oldPrice = product.oldPrice ?? product.old_price
   const formattedOldPrice = useMemo(() =>
-    parseFloat(oldPrice) > 0 && parseFloat(oldPrice) > parseFloat(product.price)
+    !isOpt && parseFloat(oldPrice) > 0 && parseFloat(oldPrice) > parseFloat(price)
       ? Math.floor(oldPrice).toLocaleString('ru-RU')
       : null,
-    [oldPrice, product.price]
+    [oldPrice, price, isOpt]
   )
 
   // Баллы приходят с бэкенда полем bonus (app_mobile.product_list)
@@ -74,6 +76,7 @@ function ProductCard({ product }) {
           <div className="catalog__main-row">
             <div className="catalog__main-prices">
               <div className="catalog__main-price">{formattedPrice} ₽</div>
+              {isOpt && <div className="catalog__main-oldprice" style={{ textDecoration: 'none' }}>Опт</div>}
               {formattedOldPrice && (
                 <div className="catalog__main-oldprice">{formattedOldPrice} ₽</div>
               )}
@@ -85,7 +88,7 @@ function ProductCard({ product }) {
               </div>
             )}
           </div>
-          <AddToCartButton product={product} className="catalog__main-button" />
+          <AddToCartButton product={isOpt ? { ...product, price } : product} className="catalog__main-button" />
         </>
       ) : (
         <>

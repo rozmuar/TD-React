@@ -19,6 +19,7 @@ import JsonLd from '../../components/JsonLd/JsonLd'
 import AddToCartButton from '../../components/AddToCartButton/AddToCartButton'
 import { productSchema, breadcrumbSchema } from '../../utils/jsonLd'
 import { getBadgeClass } from '../../utils/productBadge'
+import { useWholesalePrice } from '../../hooks/useWholesalePrice'
 
 // Достаём массив картинок галереи из свойства "Галерея" (JSON-строка со
 // доп. фото) + основное фото первым — используется и для начального
@@ -109,6 +110,7 @@ function Product() {
   const [showCredit, setShowCredit] = useState(false)
   const [showOneClick, setShowOneClick] = useState(false)
   const abortControllerRef = useRef(null)
+  const { price: displayPrice, isOpt } = useWholesalePrice(product)
   const compareItems = useSelector((s) => s.compare.items)
   const isInCompare = product ? compareItems.some((i) => i.id === product.id) : false
   const favoriteItems = useSelector((s) => s.favorites.items)
@@ -219,7 +221,7 @@ function Product() {
     name: product.name,
     code: product.code,
     section_code: categoryCode,
-    price: parseFloat(product.price),
+    price: parseFloat(displayPrice),
     oldPrice: product.oldPrice ?? product.old_price ?? null,
     image: product.image,
   }
@@ -234,12 +236,12 @@ function Product() {
 
   const getOldPrice = () => {
     const oldPrice = parseFloat(product?.oldPrice ?? product?.old_price)
-    return oldPrice > 0 && oldPrice > parseFloat(product?.price) ? oldPrice : null
+    return !isOpt && oldPrice > 0 && oldPrice > parseFloat(displayPrice) ? oldPrice : null
   }
 
   // Доступность: цена > 0 и quantity > 0
   const hasStock = parseInt(product?.quantity) > 0
-  const hasPrice = parseFloat(product?.price) > 0
+  const hasPrice = parseFloat(displayPrice) > 0
   const isAvailable = hasPrice && hasStock
 
   // Баллы приходят с бэкенда полем bonus — не показываем, если 0/пусто
@@ -397,7 +399,8 @@ function Product() {
                 {getOldPrice() && (
                   <span className="product__old-price">{getOldPrice().toLocaleString()} ₽</span>
                 )}
-                <span className="product__price">{parseFloat(product.price).toLocaleString()} ₽</span>
+                <span className="product__price">{parseFloat(displayPrice).toLocaleString()} ₽</span>
+                {isOpt && <span className="product__old-price" style={{ textDecoration: 'none' }}>Опт</span>}
               </div>
             )}
 
@@ -445,7 +448,8 @@ function Product() {
                 {getOldPrice() && (
                   <span className="product__old-price">{getOldPrice().toLocaleString()} ₽</span>
                 )}
-                <span className="product__price">{parseFloat(product.price).toLocaleString()} ₽</span>
+                <span className="product__price">{parseFloat(displayPrice).toLocaleString()} ₽</span>
+                {isOpt && <span className="product__old-price" style={{ textDecoration: 'none' }}>Опт</span>}
               </div>
             )}
 
@@ -497,7 +501,7 @@ function Product() {
             <div className="banner1" onClick={() => setShowCredit(true)} style={{cursor: 'pointer'}}>
               <div className="banner1-text">Кредит или рассрочка от</div>
               <div className="banner1-price">
-                {Math.ceil(parseFloat(product.price) / 24).toLocaleString()} ₽/мес
+                {Math.ceil(parseFloat(displayPrice) / 24).toLocaleString()} ₽/мес
               </div>
             </div>
             <div className="banner2" onClick={() => setShowFindCheaper(true)} style={{cursor: 'pointer'}}>
@@ -628,7 +632,7 @@ function Product() {
         <FindCheaperModal
           productName={decodeHtml(product.name)}
           productId={product.id}
-          productPrice={product.price}
+          productPrice={displayPrice}
           onClose={() => setShowFindCheaper(false)}
         />
       )}
@@ -637,7 +641,7 @@ function Product() {
         <CreditModal
           productName={decodeHtml(product.name)}
           productId={product.id}
-          productPrice={product.price}
+          productPrice={displayPrice}
           onClose={() => setShowCredit(false)}
         />
       )}
@@ -646,7 +650,7 @@ function Product() {
         <OneClickModal
           productName={decodeHtml(product.name)}
           productId={product.id}
-          productPrice={product.price}
+          productPrice={displayPrice}
           onClose={() => setShowOneClick(false)}
         />
       )}
