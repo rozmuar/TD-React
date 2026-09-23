@@ -52,7 +52,17 @@ const STALE_HOST_RE = /^https?:\/\/(?:back\.)?topdisc\.ru(\/.*)?$/i
 function stripStaleHost(value) {
   if (typeof value === 'string') {
     const m = value.match(STALE_HOST_RE)
-    return m ? `https://back.topdisc.ru${m[1] || ''}` : value
+    if (!m) return value
+    // Без пути (голый "https://topdisc.ru") — это Bitrix-плейсхолдер
+    // "картинки/файла нет", а не реальная ссылка. Раньше здесь
+    // подставлялся такой же голый "https://back.topdisc.ru" — не пустая
+    // строка, поэтому ImageWithFallback и подобные "src || FALLBACK"
+    // проверки не срабатывали, <img> реально запрашивал корень
+    // back.topdisc.ru/, а тот отдаёт 503 (шлюз техобслуживания не пускает
+    // ничего, кроме rest/mobile-v1/admin/1С/bitrix-tools). Пустая строка
+    // здесь — то же самое "нет значения", что было и с относительным
+    // путём в первой версии этого фикса.
+    return m[1] || ''
   }
   if (Array.isArray(value)) return value.map(stripStaleHost)
   if (value && typeof value === 'object') {
