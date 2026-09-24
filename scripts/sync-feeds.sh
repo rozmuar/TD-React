@@ -82,6 +82,10 @@ for f in "${FEEDS[@]}"; do
   fetch "$f" 0
 done
 
+# robots.txt — тоже с бэкенда (Host/Sitemap внутри должны вести на публичный
+# домен, поэтому обрабатываем как sitemap)
+fetch "robots.txt" 1
+
 # sitemap.xml — индекс (всегда перекачиваем без If-Modified-Since, чтобы
 # точно видеть актуальный список частей); из него берём sitemap-*.xml
 rm -f "$TARGET_DIR/.sitemap.index.prev"
