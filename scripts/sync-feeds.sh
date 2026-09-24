@@ -72,7 +72,7 @@ fetch() {
   fi
 
   chmod 644 "$tmp"
-  mv -f "$tmp" "$dest"
+  mv -f "$tmp" "$dest" || { echo "$(date '+%F %T') ОШИБКА записи $name"; return 1; }
   echo "$(date '+%F %T') OK $name ($(stat -c %s "$dest") байт)"
 }
 export -f fetch
