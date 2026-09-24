@@ -3,8 +3,18 @@ import { Helmet } from 'react-helmet-async'
 import { decodeHtml } from '../../utils/decodeHtml'
 import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
 
+function readStoredOrder() {
+  try {
+    const raw = sessionStorage.getItem('last_order')
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
 function OrderSuccess() {
-  const { state } = useLocation()
+  const location = useLocation()
+  const state = location.state || readStoredOrder()
 
   if (!state || !state.orderNumber) return <Navigate to="/cart/" replace />
 

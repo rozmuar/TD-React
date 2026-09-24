@@ -283,8 +283,11 @@ function Checkout() {
   const priceLabel = (p) => (p > 0 ? `${fmt(p)} ₽` : 'Бесплатно')
 
   // ── Redirect если корзина пуста ─────────────────────────
+  // После успешного заказа корзина очищается сразу — без флага этот редирект
+  // перебивал переход на страницу благодарности, и клиент попадал в пустую корзину.
+  const orderPlacedRef = useRef(false)
   useEffect(() => {
-    if (items.length === 0) navigate('/cart/', { replace: true })
+    if (items.length === 0 && !orderPlacedRef.current) navigate('/cart/', { replace: true })
   }, [items.length, navigate])
 
   // ── DaData: debounced suggest ───────────────────────────
@@ -613,6 +616,7 @@ function Checkout() {
         return
       }
 
+      orderPlacedRef.current = true
       dispatch(clearCart())
 
       // Проверяем наличие онлайн-оплаты.
@@ -632,19 +636,20 @@ function Checkout() {
         return
       }
 
-      // Оффлайн-оплата → страница успеха
-      navigate('/cart/success/', {
-        state: {
-          orderNumber: data.order?.account_number || String(data.order?.id),
-          items,
-          totalAmount: data.order?.price || totalPrice,
-          deliveryName: activeDelivery?.name || '',
-          selectedStore,
-          firstName,
-          lastName,
-          phone,
-        },
-      })
+      // Оффлайн-оплата → страница благодарности с номером заказа
+      const successState = {
+        orderNumber: data.order?.account_number || String(data.order?.id),
+        items,
+        totalAmount: data.order?.price || totalPrice,
+        deliveryName: activeDelivery?.name || '',
+        selectedStore,
+        firstName,
+        lastName,
+        phone,
+      }
+      // Дублируем в sessionStorage: при обновлении страницы router-state теряется
+      try { sessionStorage.setItem('last_order', JSON.stringify(successState)) } catch { /* ignore */ }
+      navigate('/cart/success/', { state: successState })
     } catch (err) {
       const msg = err.response?.data?.errors?.join(', ') || err.message || 'Попробуйте позже'
       console.error('[CHECKOUT] doCreateOrder error:', err?.response?.data || err?.message)
