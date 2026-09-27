@@ -445,6 +445,8 @@ export const submitCheckout = async (data) => {
     order: res.data?.order,
     payment: res.data?.payment,
     errors: res.data?.errors,
+    debug_warnings: res.data?.debug_warnings,
+    debug_trace: res.data?.debug_trace,
   })
   return res
 }
