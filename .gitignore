@@ -22,6 +22,10 @@ dist-ssr
 /back
 /bitrix
 
+# История разработки — пишется каждую сессию, не должна попадать в git pull
+# на продакшен-сервере (сервер разворачивается прямо из рабочей копии репо)
+/HISTORY.md
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
