@@ -1,6 +1,7 @@
 import express from 'express'
 import fs from 'fs'
 import path from 'path'
+import axios from 'axios'
 import { fileURLToPath, pathToFileURL } from 'url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -49,10 +50,52 @@ async function createServer() {
   // /catalog/<section>/<code>/ → 301 → /catalog/<section>/<code>
   const PRODUCT_TRAILING_SLASH_RE = /^\/(catalog|catalog_oth)\/([^/]+)\/([^/]+)\/$/
 
+  // Старая ссылка с back.topdisc.ru (QR-коды/ценники в магазине, ?code=<артикул>,
+  // напр. ?code=20258761&utm_source=shop_tag) — back.topdisc.ru больше не отдаёт
+  // публичный HTML вообще (только API), поэтому редирект на страницу товара
+  // теперь делает сам фронтенд: резолвим артикул через REST (app_mobile.
+  // findProductByArticle.json, см. api_metods.php) и 301-редиректим на
+  // /catalog/:categoryCode/:productCode, сохраняя остальные query-параметры
+  // (utm_source и т.п.) — как и раньше делал сам PHP-скрипт.
+  const BITRIX_REST_URL =
+    process.env.VITE_BITRIX_REST_URL || 'https://back.topdisc.ru/rest/28531/ky7kc0zinte6jb7e'
+
+  async function resolveFindByCode(req, res) {
+    const params = new URLSearchParams(req.query)
+    const code = params.get('code')
+    params.delete('code')
+    const restQs = params.toString()
+
+    if (!code) {
+      return res.redirect(301, '/catalog/')
+    }
+
+    try {
+      const apiRes = await axios.get(`${BITRIX_REST_URL}/app_mobile.findProductByArticle.json`, {
+        params: { code },
+        timeout: 6000,
+      })
+      const result = apiRes.data?.result
+
+      if (result?.error === 0 && result.section_code && result.product_code) {
+        const target = `/catalog/${result.section_code}/${result.product_code}${restQs ? `?${restQs}` : ''}`
+        return res.redirect(301, target)
+      }
+    } catch (e) {
+      console.error('[find_by_code] resolve error:', e.message)
+    }
+
+    return res.redirect(301, '/catalog/')
+  }
+
   // Все запросы обрабатываем SSR
   app.use(async (req, res) => {
     const url = req.originalUrl
     const urlPath = url.split('?')[0]
+
+    if (urlPath === '/catalog/find_by_code.php') {
+      return resolveFindByCode(req, res)
+    }
 
     const productSlashMatch = urlPath.match(PRODUCT_TRAILING_SLASH_RE)
     if (productSlashMatch) {
