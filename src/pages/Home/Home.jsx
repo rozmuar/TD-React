@@ -137,6 +137,7 @@ function Home() {
         <meta name="description" content="TopDisc - интернет-магазин электроники, смартфонов, гаджетов, бытовой техники. Быстрая доставка, низкие цены, гарантия качества." />
         <meta property="og:title" content="TopDisc - Интернет-магазин электроники" />
         <meta property="og:description" content="Интернет-магазин электроники и бытовой техники" />
+        <script src="https://res.smartwidgets.ru/app.js" defer></script>
       </Helmet>
       {/* HERO-секция */}
       <div className="container">
@@ -410,55 +411,12 @@ function Home() {
       </section>
       )}
 
-      {/* ОТЗЫВЫ */}
-      <section className="reviews">
-        <div className="container">
-          <h2 className="reviews__title">Отзывы</h2>
-
-          <div className="reviews__wrapper">
-            <Swiper
-              modules={[Navigation]}
-              spaceBetween={16}
-              slidesPerView={1}
-              navigation={{
-                nextEl: '.reviews__arrow--next',
-                prevEl: '.reviews__arrow--prev',
-              }}
-              breakpoints={{
-                576: { slidesPerView: 2 },
-                992: { slidesPerView: 3 },
-              }}
-              className="reviews__slider swiper"
-            >
-              {[...Array(6)].map((_, i) => (
-                <SwiperSlide key={i}>
-                  <div className="reviews__slide">
-                    <article className="review-card">
-                      <header className="review-card__head">
-                        <span className="review-card__author">Марина</span>
-                        <img className="review-card__logo" src="/img/2gis.png" alt="2ГИС" />
-                      </header>
-                      <ul className="review-card__stars">
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                        <li></li>
-                      </ul>
-                      <p className="review-card__text">
-                        Магазин с широким ассортиментом товаров, можно предварительно выбрать на сайте, а самое главное – цена! Рекомендую!
-                      </p>
-                    </article>
-                  </div>
-                </SwiperSlide>
-              ))}
-            </Swiper>
-
-            <button className="reviews__arrow reviews__arrow--prev" aria-label="Назад"></button>
-            <button className="reviews__arrow reviews__arrow--next" aria-label="Вперёд"></button>
-          </div>
+      {/* Блок "Отзывы" скрыт по просьбе — вместо него виджет SmartWidgets */}
+      <div className="container">
+        <div className="advanced-container">
+          <div className="sw-app" data-app="9090a99d9ccc5678968042e07e7fdf05"></div>
         </div>
-      </section>
+      </div>
     </>
   )
 }
