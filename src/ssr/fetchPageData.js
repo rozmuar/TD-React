@@ -220,6 +220,7 @@ const INFO_CODES = {
   '/pravila/': 'pravila-prodazhi',
   '/politika-konfidentsialnosti/': 'politika-konfidentsialnosti',
   '/dogovor-oferty/': 'dogovor-oferty',
+  '/rassrochka-i-kreditovanie/': 'rassrochka-i-kreditovanie',
 }
 
 async function fetchInfo(code) {
