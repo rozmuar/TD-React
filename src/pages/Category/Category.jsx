@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import { useParams, Link, useSearchParams, useLocation } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import { getCategoryFirst, getCategoryById, getCategoryByCode, getProductList, getFilters } from '../../services/apiClient'
+import { getCategoryFirst, getCategoryById, getCategoryByCode, getProductList, getFilters, getSaleStores } from '../../services/apiClient'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation } from 'swiper/modules'
 import ProductCard from '../../components/ProductCard/ProductCard'
@@ -117,6 +117,7 @@ function Category() {
   const [childSubcategories, setChildSubcategories] = useState(ssrMatch ? ssrData.childSubcategories : [])
   const [activeFilters, setActiveFilters] = useState({})
   const [appliedFilters, setAppliedFilters] = useState({})
+  const [stores, setStores] = useState([])
   const [sortOrder, setSortOrder] = useState('')
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [floatingBtnPos, setFloatingBtnPos] = useState(null)
@@ -140,6 +141,8 @@ function Category() {
         restored._price = { ...(restored._price || {}), max: Number(value) }
       } else if (key === 'inStock') {
         restored._inStock = value === '1'
+      } else if (key === 'store_id') {
+        restored._storeId = value
       } else {
         // Обычные фильтры: может быть несколько значений через повторяющиеся params
         if (!restored[key]) restored[key] = []
@@ -156,6 +159,14 @@ function Category() {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Список складов для фильтра "Наличие на складе" — общий для всего
+  // каталога (не зависит от категории), грузим один раз.
+  useEffect(() => {
+    getSaleStores()
+      .then((res) => setStores(res.data?.data || []))
+      .catch(() => setStores([]))
+  }, [])
+
   // Синхронизация appliedFilters и sortOrder в URL
   const syncFiltersToUrl = useCallback((newApplied, newSort) => {
     const params = new URLSearchParams()
@@ -168,6 +179,8 @@ function Category() {
         if (values?.max !== undefined) params.set('price_max', values.max)
       } else if (key === '_inStock') {
         if (values) params.set('inStock', '1')
+      } else if (key === '_storeId') {
+        if (values) params.set('store_id', values)
       } else if (Array.isArray(values)) {
         values.forEach(v => params.append(key, v))
       }
@@ -483,6 +496,11 @@ function Category() {
           if (appliedFilters._inStock === true) {
             filterPairs.push('in_stock=1')
           }
+          // "Наличие на складе" — одиночный выбор конкретного склада,
+          // фильтрует сервер через виртуальное поле CATALOG_STORE_AMOUNT_<ID>
+          if (appliedFilters._storeId) {
+            filterPairs.push(`store_id=${encodeURIComponent(appliedFilters._storeId)}`)
+          }
 
           const productParams = { cat: foundCategory.id, page: currentPage, prods: 20, sort: sortOrder }
           if (filterPairs.length > 0) {
@@ -635,6 +653,15 @@ function Category() {
 
   const handleInStockChange = useCallback((checked) => {
     setActiveFilters(prev => ({ ...prev, _inStock: checked }))
+  }, [])
+
+  // Одиночный выбор склада (радио) — повторный клик по уже выбранному
+  // складу снимает фильтр, как обычно ожидается от радио-группы с очисткой.
+  const handleStoreChange = useCallback((storeId) => {
+    setActiveFilters(prev => ({
+      ...prev,
+      _storeId: String(prev._storeId) === String(storeId) ? undefined : storeId,
+    }))
   }, [])
 
   const handleResetFilters = useCallback(() => {
@@ -1009,7 +1036,38 @@ function Category() {
                     )
                   })
                 })()}
-                
+
+                {/* Наличие на складе — одиночный выбор (радио), не завязан
+                    на конкретную категорию, поэтому отдельный блок, а не
+                    часть filters.ITEMS с бэкенда */}
+                {stores.length > 0 && (
+                  <>
+                    <div className="filter-divider"></div>
+                    <details className="filter">
+                      <summary className="filter__head">
+                        <span>Наличие на складе</span>
+                        <svg className="filter__arrow" width="10" height="6" viewBox="0 0 10 6" fill="none">
+                          <path d="M1 1L5 5L9 1" stroke="#CCCCCC" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                      </summary>
+                      <div className="filter__body">
+                        {stores.map((store) => (
+                          <label key={store.ID} className="filter-checkbox">
+                            <input
+                              type="radio"
+                              name="store_id"
+                              checked={String(activeFilters._storeId) === String(store.ID)}
+                              onChange={() => handleStoreChange(store.ID)}
+                            />
+                            <span className="checkbox-custom"></span>
+                            <span>{store.TITLE || store.ADDRESS}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </details>
+                  </>
+                )}
+
                 {/* Кнопки фильтров */}
                 <div className="filter-divider"></div>
                 <div className="filters__actions">
