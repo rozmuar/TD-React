@@ -770,7 +770,7 @@ function Category() {
                       className={`subcategory__card ${index === 6 ? 'subcategory__card--xl' : ''}`}
                       style={{ '--pic': `url(${subcat.ico})` }}
                     >
-                      <span className="subcategory__name" dangerouslySetInnerHTML={{ __html: sanitizeHtml(subcat.name.replace(/\s/g, '<br />')) }} />
+                      <span className="subcategory__name">{decodeHtml(subcat.name)}</span>
                     </Link>
                   ))}
                 </div>
