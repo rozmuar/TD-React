@@ -942,6 +942,24 @@ function Category() {
                                     <span>В наличии</span>
                                   </label>
                                 </div>
+                                {/* Наличие на складе — сразу после "В наличии" */}
+                                {stores.length > 0 && (
+                                  <div style={{ marginTop: '16px' }}>
+                                    <div className="filter__subtitle">Наличие на складе</div>
+                                    {stores.map((store) => (
+                                      <label key={store.ID} className="filter-checkbox">
+                                        <input
+                                          type="radio"
+                                          name="store_id"
+                                          checked={String(activeFilters._storeId) === String(store.ID)}
+                                          onChange={() => handleStoreChange(store.ID)}
+                                        />
+                                        <span className="checkbox-custom"></span>
+                                        <span>{store.TITLE || store.ADDRESS}</span>
+                                      </label>
+                                    ))}
+                                  </div>
+                                )}
                               </>
                             ) : isColor && filterData.VALUES && Array.isArray(filterData.VALUES) ? (
                               /* Специальная обработка для фильтра "Цвет" - плитки с цветами */
@@ -1036,37 +1054,6 @@ function Category() {
                     )
                   })
                 })()}
-
-                {/* Наличие на складе — одиночный выбор (радио), не завязан
-                    на конкретную категорию, поэтому отдельный блок, а не
-                    часть filters.ITEMS с бэкенда */}
-                {stores.length > 0 && (
-                  <>
-                    <div className="filter-divider"></div>
-                    <details className="filter">
-                      <summary className="filter__head">
-                        <span>Наличие на складе</span>
-                        <svg className="filter__arrow" width="10" height="6" viewBox="0 0 10 6" fill="none">
-                          <path d="M1 1L5 5L9 1" stroke="#CCCCCC" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                      </summary>
-                      <div className="filter__body">
-                        {stores.map((store) => (
-                          <label key={store.ID} className="filter-checkbox">
-                            <input
-                              type="radio"
-                              name="store_id"
-                              checked={String(activeFilters._storeId) === String(store.ID)}
-                              onChange={() => handleStoreChange(store.ID)}
-                            />
-                            <span className="checkbox-custom"></span>
-                            <span>{store.TITLE || store.ADDRESS}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </details>
-                  </>
-                )}
 
                 {/* Кнопки фильтров */}
                 <div className="filter-divider"></div>

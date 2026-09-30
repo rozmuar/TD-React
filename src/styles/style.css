@@ -1718,6 +1718,13 @@ details[open] .filter__arrow {
     user-select: none;
 }
 
+.filter__subtitle {
+    font-size: 13px;
+    font-weight: 600;
+    color: #7a7a7a;
+    margin: 0 0 8px;
+}
+
 /* ---------- чекбокс «В наличии» ---------- */
 .filter-checkbox {
     display: flex;
