@@ -942,23 +942,25 @@ function Category() {
                                     <span>В наличии</span>
                                   </label>
                                 </div>
-                                {/* Наличие на складе — сразу после "В наличии" */}
+                                {/* Наличие на складе — сразу после "В наличии", свёрнуто по умолчанию */}
                                 {stores.length > 0 && (
-                                  <div style={{ marginTop: '16px' }}>
-                                    <div className="filter__subtitle">Наличие на складе</div>
-                                    {stores.map((store) => (
-                                      <label key={store.ID} className="filter-checkbox">
-                                        <input
-                                          type="radio"
-                                          name="store_id"
-                                          checked={String(activeFilters._storeId) === String(store.ID)}
-                                          onChange={() => handleStoreChange(store.ID)}
-                                        />
-                                        <span className="checkbox-custom"></span>
-                                        <span>{store.TITLE || store.ADDRESS}</span>
-                                      </label>
-                                    ))}
-                                  </div>
+                                  <details className="filter-nested" style={{ marginTop: '16px' }}>
+                                    <summary className="filter__subtitle">Наличие на складе</summary>
+                                    <div style={{ marginTop: '8px' }}>
+                                      {stores.map((store) => (
+                                        <label key={store.ID} className="filter-checkbox">
+                                          <input
+                                            type="radio"
+                                            name="store_id"
+                                            checked={String(activeFilters._storeId) === String(store.ID)}
+                                            onChange={(e) => { handleStoreChange(store.ID); showFloatingBtn(e) }}
+                                          />
+                                          <span className="checkbox-custom"></span>
+                                          <span>{store.TITLE || store.ADDRESS}</span>
+                                        </label>
+                                      ))}
+                                    </div>
+                                  </details>
                                 )}
                               </>
                             ) : isColor && filterData.VALUES && Array.isArray(filterData.VALUES) ? (
