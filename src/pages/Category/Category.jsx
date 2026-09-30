@@ -29,6 +29,20 @@ function isPremiumCategory(cat) {
   return cat.id === PREMIUM_ROOT_ID || cat.id >= PREMIUM_ID_OFFSET
 }
 
+// Склады, которые реально нужно показывать покупателю в фильтре "Наличие
+// на складе" (по названию из 1С/админки) — /sale/stores отдаёт вообще все
+// активные склады, включая служебные (оптовые точки, "в пути" и т.п.).
+const STORE_FILTER_WHITELIST = [
+  '173 Витрина',
+  'Западный Витрина',
+  'Коллаж Витрина',
+  'Платформа Витрина',
+  'Платформа Склад',
+  'Склад - Основной',
+  'В пути',
+  'Комсомольская 10',
+]
+
 function categoryUrl(cat) {
   if (cat.id === PREMIUM_ROOT_ID || cat.code === 'premium') return '/category/premium/'
   if (isPremiumCategory(cat)) return `/category/premium/${cat.code}/`
@@ -160,10 +174,16 @@ function Category() {
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Список складов для фильтра "Наличие на складе" — общий для всего
-  // каталога (не зависит от категории), грузим один раз.
+  // каталога (не зависит от категории), грузим один раз. /sale/stores
+  // отдаёт ВСЕ активные склады (в т.ч. служебные — оптовые точки, "в пути"
+  // и т.п.), а в фильтре нужен только конкретный список торговых точек —
+  // сверяем по названию (TITLE), как показано в 1С/админке.
   useEffect(() => {
     getSaleStores()
-      .then((res) => setStores(res.data?.data || []))
+      .then((res) => {
+        const all = res.data?.data || []
+        setStores(all.filter((s) => STORE_FILTER_WHITELIST.includes(s.TITLE)))
+      })
       .catch(() => setStores([]))
   }, [])
 
