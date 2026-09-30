@@ -261,6 +261,15 @@ function Product() {
   const pageTitle = decodeHtml(product.seo?.title) || `${decodeHtml(product.name)} - TopDisc`
   const pageDescription = decodeHtml(product.seo?.description) || `Купить ${decodeHtml(product.name)} в интернет-магазине TopDisc`
 
+  // Полная цепочка раздел -> подраздел -> ... для хлебных крошек (бэкенд
+  // теперь поднимается по IBLOCK_SECTION_ID до корня — см. category_path в
+  // appGetProduct). Раньше показывался только один, ближайший раздел.
+  // Фолбэк на старое поведение (один уровень) — на случай устаревших
+  // закэшированных SSR-данных без этого поля.
+  const breadcrumbCategories = Array.isArray(product.category_path) && product.category_path.length > 0
+    ? product.category_path
+    : (category ? [category] : [])
+
   return (
     <>
       <Helmet>
@@ -286,7 +295,7 @@ function Product() {
         breadcrumbSchema([
           { name: 'Главная', url: '/' },
           { name: 'Каталог', url: '/catalog/' },
-          ...(category ? [{ name: decodeHtml(category.name), url: `/catalog/${category.code}/` }] : []),
+          ...breadcrumbCategories.map((c) => ({ name: decodeHtml(c.name), url: `/catalog/${c.code}/` })),
           { name: decodeHtml(product.name) },
         ]),
       ]} />
@@ -301,11 +310,11 @@ function Product() {
             <li className="breadcrumbs-item">
               <Link className="breadcrumbs-link" to="/catalog/">Каталог</Link>
             </li>
-            {category && (
-              <li className="breadcrumbs-item">
-                <Link className="breadcrumbs-link" to={`/catalog/${category.code}/`}>{decodeHtml(category.name)}</Link>
+            {breadcrumbCategories.map((c) => (
+              <li className="breadcrumbs-item" key={c.id ?? c.code}>
+                <Link className="breadcrumbs-link" to={`/catalog/${c.code}/`}>{decodeHtml(c.name)}</Link>
               </li>
-            )}
+            ))}
           </ul>
         </div>
       </div>
