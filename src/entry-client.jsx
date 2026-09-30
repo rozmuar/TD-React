@@ -9,6 +9,7 @@ import { injectStore } from './services/apiClient'
 import { fetchFavorites } from './store/slices/favoritesSlice'
 import { fetchServerCart } from './store/slices/cartSlice'
 import { getGuestFuserId } from './services/apiClient'
+import { exposeAddToCart } from './utils/globalCartApi'
 import './styles/normalize.css'
 import './styles/bootstrap-grid.css'
 import 'swiper/css'
@@ -19,6 +20,7 @@ import './styles/style.css'
 
 // Передаём store в apiClient для обработки 401
 injectStore(store)
+exposeAddToCart(store)
 
 // Если пользователь авторизован — загружаем избранное и серверную корзину.
 // Для гостей с сохранённым fuser_id тоже подтягиваем корзину с сервера.

@@ -149,6 +149,24 @@ export const addToCart = (product, quantity = 1) => async (dispatch) => {
   }
 }
 
+// Для вызовов ИЗВНЕ React-дерева (см. src/utils/globalCartApi.js,
+// window.addToCart) — нет заранее загруженного объекта товара (только
+// голый id), поэтому оптимистично ничего не рисуем (нечем — не знаем
+// имя/цену/картинку), просто добавляем на сервере и сразу перечитываем
+// корзину целиком, чтобы в UI сразу появилась настоящая карточка позиции.
+export const addToCartById = (productId, quantity = 1) => async (dispatch) => {
+  const id = Number(productId)
+  if (!id) return
+  const qty = Math.max(1, Math.floor(Number(quantity) || 1))
+  try {
+    await addToServerBasket(id, qty)
+  } catch (e) {
+    console.warn('[CART] addToCartById server error:', e?.message)
+  } finally {
+    dispatch(fetchServerCart())
+  }
+}
+
 export const removeFromCart = (productId) => async (dispatch) => {
   if (!productId) return
   dispatch(cartSlice.actions._removeItemLocal(productId))
