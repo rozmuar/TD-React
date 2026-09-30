@@ -1718,20 +1718,6 @@ details[open] .filter__arrow {
     user-select: none;
 }
 
-.filter__subtitle {
-    font-size: 13px;
-    font-weight: 600;
-    color: #7a7a7a;
-    margin: 0 0 8px;
-    cursor: pointer;
-    user-select: none;
-}
-
-.filter-nested {
-    border-top: 1px solid #f0f0f0;
-    padding-top: 12px;
-}
-
 /* ---------- чекбокс «В наличии» ---------- */
 .filter-checkbox {
     display: flex;

@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useMemo, useCallback } from 'react'
+import { Fragment, useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import { useParams, Link, useSearchParams, useLocation } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { getCategoryFirst, getCategoryById, getCategoryByCode, getProductList, getFilters, getSaleStores } from '../../services/apiClient'
@@ -929,7 +929,8 @@ function Category() {
                     const isColor = filterData.NAME === 'Цвет' || filterData.NAME.toLowerCase().includes('цвет')
                   
                     return (
-                      <div key={filterKey}>
+                      <Fragment key={filterKey}>
+                      <div>
                         <details className="filter" open={isPrice}>
                           <summary className="filter__head">
                             <span>{filterData.NAME}</span>
@@ -962,26 +963,6 @@ function Category() {
                                     <span>В наличии</span>
                                   </label>
                                 </div>
-                                {/* Наличие на складе — сразу после "В наличии", свёрнуто по умолчанию */}
-                                {stores.length > 0 && (
-                                  <details className="filter-nested" style={{ marginTop: '16px' }}>
-                                    <summary className="filter__subtitle">Наличие на складе</summary>
-                                    <div style={{ marginTop: '8px' }}>
-                                      {stores.map((store) => (
-                                        <label key={store.ID} className="filter-checkbox">
-                                          <input
-                                            type="radio"
-                                            name="store_id"
-                                            checked={String(activeFilters._storeId) === String(store.ID)}
-                                            onChange={(e) => { handleStoreChange(store.ID); showFloatingBtn(e) }}
-                                          />
-                                          <span className="checkbox-custom"></span>
-                                          <span>{store.TITLE || store.ADDRESS}</span>
-                                        </label>
-                                      ))}
-                                    </div>
-                                  </details>
-                                )}
                               </>
                             ) : isColor && filterData.VALUES && Array.isArray(filterData.VALUES) ? (
                               /* Специальная обработка для фильтра "Цвет" - плитки с цветами */
@@ -1069,10 +1050,41 @@ function Category() {
                             )}
                           </div>
                         </details>
-                        {index < sortedFilters.length - 1 && (
+                        {(index < sortedFilters.length - 1 || (isPrice && stores.length > 0)) && (
                           <div className="filter-divider"></div>
                         )}
                       </div>
+                      {/* Наличие на складе — визуально такой же блок, сразу после "Цена"/"В наличии" */}
+                      {isPrice && stores.length > 0 && (
+                        <div>
+                          <details className="filter">
+                            <summary className="filter__head">
+                              <span>Наличие на складе</span>
+                              <svg className="filter__arrow" width="10" height="6" viewBox="0 0 10 6" fill="none">
+                                <path d="M1 1L5 5L9 1" stroke="#CCCCCC" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                              </svg>
+                            </summary>
+                            <div className="filter__body">
+                              {stores.map((store) => (
+                                <label key={store.ID} className="filter-checkbox">
+                                  <input
+                                    type="radio"
+                                    name="store_id"
+                                    checked={String(activeFilters._storeId) === String(store.ID)}
+                                    onChange={(e) => { handleStoreChange(store.ID); showFloatingBtn(e) }}
+                                  />
+                                  <span className="checkbox-custom"></span>
+                                  <span>{store.TITLE || store.ADDRESS}</span>
+                                </label>
+                              ))}
+                            </div>
+                          </details>
+                          {index < sortedFilters.length - 1 && (
+                            <div className="filter-divider"></div>
+                          )}
+                        </div>
+                      )}
+                      </Fragment>
                     )
                   })
                 })()}
