@@ -649,8 +649,13 @@ function Category() {
     if (!target) return
     const aside = filtersAsideRef.current
     const asideRect = aside.getBoundingClientRect()
-    const targetRect = target.closest('.filter')?.getBoundingClientRect() || target.getBoundingClientRect()
-    setFloatingBtnPos(targetRect.bottom - asideRect.top + aside.scrollTop + 8)
+    // Кнопка должна появляться рядом с конкретной строкой, по которой
+    // кликнули (checkbox/radio), а не у нижнего края всего блока фильтра —
+    // раньше closest('.filter') подхватывал весь список (иногда из 15+
+    // значений), и кнопка уезжала далеко вниз от места клика.
+    const row = target.closest('.filter-checkbox') || target.closest('li') || target
+    const rowRect = row.getBoundingClientRect()
+    setFloatingBtnPos(rowRect.bottom - asideRect.top + aside.scrollTop + 8)
   }, [])
 
   const handleFilterChange = useCallback((filterKey, value, checked, e) => {
