@@ -404,6 +404,11 @@ function Product() {
               </div>
             )}
 
+            {/* Причина уценки — показываем только если бэкенд реально прислал текст */}
+            {product.discount_reason && (
+              <div className="product__discount-reason">Причина уценки: {product.discount_reason}</div>
+            )}
+
             {/* Рейтинг / Артикул */}
             <div className="product__meta">
               {getArtikul() && <span className="product__sku">Артикул: {getArtikul()}</span>}

@@ -3432,6 +3432,16 @@ footer {
     color: #D1D1D1;
 }
 
+.product__discount-reason {
+    margin: 12px 0 0;
+    padding: 8px 12px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #C1272D;
+    background: #FDECEC;
+    border-radius: 8px;
+}
+
 .product__rating {
     display: flex;
     align-items: center;
