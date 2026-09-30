@@ -1064,7 +1064,7 @@ function Category() {
                         <div>
                           <details className="filter">
                             <summary className="filter__head">
-                              <span>Наличие на складе</span>
+                              <span>Наличие в магазинах</span>
                               <svg className="filter__arrow" width="10" height="6" viewBox="0 0 10 6" fill="none">
                                 <path d="M1 1L5 5L9 1" stroke="#CCCCCC" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                               </svg>
