@@ -34,6 +34,7 @@ import PlatnyyRemont from './pages/Info/PlatnyyRemont'
 import Rules from './pages/Info/Rules'
 import Privacy from './pages/Info/Privacy'
 import Oferta from './pages/Info/Oferta'
+import LegalEntities from './pages/Info/LegalEntities'
 
 // /catalog_oth/ — старый URL премиум-товаров (инфоблок 71), заменён на
 // /category/premium/. Редиректим, а не роутим напрямую на Category,
@@ -81,6 +82,7 @@ function App({ helmetContext }) {
           <Route path="contacts/" element={<Contacts />} />
           <Route path="suppliers/" element={<Suppliers />} />
           <Route path="opt/" element={<Wholesale />} />
+          <Route path="yuridicheskim-litsam/" element={<LegalEntities />} />
           <Route path="dostavka/" element={<Delivery />} />
           <Route path="payment/" element={<Payment />} />
           <Route path="bonus/" element={<Bonus />} />

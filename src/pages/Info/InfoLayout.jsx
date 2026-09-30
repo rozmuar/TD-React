@@ -6,6 +6,7 @@ const sidebarLinks = [
   { to: '/contacts/', label: 'Контакты' },
   { to: '/suppliers/', label: 'Поставщикам' },
   { to: '/opt/', label: 'Оптовикам' },
+  { to: '/yuridicheskim-litsam/', label: 'Юридическим лицам' },
   { to: '/dostavka/', label: 'Доставка' },
   { to: '/payment/', label: 'Оплата' },
   { to: '/bonus/', label: 'Бонусная программа' },

@@ -6347,6 +6347,134 @@ p.region-delivery__note {
   }
 }
 
+/* ===== Юридическим лицам (перенесено из шаблона bitlate_pro back.topdisc.ru,
+   классы .yur-lico* сохранены как есть, чтобы не потерять исходный дизайн) ===== */
+.yur-lico-page__hero {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  margin: 0 0 20px;
+}
+
+.yur-lico-block h2 {
+  font-weight: 900;
+  font-size: 30px;
+  line-height: 42px;
+  text-align: center;
+  text-transform: uppercase;
+  color: #000000;
+  margin: 50px 0 20px;
+}
+
+.yur-lico-block .yur-lico__item {
+  text-align: center;
+  margin: 30px 0;
+}
+
+.yur-lico-block .yur-lico__item img {
+  width: 74px;
+  border: 2px solid #a3bc28;
+  border-radius: 50%;
+  margin: 0 0 14px;
+}
+
+.yur-lico-block .yur-lico__item p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.yur-lico-block .yur-lico__item p.yur-lico__title {
+  font-weight: 900;
+  font-size: 16px;
+  line-height: 1.4;
+  text-align: center;
+  color: #000000;
+}
+
+.yur-lico-block .yur-lico__item a {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.yur-lico-block .yur-lico__item span {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.yur-lico-block ul {
+  margin: 0 0 10px;
+}
+
+.yur-lico-block p {
+  margin: 0 0 10px;
+}
+
+.yur-lico-block .yur-lico-doc {
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  margin: 30px 0 0;
+}
+
+.yur-lico-block .yur-lico-doc .yur-lico-doc-item {
+  text-align: center;
+  margin: 0 30px 20px 0;
+  max-width: 200px;
+}
+
+.yur-lico-block .yur-lico-doc .yur-lico-doc-item img {
+  width: 74px;
+  border: 2px solid #a3bc28;
+  border-radius: 50%;
+  margin: 0 0 14px;
+}
+
+.yur-lico-block .yur-lico-doc .yur-lico-doc-item p {
+  font-weight: 900;
+  font-size: 16px;
+  line-height: 1.4;
+  text-align: center;
+  color: #000000;
+}
+
+@media (max-width: 575px) {
+  .yur-lico-block h2 {
+    font-weight: 900;
+    font-size: 22px;
+    line-height: 37px;
+  }
+
+  .yur-lico-block .yur-lico-doc {
+    margin: 30px 0 50px;
+    justify-content: space-between;
+  }
+
+  .yur-lico-block .yur-lico-doc .yur-lico-doc-item {
+    text-align: center;
+    margin: 0 15px 15px;
+    max-width: 180px;
+  }
+
+  .yur-lico-block ul {
+    margin: 0 0 10px 24px;
+  }
+
+  .yur-lico-block p {
+    margin: 0 0 10px;
+    font-size: 15px;
+    line-height: 1.4;
+    color: #000000;
+  }
+}
+
 /* ===== Platnyy remont page ===== */
 .repair-page__hero {
   display: flex;
