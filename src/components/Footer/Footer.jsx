@@ -105,17 +105,14 @@ function Footer() {
                   </div>
                   <div className="footer__contacts-right">
                     <div className="footer__socials-row">
-                      <a href="#" className="footer__socials-item">
-                        <img src="/img/footer/wp.svg" alt="whatsapp" />
+                      <a href="https://vk.ru/topdisc" className="footer__socials-item" target="_blank" rel="noopener noreferrer">
+                        <img src="/img/footer/vk.svg" alt="vk" />
                       </a>
-                      <a href="#" className="footer__socials-item">
+                      <a href="tg://resolve?domain=TPDisc_bot" className="footer__socials-item" target="_blank" rel="noopener noreferrer">
                         <img src="/img/footer/tg.svg" alt="telegram" />
                       </a>
-                      <a href="#" className="footer__socials-item">
+                      <a href="mailto:shop@topdisc.ru" className="footer__socials-item" target="_blank" rel="noopener noreferrer">
                         <img src="/img/footer/mail.svg" alt="mail" />
-                      </a>
-                      <a href="#" className="footer__socials-item">
-                        <img src="/img/footer/vk.svg" alt="vk" />
                       </a>
                     </div>
                   </div>
