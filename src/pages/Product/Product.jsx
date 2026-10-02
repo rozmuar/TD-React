@@ -475,7 +475,6 @@ function Product() {
                   {product.store.map((store) => (
                     <div key={store.ID} className="product__store-item">
                       <div className="product__store-info">
-                        <div className="product__store-name">{store.TITLE}</div>
                         <div className="product__store-address">{store.ADDRESS}</div>
                       </div>
                       <div className="product__store-amount">
