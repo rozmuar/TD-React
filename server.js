@@ -60,6 +60,17 @@ async function createServer() {
   const BITRIX_REST_URL =
     process.env.VITE_BITRIX_REST_URL || 'https://back.topdisc.ru/rest/28531/ky7kc0zinte6jb7e'
 
+  // Т-Банк шлёт подтверждение оплаты (и редиректит браузер клиента) на
+  // старый путь topdisc.ru/personal/order/success.php — Notification URL
+  // в личном кабинете Т-Банка указывает именно на topdisc.ru (не на
+  // back.topdisc.ru, где реально живёт Bitrix и проверяет подпись банка),
+  // поменять это в кабинете банка нельзя/неудобно. Поэтому ретранслируем
+  // запрос как есть на реальный обработчик Bitrix — мы тут ничего не
+  // парсим и не доверяем содержимому, просто пересылаем сырые данные,
+  // подпись проверяет сам Bitrix на back.topdisc.ru.
+  const TBANK_CALLBACK_PATH = '/personal/order/success.php'
+  const BITRIX_PS_RESULT_URL = 'https://back.topdisc.ru/bitrix/tools/sale_ps_result.php'
+
   async function resolveFindByCode(req, res) {
     const params = new URLSearchParams(req.query)
     const code = params.get('code')
@@ -87,6 +98,42 @@ async function createServer() {
 
     return res.redirect(301, '/catalog/')
   }
+
+  // POST — настоящее серверное уведомление от Т-Банка (сервер-сервер,
+  // никакого браузера), ретранслируем целиком и отдаём банку ровно то,
+  // что ответил Bitrix (он сам решает, что должен увидеть банк).
+  app.post(TBANK_CALLBACK_PATH, express.raw({ type: '*/*', limit: '2mb' }), async (req, res) => {
+    const qs = req.originalUrl.includes('?') ? req.originalUrl.slice(req.originalUrl.indexOf('?')) : ''
+    try {
+      const backendRes = await axios.post(`${BITRIX_PS_RESULT_URL}${qs}`, req.body, {
+        headers: { 'Content-Type': req.headers['content-type'] || 'application/x-www-form-urlencoded' },
+        responseType: 'arraybuffer',
+        validateStatus: () => true,
+        timeout: 15000,
+      })
+      res.status(backendRes.status)
+      if (backendRes.headers['content-type']) res.set('Content-Type', backendRes.headers['content-type'])
+      res.end(Buffer.from(backendRes.data))
+    } catch (e) {
+      console.error('[TBANK webhook relay] POST error:', e.message)
+      res.status(502).end('Bad Gateway')
+    }
+  })
+
+  // GET — визит браузера клиента после оплаты (и, возможно, тот же колбэк,
+  // если в кабинете банка настроен один общий URL без различия методов).
+  // Ретранслируем в фоне (не блокируя страницу надолго), затем в любом
+  // случае показываем клиенту обычную SPA-страницу результата оплаты —
+  // next() передаёт запрос дальше, в общий SSR-обработчик ниже.
+  app.get(TBANK_CALLBACK_PATH, async (req, res, next) => {
+    const qs = req.originalUrl.includes('?') ? req.originalUrl.slice(req.originalUrl.indexOf('?')) : ''
+    try {
+      await axios.get(`${BITRIX_PS_RESULT_URL}${qs}`, { timeout: 8000, validateStatus: () => true })
+    } catch (e) {
+      console.error('[TBANK webhook relay] GET error:', e.message)
+    }
+    next()
+  })
 
   // Все запросы обрабатываем SSR
   app.use(async (req, res) => {
