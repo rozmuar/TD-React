@@ -3384,6 +3384,11 @@ footer {
     background: #FF7A00;
 }
 
+.product__badge--transit,
+.catalog__main-badge--transit {
+    background: #8B8B8B;
+}
+
 /* Бейдж поверх картинки товара в каталоге/списках */
 .catalog__main-badge {
     position: absolute;

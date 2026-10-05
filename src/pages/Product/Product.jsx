@@ -386,6 +386,9 @@ function Product() {
                 {product.badge && (
                   <span className={`product__badge product__badge--${getBadgeClass(product.badge)}`}>{product.badge}</span>
                 )}
+                {Number(product.in_transit_quantity) > 0 && (
+                  <span className="product__badge product__badge--transit">В пути</span>
+                )}
                 {isAvailable && productBonus > 0 && (
                   <span className="product__bonus mobile-hidden">
                     {productBonus} <img className="catalog__main-score-img" alt="Score" src="/img/header/score.png" />
