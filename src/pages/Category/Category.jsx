@@ -183,7 +183,25 @@ function Category() {
     getSaleStores()
       .then((res) => {
         const all = res.data?.data || []
-        setStores(all.filter((s) => STORE_FILTER_WHITELIST.includes(s.TITLE)))
+        const whitelisted = all.filter((s) => STORE_FILTER_WHITELIST.includes(s.TITLE))
+        // "Платформа Витрина" и "Платформа Склад" — один и тот же физический
+        // адрес (ул. Ставского, д. 4), в фильтре это должна быть одна точка,
+        // а не два одинаковых пункта с разными ID — объединяем по адресу,
+        // store_id уходит на бэкенд как "18,29" (buildSmartFilterArFilter
+        // поддерживает несколько ID через OR).
+        const merged = []
+        const byAddress = new Map()
+        for (const s of whitelisted) {
+          const existing = byAddress.get(s.ADDRESS)
+          if (existing) {
+            existing.ID = `${existing.ID},${s.ID}`
+          } else {
+            const entry = { ...s }
+            byAddress.set(s.ADDRESS, entry)
+            merged.push(entry)
+          }
+        }
+        setStores(merged)
       })
       .catch(() => setStores([]))
   }, [])
