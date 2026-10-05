@@ -1080,7 +1080,7 @@ function Category() {
                                     onChange={(e) => { handleStoreChange(store.ID); showFloatingBtn(e) }}
                                   />
                                   <span className="checkbox-custom"></span>
-                                  <span>{store.TITLE || store.ADDRESS}</span>
+                                  <span>{store.ADDRESS || store.TITLE}</span>
                                 </label>
                               ))}
                             </div>
