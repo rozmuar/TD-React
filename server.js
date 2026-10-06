@@ -99,10 +99,43 @@ async function createServer() {
     return res.redirect(301, '/catalog/')
   }
 
+  // ВРЕМЕННЫЙ логгер всех POST-запросов (диагностика: куда и что шлёт Т-Банк).
+  // Пишет в logs/post-requests.log (одна JSON-строка на запрос). Удалить после
+  // диагностики.
+  const POST_LOG_DIR = path.join(__dirname, 'logs')
+  const POST_LOG_FILE = path.join(POST_LOG_DIR, 'post-requests.log')
+  const SKIP_LOG_HEADERS = new Set(['cookie', 'authorization'])
+
+  app.use((req, res, next) => {
+    if (req.method !== 'POST') return next()
+    express.raw({ type: '*/*', limit: '2mb' })(req, res, (err) => {
+      if (err) return next(err)
+      const bodyText = Buffer.isBuffer(req.body) ? req.body.toString('utf8') : ''
+      const headers = {}
+      for (const [k, v] of Object.entries(req.headers)) {
+        if (!SKIP_LOG_HEADERS.has(k)) headers[k] = v
+      }
+      const entry = {
+        time: new Date().toISOString(),
+        method: req.method,
+        url: req.originalUrl,
+        ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress,
+        headers,
+        bodyBytes: bodyText.length,
+        body: bodyText.slice(0, 5000),
+      }
+      fs.mkdir(POST_LOG_DIR, { recursive: true }, () => {
+        fs.appendFile(POST_LOG_FILE, JSON.stringify(entry) + '\n', () => {})
+      })
+      console.log('[POST]', entry.time, entry.url, `(${bodyText.length} bytes)`)
+      next()
+    })
+  })
+
   // POST — настоящее серверное уведомление от Т-Банка (сервер-сервер,
   // никакого браузера), ретранслируем целиком и отдаём банку ровно то,
   // что ответил Bitrix (он сам решает, что должен увидеть банк).
-  app.post(TBANK_CALLBACK_PATH, express.raw({ type: '*/*', limit: '2mb' }), async (req, res) => {
+  app.post(TBANK_CALLBACK_PATH, async (req, res) => {
     const qs = req.originalUrl.includes('?') ? req.originalUrl.slice(req.originalUrl.indexOf('?')) : ''
     try {
       const backendRes = await axios.post(`${BITRIX_PS_RESULT_URL}${qs}`, req.body, {
