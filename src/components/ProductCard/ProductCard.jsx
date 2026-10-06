@@ -62,6 +62,12 @@ function ProductCard({ product }) {
         {product.badge && (
           <span className={`catalog__main-badge catalog__main-badge--${getBadgeClass(product.badge)}`}>{product.badge}</span>
         )}
+        {Number(product.in_transit_quantity) > 0 && (
+          <span
+            className="catalog__main-badge catalog__main-badge--transit"
+            style={product.badge ? { top: 40 } : undefined}
+          >В пути</span>
+        )}
         <div className="catalog__main-item-action-buttons">
           <button className={`action-btn favorite${isInFavorites ? ' is-active' : ''}`} type="button" aria-label="Добавить в избранное" onClick={handleToggleFavorite}></button>
           <button className="action-btn compare" type="button" aria-label="Добавить к сравнению" onClick={handleToggleCompare} style={isInCompare ? { backgroundColor: 'var(--accent, #44BD31)' } : undefined}></button>
