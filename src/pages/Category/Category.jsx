@@ -35,6 +35,13 @@ function isPremiumCategory(cat) {
 // а статус "товар ещё едет", фильтровать по нему нечего. "Склад - Основной"
 // тоже убран — служебный склад ("Склад - Технопорт"), не физическая точка,
 // где покупатель может забрать заказ (см. правки от 2026-10-05).
+const STORE_LABELS = {
+  '173 Витрина': 'ТЦ Универсам "173"',
+  'Западный Витрина': 'ТЦ "Западный"',
+  'Коллаж Витрина': 'ТРЦ "Коллаж"',
+  'Комсомольская 10': 'ТЦ "Юбилейный" (Заречный)',
+}
+
 const STAVSKOGO_TITLES = [
   'Платформа Витрина',
   'Платформа Склад',
@@ -211,8 +218,8 @@ function Category() {
             existing.ID = `${existing.ID},${s.ID}`
           } else {
             const entry = group === 'stavskogo'
-              ? { ...s, ADDRESS: 'ул. Ставского, д. 4' }
-              : { ...s }
+              ? { ...s, ADDRESS: 'ул. Ставского, д. 4', LABEL: 'Ставского 4, к. 1' }
+              : { ...s, LABEL: STORE_LABELS[s.TITLE] || s.ADDRESS || s.TITLE }
             byGroup.set(group, entry)
             merged.push(entry)
           }
@@ -1115,7 +1122,7 @@ function Category() {
                                     onClick={(e) => { handleStoreChange(store.ID); showFloatingBtn(e) }}
                                   />
                                   <span className="checkbox-custom"></span>
-                                  <span>{store.ADDRESS || store.TITLE}</span>
+                                  <span>{store.LABEL}</span>
                                 </label>
                               ))}
                             </div>
