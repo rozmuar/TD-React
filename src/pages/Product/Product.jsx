@@ -478,7 +478,7 @@ function Product() {
                   {product.store.map((store) => (
                     <div key={store.ID} className="product__store-item">
                       <div className="product__store-info">
-                        <div className="product__store-address">{store.ADDRESS}</div>
+                        <div className="product__store-address">{store.ADDRESS || store.TITLE}</div>
                       </div>
                       <div className="product__store-amount">
                         {parseInt(store.AMOUNT) > 0 ? (
