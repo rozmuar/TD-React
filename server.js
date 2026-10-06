@@ -69,6 +69,7 @@ async function createServer() {
   // парсим и не доверяем содержимому, просто пересылаем сырые данные,
   // подпись проверяет сам Bitrix на back.topdisc.ru.
   const TBANK_CALLBACK_PATH = '/personal/order/success.php'
+  const TBANK_NOTIFICATION_PATHS = [TBANK_CALLBACK_PATH, '/personal/order/notification.php']
   const BITRIX_PS_RESULT_URL = 'https://back.topdisc.ru/bitrix/tools/sale_ps_result.php'
 
   async function resolveFindByCode(req, res) {
@@ -135,7 +136,7 @@ async function createServer() {
   // POST — настоящее серверное уведомление от Т-Банка (сервер-сервер,
   // никакого браузера), ретранслируем целиком и отдаём банку ровно то,
   // что ответил Bitrix (он сам решает, что должен увидеть банк).
-  app.post(TBANK_CALLBACK_PATH, async (req, res) => {
+  app.post(TBANK_NOTIFICATION_PATHS, async (req, res) => {
     const qs = req.originalUrl.includes('?') ? req.originalUrl.slice(req.originalUrl.indexOf('?')) : ''
     try {
       const backendRes = await axios.post(`${BITRIX_PS_RESULT_URL}${qs}`, req.body, {
@@ -289,7 +290,7 @@ async function createServer() {
     }
   })
 
-  app.listen(PORT, () => {
+  app.listen(PORT, '127.0.0.1', () => {
     console.log(`SSR server: http://localhost:${PORT}`)
   })
 }
