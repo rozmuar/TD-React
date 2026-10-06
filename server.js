@@ -145,9 +145,11 @@ async function createServer() {
         validateStatus: () => true,
         timeout: 15000,
       })
+      const backendBody = Buffer.from(backendRes.data)
+      console.log('[TBANK relay] POST', req.originalUrl.split('?')[0], '→ bitrix', backendRes.status, JSON.stringify(backendBody.toString('utf8').slice(0, 300)))
       res.status(backendRes.status)
       if (backendRes.headers['content-type']) res.set('Content-Type', backendRes.headers['content-type'])
-      res.end(Buffer.from(backendRes.data))
+      res.end(backendBody)
     } catch (e) {
       console.error('[TBANK webhook relay] POST error:', e.message)
       res.status(502).end('Bad Gateway')
