@@ -1111,7 +1111,8 @@ function Category() {
                                     type="radio"
                                     name="store_id"
                                     checked={String(activeFilters._storeId) === String(store.ID)}
-                                    onChange={(e) => { handleStoreChange(store.ID); showFloatingBtn(e) }}
+                                    onChange={() => {}}
+                                    onClick={(e) => { handleStoreChange(store.ID); showFloatingBtn(e) }}
                                   />
                                   <span className="checkbox-custom"></span>
                                   <span>{store.ADDRESS || store.TITLE}</span>
