@@ -146,7 +146,8 @@ async function createServer() {
         timeout: 15000,
       })
       const backendBody = Buffer.from(backendRes.data)
-      console.log('[TBANK relay] POST', req.originalUrl.split('?')[0], '→ bitrix', backendRes.status, JSON.stringify(backendBody.toString('utf8').slice(0, 300)))
+      const notifiedOrder = ((Buffer.isBuffer(req.body) ? req.body.toString('utf8') : '').match(/"OrderId"\s*:\s*"(\d+)/) || [])[1] || '?'
+      console.log('[TBANK relay] POST', req.originalUrl.split('?')[0], 'order', notifiedOrder, '→ bitrix', backendRes.status, JSON.stringify(backendBody.toString('utf8').slice(0, 300)))
       res.status(backendRes.status)
       if (backendRes.headers['content-type']) res.set('Content-Type', backendRes.headers['content-type'])
       res.end(backendBody)
