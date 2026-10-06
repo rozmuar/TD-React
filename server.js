@@ -158,14 +158,18 @@ async function createServer() {
   // Ретранслируем в фоне (не блокируя страницу надолго), затем в любом
   // случае показываем клиенту обычную SPA-страницу результата оплаты —
   // next() передаёт запрос дальше, в общий SSR-обработчик ниже.
-  app.get(TBANK_CALLBACK_PATH, async (req, res, next) => {
+  app.get(TBANK_CALLBACK_PATH, async (req, res) => {
     const qs = req.originalUrl.includes('?') ? req.originalUrl.slice(req.originalUrl.indexOf('?')) : ''
     try {
       await axios.get(`${BITRIX_PS_RESULT_URL}${qs}`, { timeout: 8000, validateStatus: () => true })
     } catch (e) {
       console.error('[TBANK webhook relay] GET error:', e.message)
     }
-    next()
+    const orderId = String(req.query.OrderId || '').split('/')[0]
+    if (!/^\d+$/.test(orderId)) {
+      return res.redirect(302, '/personal/orders/')
+    }
+    return res.redirect(302, `/cart/payment-result/${orderId}/`)
   })
 
   // Все запросы обрабатываем SSR
