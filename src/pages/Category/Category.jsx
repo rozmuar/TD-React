@@ -35,6 +35,15 @@ function isPremiumCategory(cat) {
 // а статус "товар ещё едет", фильтровать по нему нечего. "Склад - Основной"
 // тоже убран — служебный склад ("Склад - Технопорт"), не физическая точка,
 // где покупатель может забрать заказ (см. правки от 2026-10-05).
+const STAVSKOGO_TITLES = [
+  'Платформа Витрина',
+  'Платформа Склад',
+  'ххх Цоколь',
+  'Ставского, д. 4',
+  'Склад - Основной',
+  'ххх Депо',
+]
+
 const STORE_FILTER_WHITELIST = [
   '173 Витрина',
   'Западный Витрина',
@@ -43,6 +52,8 @@ const STORE_FILTER_WHITELIST = [
   'Платформа Склад',
   'ххх Цоколь',
   'Ставского, д. 4',
+  'Склад - Основной',
+  'ххх Депо',
   'Комсомольская 10',
 ]
 
@@ -192,14 +203,17 @@ function Category() {
         // store_id уходит на бэкенд как "18,29" (buildSmartFilterArFilter
         // поддерживает несколько ID через OR).
         const merged = []
-        const byAddress = new Map()
+        const byGroup = new Map()
         for (const s of whitelisted) {
-          const existing = byAddress.get(s.ADDRESS)
+          const group = STAVSKOGO_TITLES.includes(s.TITLE) ? 'stavskogo' : s.ADDRESS
+          const existing = byGroup.get(group)
           if (existing) {
             existing.ID = `${existing.ID},${s.ID}`
           } else {
-            const entry = { ...s }
-            byAddress.set(s.ADDRESS, entry)
+            const entry = group === 'stavskogo'
+              ? { ...s, ADDRESS: 'ул. Ставского, д. 4' }
+              : { ...s }
+            byGroup.set(group, entry)
             merged.push(entry)
           }
         }
