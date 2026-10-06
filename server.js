@@ -70,7 +70,7 @@ async function createServer() {
   // подпись проверяет сам Bitrix на back.topdisc.ru.
   const TBANK_CALLBACK_PATH = '/personal/order/success.php'
   const TBANK_NOTIFICATION_PATHS = [TBANK_CALLBACK_PATH, '/personal/order/notification.php']
-  const BITRIX_PS_RESULT_URL = 'https://back.topdisc.ru/bitrix/tools/sale_ps_result.php'
+  const BITRIX_PS_RESULT_URL = 'https://back.topdisc.ru/bitrix/tools/sale_ps_result.php?PAYSYSTEM_ID=43'
 
   async function resolveFindByCode(req, res) {
     const params = new URLSearchParams(req.query)
@@ -139,7 +139,7 @@ async function createServer() {
   app.post(TBANK_NOTIFICATION_PATHS, async (req, res) => {
     const qs = req.originalUrl.includes('?') ? req.originalUrl.slice(req.originalUrl.indexOf('?')) : ''
     try {
-      const backendRes = await axios.post(`${BITRIX_PS_RESULT_URL}${qs}`, req.body, {
+      const backendRes = await axios.post(`${BITRIX_PS_RESULT_URL}${qs.replace(/^\?/, '&')}`, req.body, {
         headers: { 'Content-Type': req.headers['content-type'] || 'application/x-www-form-urlencoded' },
         responseType: 'arraybuffer',
         validateStatus: () => true,
@@ -164,7 +164,7 @@ async function createServer() {
   app.get(TBANK_CALLBACK_PATH, async (req, res) => {
     const qs = req.originalUrl.includes('?') ? req.originalUrl.slice(req.originalUrl.indexOf('?')) : ''
     try {
-      await axios.get(`${BITRIX_PS_RESULT_URL}${qs}`, { timeout: 8000, validateStatus: () => true })
+      await axios.get(`${BITRIX_PS_RESULT_URL}${qs.replace(/^\?/, '&')}`, { timeout: 8000, validateStatus: () => true })
     } catch (e) {
       console.error('[TBANK webhook relay] GET error:', e.message)
     }
