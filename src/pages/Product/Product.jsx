@@ -611,10 +611,12 @@ function Product() {
       ) : null}
 
 
-      {/* МОБИЛЬНАЯ КНОПКА ПОКУПКИ */}
+      {/* МОБИЛЬНАЯ КНОПКА ПОКУПКИ — bottom не 0, а высота нижнего таб-бара
+          (.mobile-bar, тоже position:fixed/bottom:0, z-index:1000), иначе
+          кнопки оказываются точно под ним и недоступны для нажатия. */}
       <div className="product__actions-mobile desktop-hidden" style={{
         position: 'fixed',
-        bottom: 0,
+        bottom: 'var(--mobile-bar-height, 76px)',
         left: 0,
         right: 0,
         padding: '16px',
