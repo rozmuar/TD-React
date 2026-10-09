@@ -514,12 +514,14 @@ function Product() {
         {/* БАННЕРЫ */}
         {isAvailable && (
           <div className="product-banners">
-            <div className="banner1" onClick={() => setShowCredit(true)} style={{cursor: 'pointer'}}>
-              <div className="banner1-text">Кредит или рассрочка от</div>
-              <div className="banner1-price">
-                {Math.ceil(parseFloat(displayPrice) / 24).toLocaleString()} ₽/мес
+            {!product.td_restricted && (
+              <div className="banner1" onClick={() => setShowCredit(true)} style={{cursor: 'pointer'}}>
+                <div className="banner1-text">Кредит или рассрочка от</div>
+                <div className="banner1-price">
+                  {Math.ceil(parseFloat(displayPrice) / 24).toLocaleString()} ₽/мес
+                </div>
               </div>
-            </div>
+            )}
             <div className="banner2" onClick={() => setShowFindCheaper(true)} style={{cursor: 'pointer'}}>
               <div className="banner2-text">Нашли<br />дешевле?</div>
             </div>
