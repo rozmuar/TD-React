@@ -164,16 +164,41 @@ async function createServer() {
   // next() передаёт запрос дальше, в общий SSR-обработчик ниже.
   app.get(TBANK_CALLBACK_PATH, async (req, res) => {
     const orderId = String(req.query.OrderId || '').split('/')[0]
-    if (!/^\d+$/.test(orderId)) {
-      return res.redirect(302, '/personal/orders/')
+    const target = /^\d+$/.test(orderId) ? `/cart/payment-result/${orderId}/` : '/personal/orders/'
+    // ВРЕМЕННЫЙ лог — разобраться с жалобой "первое обращение всегда 404,
+    // обновление страницы помогает" (само по себе необъяснимо, этот
+    // обработчик детерминирован). Пишем в тот же файл, что и POST-логгер.
+    const entry = {
+      time: new Date().toISOString(),
+      method: 'GET',
+      url: req.originalUrl,
+      ip: req.headers['x-forwarded-for'] || req.socket.remoteAddress,
+      userAgent: req.headers['user-agent'],
+      referer: req.headers['referer'],
+      redirectTo: target,
     }
-    return res.redirect(302, `/cart/payment-result/${orderId}/`)
+    fs.mkdir(POST_LOG_DIR, { recursive: true }, () => {
+      fs.appendFile(POST_LOG_FILE, JSON.stringify(entry) + '\n', () => {})
+    })
+    console.log('[GET success.php]', entry.time, entry.url, '→', target)
+    return res.redirect(302, target)
   })
 
   // Все запросы обрабатываем SSR
   app.use(async (req, res) => {
     const url = req.originalUrl
     const urlPath = url.split('?')[0]
+
+    // ВРЕМЕННЫЙ лог — см. комментарий у app.get(TBANK_CALLBACK_PATH, ...).
+    // Если этот путь вообще сюда долетает (т.е. app.get выше его не
+    // перехватил), это и есть причина 404 — тут маршрута на него нет,
+    // сработает catch-all NotFound на клиенте.
+    if (urlPath === TBANK_CALLBACK_PATH) {
+      console.log('[CATCH-ALL hit success.php — BUG]', new Date().toISOString(), url, 'method:', req.method)
+      fs.mkdir(POST_LOG_DIR, { recursive: true }, () => {
+        fs.appendFile(POST_LOG_FILE, JSON.stringify({ time: new Date().toISOString(), bug: 'catch-all reached success.php', url, method: req.method }) + '\n', () => {})
+      })
+    }
 
     if (urlPath === '/catalog/find_by_code.php') {
       return resolveFindByCode(req, res)
