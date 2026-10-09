@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { getOrders, getOrderById, getSaleStatuses, getProductById } from '../../services/apiClient'
 import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
 
@@ -77,8 +78,9 @@ function PersonalOrders() {
       const msg = raw?.message ?? raw
       const data = msg?.data ?? msg
 
-      // API заказа не отдаёт картинки товаров — подтягиваем их
-      // отдельно из каталога по product_id (это и есть item.id)
+      // API заказа не отдаёт ни картинки, ни ссылку на товар — подтягиваем
+      // из каталога по product_id (это и есть item.id): картинку и code/
+      // category_code, из которых строим обычный URL товара (/catalog/:cat/:code)
       if (Array.isArray(data?.basket_items) && data.basket_items.length) {
         data.basket_items = await Promise.all(
           data.basket_items.map(async (item) => {
@@ -86,8 +88,14 @@ function PersonalOrders() {
             if (!productId) return item
             try {
               const productRes = await getProductById(productId)
-              const image = productRes.data?.result?.image
-              return image ? { ...item, image } : item
+              const product = productRes.data?.result
+              if (!product) return item
+              const extra = {}
+              if (product.image) extra.image = product.image
+              if (product.code && product.category_code) {
+                extra.product_url = `/catalog/${product.category_code}/${product.code}`
+              }
+              return Object.keys(extra).length ? { ...item, ...extra } : item
             } catch {
               return item
             }
@@ -208,7 +216,7 @@ function OrderDetail({ data, order, statuses }) {
             const img = item.image || item.picture_url || item.PICTURE_URL || item.DETAIL_PICTURE || item.PREVIEW_PICTURE || ''
             const imgSrc = img && !img.startsWith('http') ? `https://back.topdisc.ru${img}` : img
             // Разрешаем только относительные пути и URL с нашего домена
-            const rawUrl = item.detail_page_url || item.DETAIL_PAGE_URL || ''
+            const rawUrl = item.product_url || item.detail_page_url || item.DETAIL_PAGE_URL || ''
             const productUrl = rawUrl && !/^\s*(javascript:|data:)/i.test(rawUrl) ? rawUrl : ''
             const name = item.name || item.NAME || item.PRODUCT_NAME || '—'
 
@@ -223,7 +231,11 @@ function OrderDetail({ data, order, statuses }) {
                 </div>
                 <div className="order-card__product-info">
                   {productUrl ? (
-                    <a className="order-card__product-name" href={productUrl} rel="noopener noreferrer">{name}</a>
+                    productUrl.startsWith('/') ? (
+                      <Link className="order-card__product-name" to={productUrl}>{name}</Link>
+                    ) : (
+                      <a className="order-card__product-name" href={productUrl} rel="noopener noreferrer">{name}</a>
+                    )
                   ) : (
                     <p className="order-card__product-name">{name}</p>
                   )}
