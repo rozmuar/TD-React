@@ -78,7 +78,11 @@ async function fetchProduct(categoryCode, productCode) {
     const productData = await safe(
       api.get('/app_mobile.product.json', { params: { id: productId } })
     )
-    product = productData?.result || null
+    // error (товар снят с продажи/не найден) — не должен приниматься как
+    // валидный товар, иначе SSR рендерит страницу с пустыми полями вместо
+    // "Товар не найден" (тот же баг, что был в Product.jsx на клиенте)
+    const result = productData?.result
+    product = result && result.error !== 1 ? result : null
   }
 
   return { type: 'product', category, product }

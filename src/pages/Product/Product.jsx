@@ -20,6 +20,7 @@ import AddToCartButton from '../../components/AddToCartButton/AddToCartButton'
 import { productSchema, breadcrumbSchema } from '../../utils/jsonLd'
 import { getBadgeClass } from '../../utils/productBadge'
 import { useWholesalePrice } from '../../hooks/useWholesalePrice'
+import NotFound from '../NotFound/NotFound'
 
 // Достаём массив картинок галереи из свойства "Галерея" (JSON-строка со
 // доп. фото) + основное фото первым — используется и для начального
@@ -267,7 +268,7 @@ function ProductInner() {
   const allSpecs = product?.properties || []
 
   if (!product && !loading) {
-    return <div className="container">Товар не найден</div>
+    return <NotFound />
   }
 
   if (!product) {
