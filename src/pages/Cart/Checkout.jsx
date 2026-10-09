@@ -488,6 +488,8 @@ function Checkout() {
         PHONE: phone.replace(/\D/g, '') || undefined,
         EMAIL: email || undefined,
         ADDRESS: deliveryAddress ? `${cityConfirmed}, ${deliveryAddress}` : (cityConfirmed || undefined),
+        DATE_DELIVERY: isCourierPenza ? deliveryDateFormatted : undefined,
+        DELIVERY_TIME: isCourierPenza ? deliveryTimeLabel : undefined,
       },
     }
     if (personTypeId) data.person_type_id = personTypeId
@@ -597,6 +599,8 @@ function Checkout() {
           SURNAME: lastName || undefined,
           EMAIL: email || undefined,
           ADDRESS: deliveryAddress ? `${cityConfirmed}, ${deliveryAddress}` : (cityConfirmed || undefined),
+          DATE_DELIVERY: isCourierPenza ? deliveryDateFormatted : undefined,
+          DELIVERY_TIME: isCourierPenza ? deliveryTimeLabel : undefined,
         },
         comment: comment || undefined,
       }
@@ -736,6 +740,14 @@ function Checkout() {
     { value: '18:00-20:00', label: 'с 18:00 до 20:00', startHour: 18, startMin: 0 },
     { value: '20:00-22:00', label: 'с 20:00 до 22:00', startHour: 20, startMin: 0 },
   ]
+
+  const deliveryTimeLabel = TIME_SLOTS.find((s) => s.value === deliveryTime)?.label
+
+  // Раньше дата/время доставки выбирались в форме, но никогда не
+  // попадали в заказ (не было в properties ни calculate, ни submit) —
+  // бот и Б24 показывали заказ без них. Отправляем в человекочитаемом
+  // виде — том же, что видит покупатель, а не ISO-дату/код слота.
+  const deliveryDateFormatted = deliveryDate ? deliveryDate.split('-').reverse().join('.') : undefined
 
   const todayStr = new Date().toISOString().slice(0, 10)
   const tomorrowStr = new Date(Date.now() + 86400000).toISOString().slice(0, 10)
