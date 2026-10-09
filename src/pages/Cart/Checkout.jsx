@@ -726,10 +726,15 @@ function Checkout() {
   // Самовывоз из ПВЗ СДЭК — любой другой город
   const isPickupCdek = isPickup && !isPenzaCity
 
-  // Курьерская доставка по Пензе (не СДЭК)
+  // Курьерская/грузовая доставка по Пензе (не СДЭК) — способы, для которых
+  // нужен выбор даты и 2-часового окна времени (заказ #78678 "Грузовая
+  // доставка по г. Пенза" тоже должен был его показывать, но попадал
+  // только под !isPickup, без слотов).
   const isCourierPenza = (() => {
     const name = activeDelivery?.name?.toLowerCase() || ''
-    return (name.includes('курьер') && name.includes('пенз')) || name.includes('такси')
+    return (name.includes('курьер') && name.includes('пенз'))
+      || name.includes('такси')
+      || (name.includes('груз') && name.includes('пенз'))
   })()
 
   // Слоты времени доставки
