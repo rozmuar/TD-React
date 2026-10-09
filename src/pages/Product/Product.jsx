@@ -192,8 +192,11 @@ function ProductInner() {
         
         // Затем загружаем товар по ID
         const response = await getProductById(productId, { signal: abortControllerRef.current.signal })
-        
-        if (response.data.result) {
+
+        // error (товар снят с продажи/не найден) — не должен приниматься
+        // как валидный товар, иначе рендерится страница с пустыми полями
+        // вместо "Товар не найден"
+        if (response.data.result && response.data.result.error !== 1) {
           const productData = response.data.result
 
           setProduct(productData)
