@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { getOrders, getOrderById, getSaleStatuses, getProductById } from '../../services/apiClient'
 import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
 
@@ -231,11 +230,7 @@ function OrderDetail({ data, order, statuses }) {
                 </div>
                 <div className="order-card__product-info">
                   {productUrl ? (
-                    productUrl.startsWith('/') ? (
-                      <Link className="order-card__product-name" to={productUrl}>{name}</Link>
-                    ) : (
-                      <a className="order-card__product-name" href={productUrl} rel="noopener noreferrer">{name}</a>
-                    )
+                    <a className="order-card__product-name" href={productUrl} rel="noopener noreferrer">{name}</a>
                   ) : (
                     <p className="order-card__product-name">{name}</p>
                   )}

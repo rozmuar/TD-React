@@ -239,7 +239,8 @@ function ProductInner() {
   }
 
   const handleColorChange = (colorCode) => {
-    navigate(`/catalog/${categoryCode}/${colorCode}`)
+    // Полная перезагрузка, не SPA-навигация — см. комментарий у Product().
+    window.location.href = `/catalog/${categoryCode}/${colorCode}`
   }
 
   const getArtikul = () => {

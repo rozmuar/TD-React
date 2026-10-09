@@ -155,13 +155,13 @@ function Cart() {
                         onChange={() => dispatch(toggleItemSelected(item.id))}
                       />
                     </label>
-                    <Link to={`/catalog/${item.section_code}/${item.code}`} className="cart__item-img">
+                    <a href={`/catalog/${item.section_code}/${item.code}`} className="cart__item-img">
                       <ImageWithFallback src={item.image} alt={decodeHtml(item.name)} />
-                    </Link>
+                    </a>
                     <div className="cart__item-info">
-                      <Link to={`/catalog/${item.section_code}/${item.code}`} className="cart__item-name">
+                      <a href={`/catalog/${item.section_code}/${item.code}`} className="cart__item-name">
                         {decodeHtml(item.name)}
-                      </Link>
+                      </a>
                       <div className="cart__item-controls">
                         <div className="cart__quantity">
                           <button className="cart__qty-btn" onClick={() => dispatch(decrementQuantity(item.id))} disabled={item.quantity <= 1}>−</button>

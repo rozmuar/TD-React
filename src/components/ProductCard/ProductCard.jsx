@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { memo, useMemo, useState } from 'react'
 import { addToCompare, removeFromCompare } from '../../store/slices/compareSlice'
@@ -72,11 +71,14 @@ function ProductCard({ product }) {
           <button className={`action-btn favorite${isInFavorites ? ' is-active' : ''}`} type="button" aria-label="Добавить в избранное" onClick={handleToggleFavorite}></button>
           <button className="action-btn compare" type="button" aria-label="Добавить к сравнению" onClick={handleToggleCompare} style={isInCompare ? { backgroundColor: 'var(--accent, #44BD31)' } : undefined}></button>
         </div>
-        <Link to={`/catalog/${product.section_code}/${product.code}`}>
+        {/* Обычный <a>, не <Link> — переход между карточками товаров должен
+            быть полной перезагрузкой страницы (см. Product.jsx), иначе
+            иногда показывался старый товар на новом URL до обновления. */}
+        <a href={`/catalog/${product.section_code}/${product.code}`}>
             <ImageWithFallback className="catalog__main-image" alt={decodeHtml(product.name)} src={product.image} />
-        </Link>
+        </a>
       </div>
-      <Link to={`/catalog/${product.section_code}/${product.code}`} className="catalog__main-title">{decodeHtml(product.name)}</Link>
+      <a href={`/catalog/${product.section_code}/${product.code}`} className="catalog__main-title">{decodeHtml(product.name)}</a>
       {isAvailable ? (
         <>
           <div className="catalog__main-row">

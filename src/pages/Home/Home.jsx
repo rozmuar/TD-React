@@ -362,9 +362,9 @@ function Home() {
                 <SwiperSlide key={product.id}>
                   <div className="catalog__main-item">
                     <div className="catalog__main-imagewrapper">
-                      <Link to={`/catalog/${product.section_code || product.category_code}/${product.code}`}>
+                      <a href={`/catalog/${product.section_code || product.category_code}/${product.code}`}>
                         <ImageWithFallback className="catalog__main-image" alt={decodeHtml(product.name)} src={product.image} />
-                      </Link>
+                      </a>
                     </div>
                     <div className="catalog__main-prices">
                       <div className="catalog__main-price">{price.toLocaleString()} ₽</div>
@@ -372,7 +372,7 @@ function Home() {
                         <div className="catalog__main-oldprice">{oldPrice.toLocaleString()} ₽</div>
                       )}
                     </div>
-                    <Link to={`/catalog/${product.section_code || product.category_code}/${product.code}`} className="catalog__main-title">{decodeHtml(product.name)}</Link>
+                    <a href={`/catalog/${product.section_code || product.category_code}/${product.code}`} className="catalog__main-title">{decodeHtml(product.name)}</a>
                     {parseInt(product.quantity) > 0 && price > 0 && (
                       <AddToCartButton product={product} className="catalog__main-button" />
                     )}
