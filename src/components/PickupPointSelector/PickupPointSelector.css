@@ -69,16 +69,10 @@
   flex: 1;
 }
 
-.pickup-point__name {
+.pickup-point__address {
   font-size: 16px;
   font-weight: 600;
   color: #333;
-  margin-bottom: 8px;
-}
-
-.pickup-point__address {
-  font-size: 14px;
-  color: #666;
   margin-bottom: 4px;
   line-height: 1.5;
 }
@@ -112,10 +106,6 @@
 
   .pickup-point {
     padding: 12px;
-  }
-
-  .pickup-point__name {
-    font-size: 15px;
   }
 
   .pickup-point__address,

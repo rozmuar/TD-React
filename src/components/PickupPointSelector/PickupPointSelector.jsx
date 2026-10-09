@@ -75,9 +75,6 @@ export default function PickupPointSelector() {
                   />
                 </div>
                 <div className="pickup-point__content">
-                  <div className="pickup-point__name">
-                    {point.name || point.TITLE || point.title || `Пункт ${pointId}`}
-                  </div>
                   {point.address || point.ADDRESS && (
                     <div className="pickup-point__address">
                       📍 {point.address || point.ADDRESS}
