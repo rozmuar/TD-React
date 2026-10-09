@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom'
 import { HelmetProvider } from 'react-helmet-async'
 import Layout from './components/Layout/Layout'
+import ScrollToTop from './components/ScrollToTop/ScrollToTop'
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute'
 import Home from './pages/Home/Home'
 import Catalog from './pages/Catalog/Catalog'
@@ -58,6 +59,7 @@ const PersonalAddresses = lazy(() => import('./pages/Personal/PersonalAddresses'
 function App({ helmetContext }) {
   return (
     <HelmetProvider context={helmetContext}>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />

@@ -77,7 +77,19 @@ function ProductSkeleton() {
   )
 }
 
+// React Router переиспользует тот же экземпляр компонента при смене
+// параметров внутри одного маршрута (categoryCode/productCode меняются,
+// сам Product не размонтируется) — переход между товарами иногда показывал
+// старый товар на новом URL, пока эффекты не успевали пересчитать state
+// (f5 чинил только потому, что это был полноценный маунт с нуля). key
+// заставляет React размонтировать и создать компонент заново при каждой
+// смене товара — весь state гарантированно чистый, без гонок эффектов.
 function Product() {
+  const { categoryCode, productCode } = useParams()
+  return <ProductInner key={`${categoryCode}/${productCode}`} />
+}
+
+function ProductInner() {
   const { categoryCode, productCode } = useParams()
   const navigate = useNavigate()
   const location = useLocation()
