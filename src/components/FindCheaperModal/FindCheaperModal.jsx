@@ -16,6 +16,22 @@ function formatPhone(value) {
   return result
 }
 
+// Магазины, которые учитываются по программе "Гарантия низкой цены" —
+// остальные ссылки отклоняются прямо в форме, до отправки заявки.
+const ALLOWED_SHOP_DOMAINS = ['mvideo.ru', 'citilink.ru', 'dns-shop.ru', 'eldorado.ru']
+
+function isAllowedShopLink(url) {
+  const trimmed = url.trim()
+  if (!trimmed) return false
+  try {
+    const withProtocol = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`
+    const host = new URL(withProtocol).hostname.replace(/^www\./i, '').toLowerCase()
+    return ALLOWED_SHOP_DOMAINS.some((domain) => host === domain || host.endsWith(`.${domain}`))
+  } catch {
+    return false
+  }
+}
+
 function FindCheaperModal({ productName, productId, productPrice, onClose }) {
   const { isAuthenticated } = useSelector((s) => s.auth)
   const [name, setName] = useState('')
@@ -38,7 +54,9 @@ function FindCheaperModal({ productName, productId, productPrice, onClose }) {
   }, [isAuthenticated])
 
   const phoneDigits = phone.replace(/\D/g, '')
-  const isValid = name.trim().length >= 2 && phoneDigits.length === 11 && link.trim().length > 0 && agreed
+  const linkEntered = link.trim().length > 0
+  const linkAllowed = linkEntered && isAllowedShopLink(link)
+  const isValid = name.trim().length >= 2 && phoneDigits.length === 11 && linkAllowed && agreed
 
   const handlePhoneChange = (e) => {
     const raw = e.target.value
@@ -125,6 +143,15 @@ function FindCheaperModal({ productName, productId, productPrice, onClose }) {
                   placeholder="https://..."
                 />
               </label>
+              {linkEntered && !linkAllowed && (
+                <div className="preorder-modal__error">
+                  Этот магазин не подходит под условия гарантии низкой цены. Учитываются только М.Видео, Ситилинк, DNS и Эльдорадо.
+                </div>
+              )}
+              <p className="preorder-modal__hint">
+                Ознакомиться с условиями можете по ссылке: гарантия{' '}
+                <a href="https://topdisc.ru/garantiya-nizkoy-tseny/" target="_blank" rel="noopener noreferrer">низкой цены</a>
+              </p>
               <label className="preorder-modal__agree">
                 <input
                   type="checkbox"

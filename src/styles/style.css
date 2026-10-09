@@ -11057,6 +11057,15 @@ a.order-card__product-name:hover {
   color: #d32f2f;
   font-size: 13px;
 }
+.preorder-modal__hint {
+  color: #777;
+  font-size: 12px;
+  margin: -4px 0 0;
+}
+.preorder-modal__hint a {
+  color: inherit;
+  text-decoration: underline;
+}
 .preorder-modal__btn {
   background: #555;
   color: #fff;
