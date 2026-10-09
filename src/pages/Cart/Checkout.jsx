@@ -1038,8 +1038,7 @@ function Checkout() {
                         {selectedStore && (
                           <div className="checkout__pickup-info">
                             <div className="checkout__pickup-details">
-                              <strong>{selectedStore.name}</strong>
-                              <p>{selectedStore.address}</p>
+                              <p><strong>{selectedStore.address}</strong></p>
                               {selectedStore.hours && <p className="checkout__pickup-hours">{selectedStore.hours}</p>}
                               {selectedStore.phone && <p className="checkout__pickup-phone">{selectedStore.phone}</p>}
                               <button className="checkout__change-btn" onClick={() => setStorePickerOpen((v) => !v)}>Изменить</button>
@@ -1063,8 +1062,7 @@ function Checkout() {
                                   .filter((s) => !storeSearch || s.name.toLowerCase().includes(storeSearch.toLowerCase()) || s.address.toLowerCase().includes(storeSearch.toLowerCase()))
                                   .map((store) => (
                                     <div className="checkout__store-item" key={store.id}>
-                                      <strong>{store.name}</strong>
-                                      <p>{store.address}</p>
+                                      <p><strong>{store.address}</strong></p>
                                       {store.hours && <p className="checkout__store-hours">{store.hours}</p>}
                                       <button
                                         className={`checkout__store-select${selectedStore?.id === store.id ? ' is-active' : ''}`}
