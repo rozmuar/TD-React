@@ -580,6 +580,7 @@ function Checkout() {
     if (!phone.trim()) { alert('Укажите телефон'); return }
     if (!cityConfirmed) { alert('Выберите город из подсказок'); return }
     if (isPickup && !selectedStore) { alert('Выберите магазин для самовывоза'); return }
+    if (!isPickup && !deliveryAddress.trim()) { alert('Укажите адрес доставки'); return }
     await doCreateOrder()
   }
 
