@@ -656,8 +656,12 @@ function Checkout() {
       try { sessionStorage.setItem('last_order', JSON.stringify(successState)) } catch { /* ignore */ }
       navigate('/cart/success/', { state: successState })
     } catch (err) {
-      const msg = err.response?.data?.errors?.join(', ') || err.message || 'Попробуйте позже'
-      console.error('[CHECKOUT] doCreateOrder error:', err?.response?.data || err?.message)
+      const data = err.response?.data
+      // Бэкенд отдаёт либо errors (массив), либо error/debug_message
+      // (строка) — проверяли только errors, из-за чего реальная причина
+      // пряталась за общим "Request failed with status code 400/500".
+      const msg = data?.errors?.join(', ') || data?.debug_message || data?.error || err.message || 'Попробуйте позже'
+      console.error('[CHECKOUT] doCreateOrder error:', data || err?.message)
       alert('Ошибка при создании заказа: ' + msg)
     }
     setSubmitting(false)
