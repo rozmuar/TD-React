@@ -29,7 +29,11 @@ function OrderSuccess() {
 
   return (
     <>
-      <Helmet><title>Заказ принят — TopDisc</title></Helmet>
+      <Helmet>
+        <title>Заказ принят — TopDisc</title>
+        <meta name="any-order-id" content={String(orderNumber)} />
+        <meta name="any-order-total" content={Number(totalAmount).toFixed(2)} />
+      </Helmet>
       <div className="breadcrumbs">
         <div className="container">
           <ul className="breadcrumbs-list">

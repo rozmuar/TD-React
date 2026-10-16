@@ -7,6 +7,61 @@ import { getProductById } from '../../services/apiClient'
 import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
 import { decodeHtml } from '../../utils/decodeHtml'
 import AddToCartButton from '../../components/AddToCartButton/AddToCartButton'
+import PreorderModal from '../../components/PreorderModal/PreorderModal'
+
+function formatPrice(val) {
+  const n = Number(val)
+  return isNaN(n) ? '—' : Math.floor(n).toLocaleString('ru-RU')
+}
+
+function CompareProductCard({ p, onRemove }) {
+  const [showPreorder, setShowPreorder] = useState(false)
+
+  // Та же проверка доступности, что и в ProductCard.jsx — иначе для
+  // товара не в наличии (price может прийти 0/null, пока oldPrice —
+  // настоящая прежняя цена) показывалось "0 ₽" с перечёркнутой старой
+  // ценой и активная кнопка "В корзину", хотя купить товар нельзя.
+  const hasStock = parseInt(p.quantity) > 0
+  const hasPrice = parseFloat(p.price) > 0
+  const isAvailable = hasPrice && hasStock
+
+  return (
+    <div className="compare__product">
+      <button className="compare__product-remove" onClick={() => onRemove(p.id)} aria-label="Убрать">×</button>
+      <a href={`/catalog/${p.section_code}/${p.code}`} className="compare__product-img">
+        <ImageWithFallback src={p.image} alt={decodeHtml(p.name)} />
+      </a>
+      <a href={`/catalog/${p.section_code}/${p.code}`} className="compare__product-name">
+        {decodeHtml(p.name)}
+      </a>
+      {isAvailable ? (
+        <>
+          <div className="compare__product-prices">
+            <span className="compare__product-price">{formatPrice(p.price)} ₽</span>
+            {p.oldPrice && Number(p.oldPrice) > Number(p.price) && (
+              <span className="compare__product-old">{formatPrice(p.oldPrice)} ₽</span>
+            )}
+          </div>
+          <AddToCartButton product={p} className="compare__product-cart" />
+        </>
+      ) : (
+        <>
+          <div className="compare__product-prices">
+            <span className="compare__product-price compare__product-price--muted">Цена по запросу</span>
+          </div>
+          <button className="compare__product-cart compare__product-cart--preorder" onClick={() => setShowPreorder(true)}>Хочу под заказ</button>
+          {showPreorder && (
+            <PreorderModal
+              productName={decodeHtml(p.name)}
+              productId={p.id}
+              onClose={() => setShowPreorder(false)}
+            />
+          )}
+        </>
+      )}
+    </div>
+  )
+}
 
 function Compare() {
   const dispatch = useDispatch()
@@ -72,11 +127,6 @@ function Compare() {
   const handleRemove = (id) => dispatch(removeFromCompare(id))
   const handleClear = () => dispatch(clearCompare())
 
-  const formatPrice = (val) => {
-    const n = Number(val)
-    return isNaN(n) ? '—' : Math.floor(n).toLocaleString('ru-RU')
-  }
-
   return (
     <>
       <Helmet>
@@ -114,22 +164,7 @@ function Compare() {
               <div className="compare__products">
                 <div className="compare__products-scroll">
                 {products.map((p) => (
-                  <div className="compare__product" key={p.id}>
-                    <button className="compare__product-remove" onClick={() => handleRemove(p.id)} aria-label="Убрать">×</button>
-                    <a href={`/catalog/${p.section_code}/${p.code}`} className="compare__product-img">
-                      <ImageWithFallback src={p.image} alt={decodeHtml(p.name)} />
-                    </a>
-                    <a href={`/catalog/${p.section_code}/${p.code}`} className="compare__product-name">
-                      {decodeHtml(p.name)}
-                    </a>
-                    <div className="compare__product-prices">
-                      <span className="compare__product-price">{formatPrice(p.price)} ₽</span>
-                      {p.oldPrice && Number(p.oldPrice) > Number(p.price) && (
-                        <span className="compare__product-old">{formatPrice(p.oldPrice)} ₽</span>
-                      )}
-                    </div>
-                    <AddToCartButton product={p} className="compare__product-cart" />
-                  </div>
+                  <CompareProductCard p={p} onRemove={handleRemove} key={p.id} />
                 ))}
 
                 {/* Слот «Добавить товар» */}

@@ -38,7 +38,15 @@ function PaymentResult() {
 
   return (
     <>
-      <Helmet><title>Оплата заказа — TopDisc</title></Helmet>
+      <Helmet>
+        <title>Оплата заказа — TopDisc</title>
+        {order && (
+          <>
+            <meta name="any-order-id" content={String(order.id)} />
+            <meta name="any-order-total" content={Number(order.price).toFixed(2)} />
+          </>
+        )}
+      </Helmet>
       <div className="breadcrumbs">
         <div className="container">
           <ul className="breadcrumbs-list">

@@ -147,7 +147,7 @@ function Cart() {
               {items.map((item) => {
                 const isInFav = favoriteItems.some((f) => f.id === item.id)
                 return (
-                  <div className="cart__item" key={item.id}>
+                  <div className="cart__item" data-offer-id={item.id} key={item.id}>
                     <label className="cart__item-checkbox">
                       <input
                         type="checkbox"

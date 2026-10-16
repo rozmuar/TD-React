@@ -9151,6 +9151,17 @@ p.region-delivery__note {
 .compare__product-cart:hover {
   background: var(--accent-hover, #20C905);
 }
+.compare__product-price--muted {
+  font-size: 13px;
+  font-weight: 400;
+  color: #888;
+}
+.compare__product-cart--preorder {
+  background: #555;
+}
+.compare__product-cart--preorder:hover {
+  background: #444;
+}
 .compare__actions {
   display: flex;
   justify-content: flex-end;

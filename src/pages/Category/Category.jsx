@@ -802,6 +802,7 @@ function Category() {
       <Helmet>
         <title>{mainCategory.name} - TopDisc</title>
         <meta name="description" content={`Купить ${mainCategory.name} в интернет-магазине TopDisc`} />
+        <meta name="any-category-page" />
       </Helmet>
       {(() => {
         const path = categoryUrl(mainCategory)

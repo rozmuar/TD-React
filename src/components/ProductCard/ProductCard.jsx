@@ -56,7 +56,7 @@ function ProductCard({ product }) {
   )
 
   return (
-    <div className="catalog__main-item">
+    <div className="catalog__main-item" data-offer-id={product.id}>
       <div className="catalog__main-imagewrapper">
         {product.badge && (
           <span className={`catalog__main-badge catalog__main-badge--${getBadgeClass(product.badge)}`}>{product.badge}</span>
