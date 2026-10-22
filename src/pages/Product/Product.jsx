@@ -292,6 +292,14 @@ function ProductInner() {
       <Helmet>
         <title>{pageTitle}</title>
         <meta name="description" content={pageDescription} />
+        {/* Партнёрский трекинг (CPA-метки, тот же сервис, что подключает поиск
+            Diginetica в Header.jsx): их скрипт читает этот тег из <head>,
+            поэтому он должен физически оказаться раньше скрипта в разметке —
+            при переходе между товарами используется полная перезагрузка
+            страницы (см. комментарий в ProductCard.jsx), так что SSR-разметка
+            с этим тегом всегда приходит раньше, чем Header.jsx успевает
+            добавить сам скрипт через useEffect. */}
+        <meta name="any-product-page" content={product.id} />
         {product.seo?.keywords && <meta name="keywords" content={decodeHtml(product.seo.keywords)} />}
 
         <meta property="og:type" content="product" />
