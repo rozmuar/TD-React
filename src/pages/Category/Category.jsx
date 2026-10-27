@@ -896,6 +896,8 @@ function Category() {
                       1024: { slidesPerView: 4 },
                       1280: { slidesPerView: 5 }
                     }}
+                    observer={true}
+                    observeParents={true}
                   >
                     {filteredProducts.map(product => (
                       <SwiperSlide key={product.id}>

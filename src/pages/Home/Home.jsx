@@ -252,6 +252,8 @@ function Home() {
                 992: { slidesPerView: 4.5, spaceBetween: 37 },
               }}
               watchOverflow={true}
+              observer={true}
+              observeParents={true}
               className="swiper hits__swiper"
             >
               {displayedForYou.map((product) => {
@@ -352,6 +354,8 @@ function Home() {
                 992: { slidesPerView: 4.5, spaceBetween: 37 },
               }}
               watchOverflow={true}
+              observer={true}
+              observeParents={true}
               className="swiper hits-green__swiper"
             >
               {hurryToBuyProducts.slice(0, 20).map((product) => {
