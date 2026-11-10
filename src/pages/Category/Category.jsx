@@ -212,7 +212,10 @@ function Category() {
         const merged = []
         const byGroup = new Map()
         for (const s of whitelisted) {
-          const group = STAVSKOGO_TITLES.includes(s.TITLE) ? 'stavskogo' : s.ADDRESS
+          // ADDRESS у складов, пришедших из 1С, бывает пустым (новый бэк,
+          // 2026-11-10) — тогда все отдельные точки слились бы в одну
+          // группа '' и в фильтре осталась бы одна строка вместо четырёх.
+          const group = STAVSKOGO_TITLES.includes(s.TITLE) ? 'stavskogo' : (s.ADDRESS || s.TITLE)
           const existing = byGroup.get(group)
           if (existing) {
             existing.ID = `${existing.ID},${s.ID}`
