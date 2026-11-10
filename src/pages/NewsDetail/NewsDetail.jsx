@@ -7,6 +7,7 @@ import { sanitizeHtml } from '../../utils/sanitizeHtml'
 import { decodeHtml } from '../../utils/decodeHtml'
 import { useSSRData } from '../../context/SSRDataContext'
 import JsonLd from '../../components/JsonLd/JsonLd'
+import { BACKEND_ORIGIN } from '../../config/backend'
 import { breadcrumbSchema, newsArticleSchema } from '../../utils/jsonLd'
 
 function NewsDetail() {
@@ -43,7 +44,7 @@ function NewsDetail() {
       // topdisc.ru приводим к правильному абсолютному на back.topdisc.ru —
       // туда переехал Bitrix-бэкенд (2026-09-22), topdisc.ru эти файлы
       // больше не отдаёт вообще
-      .replace(/src="(?:https?:\/\/(?:back\.)?topdisc\.ru)?\/([^"]+)"/g, 'src="https://back.topdisc.ru/$1"')
+      .replace(/src="(?:https?:\/\/(?:back\.)?topdisc\.ru)?\/([^"]+)"/g, `src="${BACKEND_ORIGIN}/$1"`)
       // href, наоборот, приводим к относительным — чтобы ссылки внутри
       // текста новости оставались в SPA-роутинге, а не улетали на бэкенд;
       // ловим оба варианта домена на случай, если в самом тексте уже

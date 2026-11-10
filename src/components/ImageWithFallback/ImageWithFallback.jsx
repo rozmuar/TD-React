@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
+import { BACKEND_ORIGIN } from '../../config/backend'
 
 // Сертификат back.topdisc.ru починен — грузим напрямую, не через прокси
-const FALLBACK_IMAGE = 'https://back.topdisc.ru/local/templates/bitlate_pro/images/top_no.png'
+const FALLBACK_IMAGE = `${BACKEND_ORIGIN}/local/templates/bitlate_pro/images/top_no.png`
 
 function ImageWithFallback({ src, alt, className, style, ...props }) {
   const [imgSrc, setImgSrc] = useState(src || FALLBACK_IMAGE)

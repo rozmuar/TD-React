@@ -1,7 +1,20 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 
-export default defineConfig(({ isSsrBuild }) => ({
+export default defineConfig(({ isSsrBuild, mode }) => {
+  // Бэкенд для dev-прокси — тот же VITE_BACKEND_ORIGIN, что и в
+  // src/config/backend.js (`npm run dev:newback` → .env.newback).
+  const env = loadEnv(mode, process.cwd(), 'VITE_')
+  const backend = (env.VITE_BACKEND_ORIGIN || 'https://back.topdisc.ru').replace(/\/+$/, '')
+  const toBackend = (from, to) => ({
+    target: backend,
+    changeOrigin: true,
+    secure: false,
+    cookieDomainRewrite: '',
+    rewrite: (path) => path.replace(from, to),
+  })
+
+  return {
   plugins: [react()],
   resolve: {
     alias: {
@@ -53,11 +66,8 @@ export default defineConfig(({ isSsrBuild }) => ({
   },
   server: {
     proxy: {
-      '/api/mobile': {
-        target: 'https://topdisc.ru',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/mobile/, '/mobile'),
-      },
+      '/api/mobile': toBackend(/^\/api\/mobile/, '/mobile'),
+      '/api/rest': toBackend(/^\/api\/rest/, '/rest'),
     },
   },
   ssr: {
@@ -65,4 +75,5 @@ export default defineConfig(({ isSsrBuild }) => ({
     target: 'node',
     format: 'esm',
   },
-}))
+  }
+})

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getOrders, getOrderById, getSaleStatuses, getProductById } from '../../services/apiClient'
 import ImageWithFallback from '../../components/ImageWithFallback/ImageWithFallback'
+import { BACKEND_ORIGIN } from '../../config/backend'
 
 function PersonalOrders() {
   const [orders, setOrders] = useState([])
@@ -213,7 +214,7 @@ function OrderDetail({ data, order, statuses }) {
             const basePrice = Number(item.base_price || item.BASE_PRICE || 0)
             const qty = Number(item.quantity || item.QUANTITY || 1)
             const img = item.image || item.picture_url || item.PICTURE_URL || item.DETAIL_PICTURE || item.PREVIEW_PICTURE || ''
-            const imgSrc = img && !img.startsWith('http') ? `https://back.topdisc.ru${img}` : img
+            const imgSrc = img && !img.startsWith('http') ? `${BACKEND_ORIGIN}${img}` : img
             // Разрешаем только относительные пути и URL с нашего домена
             const rawUrl = item.product_url || item.detail_page_url || item.DETAIL_PAGE_URL || ''
             const productUrl = rawUrl && !/^\s*(javascript:|data:)/i.test(rawUrl) ? rawUrl : ''

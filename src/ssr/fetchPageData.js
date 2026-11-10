@@ -4,16 +4,17 @@
  */
 import axios from 'axios'
 import { stripStaleHost } from '../utils/stripStaleHost'
+import { BACKEND_ORIGIN, REST_WEBHOOK, CATALOG_IBLOCK_ID } from '../config/backend'
 
 const BITRIX_URL =
   (typeof process !== 'undefined' && process.env.VITE_BITRIX_REST_URL) ||
-  'https://back.topdisc.ru/rest/28531/ky7kc0zinte6jb7e'
+  `${BACKEND_ORIGIN}/rest/${REST_WEBHOOK}`
 
 // На сервере /api/mobile/* → обращаемся напрямую к back.topdisc.ru
 // (весь Bitrix-бэкенд переехал с topdisc.ru на back.topdisc.ru, 2026-09-22)
 const FILTER_URL =
   (typeof process !== 'undefined' && process.env.VITE_FILTER_API_URL) ||
-  'https://back.topdisc.ru/mobile/v1'
+  `${BACKEND_ORIGIN}/mobile/v1`
 
 const api = axios.create({ baseURL: BITRIX_URL, timeout: 6000 })
 const filterApi = axios.create({ baseURL: FILTER_URL, timeout: 6000 })
@@ -146,7 +147,7 @@ async function fetchCategory(categoryCode, searchParams) {
     childSubcategories = children
 
     const [filtersData, productsData] = await Promise.all([
-      safe(filterApi.get(`/filter/4/${category.id}`)),
+      safe(filterApi.get(`/filter/${CATALOG_IBLOCK_ID}/${category.id}`)),
       safe(
         api.get('/app_mobile.product_list.json', {
           params: { cat: category.id, page: currentPage, prods: 20, sort: sortOrder },

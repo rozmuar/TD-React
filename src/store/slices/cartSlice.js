@@ -8,11 +8,12 @@ import {
   clearGuestFuserId,
   getProductById,
 } from '../../services/apiClient'
+import { BACKEND_ORIGIN } from '../../config/backend'
 
 const LOCAL_KEY = 'cart_items'
 // Картинки грузятся напрямую с бэкенда, не через прокси фронтенда —
 // для <img src> CORS не нужен, а лишний прокси-хоп только замедляет
-const SITE_ORIGIN = 'https://back.topdisc.ru'
+const SITE_ORIGIN = BACKEND_ORIGIN
 
 function resolveImage(url) {
   if (!url) return ''

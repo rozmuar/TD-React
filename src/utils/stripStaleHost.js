@@ -7,7 +7,9 @@
 // src/ssr/fetchPageData.js (SSR) — раньше SSR использовал отдельные axios-
 // инстансы без этой обработки, из-за чего в серверно отрисованном HTML
 // оставались "сырые" ссылки на topdisc.ru.
-const STALE_HOST_RE = /^https?:\/\/(?:back\.)?topdisc\.ru(\/.*)?$/i
+import { BACKEND_ORIGIN } from '../config/backend'
+
+const STALE_HOST_RE =/^https?:\/\/(?:back\.)?topdisc\.ru(\/.*)?$/i
 
 export function stripStaleHost(value) {
   if (typeof value === 'string') {
@@ -16,7 +18,7 @@ export function stripStaleHost(value) {
     // Без пути (голый "https://topdisc.ru") — это Bitrix-плейсхолдер
     // "картинки/файла нет", а не реальная ссылка.
     if (!m[1]) return ''
-    return `https://back.topdisc.ru${m[1]}`
+    return `${BACKEND_ORIGIN}${m[1]}`
   }
   if (Array.isArray(value)) return value.map(stripStaleHost)
   if (value && typeof value === 'object') {

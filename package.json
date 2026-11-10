@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:newback": "vite --mode newback --port 5174",
     "dev:ssr": "node server.js",
     "build": "vite build && vite build --ssr src/entry-server.jsx",
     "build:client": "vite build",

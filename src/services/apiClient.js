@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { stripStaleHost } from '../utils/stripStaleHost'
+import { BACKEND_ORIGIN, REST_WEBHOOK, CATALOG_IBLOCK_ID, PREMIUM_IBLOCK_ID as PREMIUM_IBLOCK_ID_CFG } from '../config/backend'
 
 // Бэкенд (весь Bitrix — API, rest, uploads) переехал с topdisc.ru на
 // back.topdisc.ru (2026-09-22; сертификат на back.topdisc.ru переиздан
@@ -12,8 +13,8 @@ const _isSSR = typeof window === 'undefined'
 
 // Centralized Bitrix REST API base URL
 const BITRIX_REST_URL = _isSSR
-  ? (import.meta.env.VITE_BITRIX_REST_URL || 'https://back.topdisc.ru/rest/28531/ky7kc0zinte6jb7e')
-  : '/api/rest/28531/ky7kc0zinte6jb7e'
+  ? (import.meta.env.VITE_BITRIX_REST_URL || `${BACKEND_ORIGIN}/rest/${REST_WEBHOOK}`)
+  : `/api/rest/${REST_WEBHOOK}`
 
 // Inject Redux store для 401-interceptor (вызывается из main.jsx, избегает circular imports)
 let _store = null
@@ -25,7 +26,7 @@ export const injectStore = (store) => {
 // SSR (Node.js) — используем абсолютный URL из env
 // Браузер — всегда релятивный /api/mobile/v1 (через nginx proxy), игнорируем VITE_FILTER_API_URL
 const FILTER_API_URL = _isSSR
-  ? (import.meta.env.VITE_FILTER_API_URL || 'https://back.topdisc.ru/mobile/v1')
+  ? (import.meta.env.VITE_FILTER_API_URL || `${BACKEND_ORIGIN}/mobile/v1`)
   : '/api/mobile/v1'
 
 export const bitrixClient = axios.create({
@@ -167,13 +168,13 @@ export const getTradeInData = (opts) =>
 // id раздела на фронте смещён на PREMIUM_ID_OFFSET (см. Category.jsx),
 // а /filter/{iblock}/{id} на бэкенде принимает iblock и id как есть, без
 // своего снятия смещения — поэтому распаковываем его здесь.
-const PREMIUM_IBLOCK_ID = 71
+const PREMIUM_IBLOCK_ID = PREMIUM_IBLOCK_ID_CFG
 const PREMIUM_ID_OFFSET = 10000000
 
 export const getFilters = (categoryId, opts) => {
   const id = Number(categoryId)
   const isPremium = id >= PREMIUM_ID_OFFSET
-  const iblock = isPremium ? PREMIUM_IBLOCK_ID : 4
+  const iblock = isPremium ? PREMIUM_IBLOCK_ID : CATALOG_IBLOCK_ID
   const sectionId = isPremium ? id - PREMIUM_ID_OFFSET : id
   return filterClient.get(`/filter/${iblock}/${sectionId}`, opts)
 }
