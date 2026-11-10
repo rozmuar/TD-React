@@ -70,7 +70,10 @@ async function createServer() {
   // подпись проверяет сам Bitrix на back.topdisc.ru.
   const TBANK_CALLBACK_PATH = '/personal/order/success.php'
   const TBANK_NOTIFICATION_PATHS = [TBANK_CALLBACK_PATH, '/personal/order/notification.php']
-  const BITRIX_NOTIFICATION_URL = 'https://back.topdisc.ru/personal/order/notification.php'
+  // Бэк — из env (VITE_BACKEND_ORIGIN, как в src/config/backend.js): на время
+  // сбоя back.topdisc.ru фронт может смотреть на другой бэк (cw325546.tw1.ru).
+  const BACKEND_ORIGIN = (process.env.VITE_BACKEND_ORIGIN || 'https://back.topdisc.ru').replace(/\/+$/, '')
+  const BITRIX_NOTIFICATION_URL = `${BACKEND_ORIGIN}/personal/order/notification.php`
 
   async function resolveFindByCode(req, res) {
     const params = new URLSearchParams(req.query)
