@@ -8,6 +8,7 @@
     "dev:newback": "vite --mode newback --port 5174",
     "dev:ssr": "node server.js",
     "build": "vite build && vite build --ssr src/entry-server.jsx",
+    "build:newback": "vite build --mode newback && vite build --mode newback --ssr src/entry-server.jsx",
     "build:client": "vite build",
     "build:server": "vite build --ssr src/entry-server.jsx",
     "build:prerender": "npm run build:client && node prerender.js",
