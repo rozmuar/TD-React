@@ -22,8 +22,13 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 IP="$(ip -4 route get 1.1.1.1 | awk '{for(i=1;i<NF;i++) if($i=="src") print $(i+1)}')"
 echo "== IP сервера: $IP"
 
+RAM_MB="$(awk '/MemTotal/ {print int($2/1024)}' /proc/meminfo)"
+echo "== RAM: ${RAM_MB} МБ"
+
 echo "== Пакеты"
 export DEBIAN_FRONTEND=noninteractive
+# У VPS может не быть IPv6, а зеркала резолвятся в IPv6 — apt зависает.
+echo 'Acquire::ForceIPv4 "true";' > /etc/apt/apt.conf.d/99force-ipv4
 apt-get update
 apt-get install -y nginx mysql-server openssl curl unzip cron ufw \
   php-fpm php-cli php-mysql php-gd php-mbstring php-xml php-curl php-zip \
@@ -69,6 +74,8 @@ INI
 done
 
 echo "== PHP-FPM: пул $DOMAIN"
+# ~400 МБ RAM на воркер с запасом под MySQL: 4 ГБ → 10, 16 ГБ → 40.
+MAX_CHILDREN=$(( RAM_MB / 400 )); [ "$MAX_CHILDREN" -lt 8 ] && MAX_CHILDREN=8
 cat > "/etc/php/$PHPV/fpm/pool.d/$DOMAIN.conf" <<POOL
 [$DOMAIN]
 user = www-data
@@ -77,12 +84,11 @@ listen = /run/php/$DOMAIN.sock
 listen.owner = www-data
 listen.group = www-data
 
-; Под 4 ГБ RAM. Больше памяти — можно поднять max_children.
 pm = dynamic
-pm.max_children = 16
+pm.max_children = $MAX_CHILDREN
 pm.start_servers = 4
-pm.min_spare_servers = 2
-pm.max_spare_servers = 6
+pm.min_spare_servers = 4
+pm.max_spare_servers = 10
 pm.max_requests = 500
 
 php_admin_value[memory_limit] = 512M
@@ -97,7 +103,6 @@ systemctl enable --now "php$PHPV-fpm"
 systemctl restart "php$PHPV-fpm"
 
 echo "== MySQL: настройки для Bitrix"
-RAM_MB="$(awk '/MemTotal/ {print int($2/1024)}' /proc/meminfo)"
 POOL_MB=$(( RAM_MB / 4 )); [ "$POOL_MB" -lt 256 ] && POOL_MB=256
 cat > /etc/mysql/mysql.conf.d/zz-bitrix.cnf <<CNF
 [mysqld]
