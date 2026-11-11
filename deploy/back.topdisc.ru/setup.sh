@@ -32,7 +32,7 @@ echo 'Acquire::ForceIPv4 "true";' > /etc/apt/apt.conf.d/99force-ipv4
 apt-get update
 apt-get install -y nginx mysql-server openssl curl unzip cron ufw \
   php-fpm php-cli php-mysql php-gd php-mbstring php-xml php-curl php-zip \
-  php-intl php-bcmath php-soap
+  php-intl php-bcmath php-soap   redis-server php-redis   # Redis нужен api_metods.php (кэш меню и др.)
 # В новых PHP opcache встроен и отдельного пакета нет — не ошибка.
 apt-get install -y php-opcache 2>/dev/null || true
 
@@ -101,6 +101,11 @@ php_admin_value[error_log] = /var/log/php/$DOMAIN.error.log
 POOL
 systemctl enable --now "php$PHPV-fpm"
 systemctl restart "php$PHPV-fpm"
+
+echo "== Redis: только localhost, 512 МБ, LRU"
+sed -i 's/^# *maxmemory .*/maxmemory 512mb/; s/^# *maxmemory-policy .*/maxmemory-policy allkeys-lru/' /etc/redis/redis.conf
+systemctl enable --now redis-server
+systemctl restart redis-server
 
 echo "== MySQL: настройки для Bitrix"
 POOL_MB=$(( RAM_MB / 4 )); [ "$POOL_MB" -lt 256 ] && POOL_MB=256
