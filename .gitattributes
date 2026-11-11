@@ -1,0 +1,4 @@
+# Скрипты и конфиги для Linux-серверов — всегда LF
+*.sh text eol=lf
+deploy/** text eol=lf
+nginx*.conf text eol=lf

@@ -73,7 +73,13 @@ async function createServer() {
   // Бэк — из env (VITE_BACKEND_ORIGIN, как в src/config/backend.js): на время
   // сбоя back.topdisc.ru фронт может смотреть на другой бэк (cw325546.tw1.ru).
   const BACKEND_ORIGIN = (process.env.VITE_BACKEND_ORIGIN || 'https://back.topdisc.ru').replace(/\/+$/, '')
-  const BITRIX_NOTIFICATION_URL = `${BACKEND_ORIGIN}/personal/order/notification.php`
+  // BITRIX_SERVER_ORIGIN — адрес бэка для самого Node, если публичный
+  // VITE_BACKEND_ORIGIN не подходит: бэк на VPS по IP (2026-11-11) доступен
+  // только через nginx фронта, а VITE_BACKEND_ORIGIN=https://topdisc.ru
+  // привёл бы обратно в этот же Node (петля). Там ставим
+  // BITRIX_SERVER_ORIGIN=http://127.0.0.1:8081 (внутренний прокси nginx).
+  const BITRIX_SERVER_ORIGIN = (process.env.BITRIX_SERVER_ORIGIN || BACKEND_ORIGIN).replace(/\/+$/, '')
+  const BITRIX_NOTIFICATION_URL = `${BITRIX_SERVER_ORIGIN}/personal/order/notification.php`
 
   async function resolveFindByCode(req, res) {
     const params = new URLSearchParams(req.query)
