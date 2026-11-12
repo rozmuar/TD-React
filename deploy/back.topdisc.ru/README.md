@@ -136,6 +136,11 @@ ufw status
 
 ## 6. Потом: включить домен back.topdisc.ru
 
+**Сделано 2026-11-12**: DNS указывает на VPS, сертификат Let's Encrypt
+выпущен (certbot 4.0, автопродление — `certbot.timer`, после продления nginx
+перечитывает конфиг хуком `/etc/letsencrypt/renewal-hooks/deploy/reload-nginx.sh`).
+Шаги ниже — для повторной установки.
+
 1. В DNS добавить A-запись `back.topdisc.ru` с IP VPS.
 2. На VPS:
    `certbot certonly --webroot -w /var/www/letsencrypt -d back.topdisc.ru`.
