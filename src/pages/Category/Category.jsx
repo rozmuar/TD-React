@@ -450,6 +450,58 @@ function Category() {
     
     abortControllerRef.current = new AbortController()
     
+    // Параметры запроса товаров: категория, страница, сортировка и выбранные фильтры
+    const buildProductParams = (categoryIdForProducts) => {
+      // Собираем фильтры для API — один параметр filters, внутри которого
+      // ключи и значения склеены через "&"/"=" в одну строку. Бэкенд
+      // (api_metods.php::parseFilters) сам разбирает эту строку вручную
+      // (explode('&')/explode('=')) — это НЕ обычный query-string, который
+      // разбирал бы PHP через $_GET, а собственный парсер, который умеет
+      // копить повторяющиеся ключи в массив. Раньше здесь отправляли
+      // filters как МАССИВ (несколько параметров filters=...&filters=...) —
+      // на уровне PHP $_GET такой повтор без [] схлопывается, выживает
+      // только последний, поэтому при выборе больше одной группы фильтров
+      // все остальные молча терялись. А если в одной группе выбирали
+      // больше одного значения — такую группу вообще не отправляли,
+      // рассчитывая на клиентскую дофильтрацию, которая никогда не
+      // работала (продукты не содержат poля properties, по которому
+      // должна была фильтровать). Здесь же сервер прекрасно умеет
+      // фильтровать по массиву значений для одного свойства — просто
+      // нужно было отправить всё одной строкой.
+      const filterPairs = []
+      for (const [key, values] of Object.entries(appliedFilters)) {
+        if (key.startsWith('_')) continue
+        if (!values || !values.length) continue
+        for (const v of values) {
+          filterPairs.push(`${encodeURIComponent(key)}=${encodeURIComponent(v)}`)
+        }
+      }
+      if (appliedFilters._price?.min !== undefined) {
+        filterPairs.push(`price_min=${encodeURIComponent(appliedFilters._price.min)}`)
+      }
+      if (appliedFilters._price?.max !== undefined) {
+        filterPairs.push(`price_max=${encodeURIComponent(appliedFilters._price.max)}`)
+      }
+      // "В наличии" тоже теперь считает сервер (CATALOG_QUANTITY > 0 в
+      // самом SQL-запросе) — раньше фильтровалось только на уже
+      // полученной странице из 20 товаров, из-за чего результат зависел
+      // от того, что попало именно в неё, а не от всего каталога
+      if (appliedFilters._inStock === true) {
+        filterPairs.push('in_stock=1')
+      }
+      // "Наличие на складе" — одиночный выбор конкретного склада,
+      // фильтрует сервер через виртуальное поле CATALOG_STORE_AMOUNT_<ID>
+      if (appliedFilters._storeId) {
+        filterPairs.push(`store_id=${encodeURIComponent(appliedFilters._storeId)}`)
+      }
+
+      const productParams = { cat: categoryIdForProducts, page: currentPage, prods: 20, sort: sortOrder }
+      if (filterPairs.length > 0) {
+        productParams.filters = filterPairs.join('&')
+      }
+      return productParams
+    }
+
     const fetchData = async () => {
       try {
         setLoading(true)
@@ -472,9 +524,37 @@ function Category() {
         let showProductList = false
         let needProducts = false
         let subcatsData = []
-        
+        const signal = abortControllerRef.current.signal
+
+        // Фильтры и товары зависят только от ID категории — запрашиваем их
+        // параллельно, а не цепочкой подкатегории → фильтр → товары (раньше
+        // каждый ждал предыдущий, +2 сетевых круга на открытие раздела).
+        const loadFilters = () =>
+          getFilters(foundCategory.id, { signal })
+            .then((filtersResponse) => {
+              // Берем только объект filter из ответа
+              setFilters(filtersResponse.data?.filter || null)
+            })
+            .catch((error) => {
+              if (error.name !== 'CanceledError') {
+                console.error('Ошибка загрузки фильтров:', error)
+                setFilters(null)
+              }
+            })
+        const loadProducts = () => getProductList(buildProductParams(foundCategory.id), { signal })
+
+        // На уровне 2+ товары нужны всегда — стартуем их вместе с подкатегориями.
+        // На уровне 1 товары нужны, только если нет подкатегорий, — ждём их.
+        const earlyLoad = level > 0
+        const filtersPromise = earlyLoad ? loadFilters() : null
+        const productsPromise = earlyLoad ? loadProducts() : null
+        // Не даём «висящему» промису товаров уронить страницу необработанной
+        // ошибкой, если подкатегории упадут раньше; ошибка всё равно
+        // поднимется ниже через await.
+        productsPromise?.catch(() => {})
+
         // Всегда запрашиваем дочерние подкатегории текущей категории
-        const childrenResponse = await getCategoryById(foundCategory.id, { signal: abortControllerRef.current.signal })
+        const childrenResponse = await getCategoryById(foundCategory.id, { signal })
         const childrenData = childrenResponse.data.result || []
 
         if (level === 0 && childrenData.length > 0) {
@@ -498,23 +578,6 @@ function Category() {
         setIsProductListPage(showProductList)
         setCategoryReady(true)
 
-        // Загрузка фильтров
-        if (needProducts) {
-          try {
-            const filtersResponse = await getFilters(foundCategory.id, { signal: abortControllerRef.current.signal })
-            // Берем только объект filter из ответа
-            const filtersData = filtersResponse.data?.filter || null
-            setFilters(filtersData)
-          } catch (error) {
-            if (error.name !== 'CanceledError') {
-              console.error('Ошибка загрузки фильтров:', error)
-              setFilters(null)
-            }
-          }
-        } else {
-          setFilters(null)
-        }
-        
         // Берем описание из текущей категории или первой подкатегории
         if (foundCategory.text) {
           setCategoryDescription(foundCategory.text)
@@ -522,61 +585,14 @@ function Category() {
           setCategoryDescription(subcatsData[0].text)
         }
 
-        // Товары запрашиваем ТОЛЬКО если они нужны для отображения
         if (needProducts) {
-          // Собираем фильтры для API — один параметр filters, внутри которого
-          // ключи и значения склеены через "&"/"=" в одну строку. Бэкенд
-          // (api_metods.php::parseFilters) сам разбирает эту строку вручную
-          // (explode('&')/explode('=')) — это НЕ обычный query-string, который
-          // разбирал бы PHP через $_GET, а собственный парсер, который умеет
-          // копить повторяющиеся ключи в массив. Раньше здесь отправляли
-          // filters как МАССИВ (несколько параметров filters=...&filters=...) —
-          // на уровне PHP $_GET такой повтор без [] схлопывается, выживает
-          // только последний, поэтому при выборе больше одной группы фильтров
-          // все остальные молча терялись. А если в одной группе выбирали
-          // больше одного значения — такую группу вообще не отправляли,
-          // рассчитывая на клиентскую дофильтрацию, которая никогда не
-          // работала (продукты не содержат poля properties, по которому
-          // должна была фильтровать). Здесь же сервер прекрасно умеет
-          // фильтровать по массиву значений для одного свойства — просто
-          // нужно было отправить всё одной строкой.
-          const filterPairs = []
-          for (const [key, values] of Object.entries(appliedFilters)) {
-            if (key.startsWith('_')) continue
-            if (!values || !values.length) continue
-            for (const v of values) {
-              filterPairs.push(`${encodeURIComponent(key)}=${encodeURIComponent(v)}`)
-            }
-          }
-          if (appliedFilters._price?.min !== undefined) {
-            filterPairs.push(`price_min=${encodeURIComponent(appliedFilters._price.min)}`)
-          }
-          if (appliedFilters._price?.max !== undefined) {
-            filterPairs.push(`price_max=${encodeURIComponent(appliedFilters._price.max)}`)
-          }
-          // "В наличии" тоже теперь считает сервер (CATALOG_QUANTITY > 0 в
-          // самом SQL-запросе) — раньше фильтровалось только на уже
-          // полученной странице из 20 товаров, из-за чего результат зависел
-          // от того, что попало именно в неё, а не от всего каталога
-          if (appliedFilters._inStock === true) {
-            filterPairs.push('in_stock=1')
-          }
-          // "Наличие на складе" — одиночный выбор конкретного склада,
-          // фильтрует сервер через виртуальное поле CATALOG_STORE_AMOUNT_<ID>
-          if (appliedFilters._storeId) {
-            filterPairs.push(`store_id=${encodeURIComponent(appliedFilters._storeId)}`)
-          }
+          // Фильтры и товары — параллельно (на уровне 2+ они уже запущены
+          // вместе с подкатегориями выше)
+          const [, productsResponse] = await Promise.all([
+            filtersPromise || loadFilters(),
+            productsPromise || loadProducts(),
+          ])
 
-          const productParams = { cat: foundCategory.id, page: currentPage, prods: 20, sort: sortOrder }
-          if (filterPairs.length > 0) {
-            productParams.filters = filterPairs.join('&')
-          }
-
-          const productsResponse = await getProductList(
-            productParams,
-            { signal: abortControllerRef.current.signal }
-          )
-          
           if (productsResponse.data.result?.data && Array.isArray(productsResponse.data.result.data)) {
             setProducts(productsResponse.data.result.data)
             if (productsResponse.data.result.pagination) {
@@ -587,6 +603,8 @@ function Category() {
             setProducts([])
             setTotalPages(1)
           }
+        } else {
+          setFilters(null)
         }
 
       } catch (error) {
