@@ -947,7 +947,7 @@ function Category() {
         </>
       ) : (
         /* УРОВЕНЬ 2: СПИСОК ТОВАРОВ С ФИЛЬТРАМИ */
-        <div className="catalog">
+        <div className="catalog" data-any-category-id={mainCategory.id}>
           <div className="container">
             <h1>{decodeHtml(mainCategory.name)}</h1>
             <div className="catalog__row">

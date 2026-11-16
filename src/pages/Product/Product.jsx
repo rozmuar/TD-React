@@ -405,7 +405,8 @@ function ProductInner() {
           </div>
 
           {/* ИНФОРМАЦИЯ О ТОВАРЕ */}
-          <div className="product">
+          {/* data-any-offer-id — трекинг Diginetica/AnyQuery (offer_id = ID товара в фиде) */}
+          <div className="product" data-any-offer-id={product.id}>
             <header className="product__header">
               <div className="product__row-badge">
                 {product.badge && (

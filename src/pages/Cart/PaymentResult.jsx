@@ -58,7 +58,7 @@ function PaymentResult() {
 
       <div className="category-page">
         <div className="container">
-          <div className="order-success">
+          <div className="order-success" data-any-order-id={order?.id} data-any-total={order ? Number(order.price) : undefined}>
 
             {loading ? (
               <div className="order-success__hero">

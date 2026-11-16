@@ -147,7 +147,7 @@ function Cart() {
               {items.map((item) => {
                 const isInFav = favoriteItems.some((f) => f.id === item.id)
                 return (
-                  <div className="cart__item" data-offer-id={item.id} key={item.id}>
+                  <div className="cart__item" data-offer-id={item.id} data-any-offer-id={item.id} data-any-quantity={item.quantity} data-any-price={item.price} key={item.id}>
                     <label className="cart__item-checkbox">
                       <input
                         type="checkbox"
@@ -235,7 +235,7 @@ function Cart() {
 
               <div className="cart__summary-divider" />
 
-              <div className="cart__summary-total">
+              <div className="cart__summary-total" data-any-total={selectedAmount}>
                 <span>Итого:</span>
                 <strong>{fmt(selectedAmount)} ₽</strong>
               </div>

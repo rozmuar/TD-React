@@ -45,7 +45,7 @@ function OrderSuccess() {
 
       <div className="category-page">
         <div className="container">
-          <div className="order-success">
+          <div className="order-success" data-any-order-id={orderNumber} data-any-total={Number(totalAmount)}>
 
             <div className="order-success__hero">
               <div className="order-success__check">

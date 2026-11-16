@@ -1265,7 +1265,7 @@ function Checkout() {
 
                 <div className="cart__summary-divider" />
 
-                <div className="cart__summary-total">
+                <div className="cart__summary-total" data-any-total={totalPrice}>
                   <span>Итого:</span>
                   <strong>{fmt(totalPrice)} ₽</strong>
                 </div>
