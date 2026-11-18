@@ -552,6 +552,19 @@ a:hover {
     line-height: 1.5;
 }
 
+/* Нативный крестик type="search" (Chrome/Safari/Edge) — дублирует кнопку
+   очистки виджета Diginetica (.digi-search-form__clear) */
+.header__search-input::-webkit-search-cancel-button,
+.header__search-input::-webkit-search-decoration {
+    -webkit-appearance: none;
+    appearance: none;
+    display: none;
+}
+
+.header__search-input::-ms-clear {
+    display: none;
+}
+
 .header__search-input::placeholder {
     color: #D1D1D1;
 }
